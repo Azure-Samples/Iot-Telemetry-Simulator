@@ -1,0 +1,14 @@
+﻿namespace IotTelemetrySimulator
+{
+    public static class Constants
+    {
+        public const string AppVersion = "1.0";
+        public const string TimeValueName = "Time";
+        public const string LocalTimeValueName = "LocalTime";
+        public const string EpochValueName = "Epoch";
+        public const string TicksValueName = "Ticks";
+        public const string DeviceIdValueName = "DeviceId";
+        public const string GuidValueName = "Guid";
+        public const string MachineNameValueName = "MachineName";
+    }
+}
