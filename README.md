@@ -4,7 +4,7 @@ IoT device simulator to test Azure IoT Hub ingest at scale. The implementation i
 
 ## Quick start
 
-The quickest way to generate telemetry is using docker, using the following command:
+The quickest way to generate telemetry is using docker with the following command:
 
 ```cmd
 docker run -it -e "IotHubConnectionString=HostName=your-iothub-name.azure-devices.net;SharedAccessKeyName=device;SharedAccessKey=your-iothub-key" fbeltrao/azureiot-telemetrysimulator
@@ -16,7 +16,9 @@ docker run -it -e "IotHubConnectionString=HostName=your-iothub-name.azure-device
 docker run -it -e "IotHubConnectionString=HostName=your-iothub-name.azure-devices.net;SharedAccessKeyName=device;SharedAccessKey=your-iothub-key" -e DeviceCount=1000 fbeltrao/azureiot-simulatordeviceprovisioning
 ```
 
-## Input parameters
+## Simulator input parameters
+
+The amount of devices, their names and telemetry generated can be customized using parameter. The list below contains the supported configuration parameters:
 
 |Name|Description|
 |-|-|
@@ -33,7 +35,7 @@ docker run -it -e "IotHubConnectionString=HostName=your-iothub-name.azure-device
 
 The simulator is able to create user customizable telemetry with dynamic variables (random, counter, time, unique identifier, value range).
 
-To generate a custom telemetry it is required to set the template and, optionally, the variables.
+To generate a custom telemetry it is required to set the template and, optionally, variables.
 
 The **template** defines how the telemetry looks like, having placeholders for variables.
 Variables are declared in the telemetry as `$.VariableName`.
@@ -43,10 +45,11 @@ Variables are declared in the telemetry as `$.VariableName`.
 ### Built-in variables
 
 The following variables are provided out of the box:
+
 |Name|Description|
 |-|-|
 |DeviceId|Outputs the device identifier|
-|Guid|A unique identifier value
+|Guid|A unique identifier value|
 |Time|Outputs the utc time in which the telemetry was generated in ISO 8601 format|
 |LocalTime|Outputs the local time in which the telemetry was generated in ISO 8601 format|
 |Ticks|Outputs the ticks in which the telemetry was generated|
@@ -56,6 +59,7 @@ The following variables are provided out of the box:
 ### Customizable variables
 
 Customizable variables can be created with the following properties:
+
 |Name|Description|
 |-|-|
 |name|Name of the property. Defines what will be replaced in the template telemetry $.Name|
@@ -65,7 +69,7 @@ Customizable variables can be created with the following properties:
 |max|The maximum value generated|
 |values|Defines an array of possible values. Example ["on", "off"]|
 
-### Example 1: Telemetry with temperature between 23 and 25 and a counter starting from 100
+#### Example 1: Telemetry with temperature between 23 and 25 and a counter starting from 100
 
 Template:
 
@@ -93,7 +97,7 @@ Running with docker:
 docker run -it -e "IotHubConnectionString=HostName=your-iothub-name.azure-devices.net;SharedAccessKeyName=device;SharedAccessKey=your-iothub-key" -e Template="{ \"deviceId\": \"$.DeviceId\", \"temp\": $.Temp, \"Ticks\": $.Ticks, \"Counter\": $.Counter, \"time\": \"$.Time\" }" -e Variables="[{name: \"Temp\", \"random\": true, \"max\": 25, \"min\": 23}, {\"name\":\"Counter\", \"min\":100} ]" fbeltrao/azureiot-telemetrysimulator
 ```
 
-### Example 2: Adding the engine status ("on" or "off") to the telemetry
+#### Example 2: Adding the engine status ("on" or "off") to the telemetry
 
 Template:
 
@@ -122,7 +126,7 @@ docker run -it -e "IotHubConnectionString=HostName=your-iothub-name.azure-device
 
 ## Generating high volume of telemetry
 
-In order to generate a constants high volume of messages a single computer might not be enough. Azure has container instances which allow the execution of containers with micro billing. This repository has a PowerShell script that will create azure container instances in your subscription. Requirements are having [az cli installed](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest).
+In order to generate a constant high volume of messages a single computer might not be enough. Azure has container instances which allow the execution of containers with micro billing. This repository has a PowerShell script that creates azure container instances in your subscription. Requirements are having [az cli installed](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest).
 
 To start the simulator in a single container instance:
 
@@ -130,7 +134,7 @@ To start the simulator in a single container instance:
 .\SimulatorCloudRunner.ps1
 ```
 
-You will be asked to enter the Azure IoT Hub Connection string. After that a resource group and container instance will be created.
+You will be asked to enter the Azure IoT Hub Connection string. After that, a resource group and one or more container instances will be created.
 
 The cloud runner can be customized with the following parameters (as `-ParameterName ParameterValue`):
 
