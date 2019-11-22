@@ -2,6 +2,6 @@
 {
     public interface IDeviceSimulatorFactory
     {
-        SimulatedDevice Create(int deviceNumber, RunnerConfiguration config);
+        SimulatedDevice Create(string deviceId, RunnerConfiguration config);
     }
 }

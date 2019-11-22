@@ -27,7 +27,7 @@ namespace IotTelemetrySimulator
             this.stringBuilderPool = new DefaultObjectPool<StringBuilder>(new DefaultPooledObjectPolicy<StringBuilder>(), 100);
         }
 
-        public string CreateTelemetry(Dictionary<string, object> values)
+        public string Create(Dictionary<string, object> values)
         {
             var builder = stringBuilderPool.Get();
             try
