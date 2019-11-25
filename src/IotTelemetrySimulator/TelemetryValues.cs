@@ -16,7 +16,7 @@ namespace IotTelemetrySimulator
             machineName = Environment.MachineName;
         }
 
-        public Dictionary<string, object> NextPropertyValues(Dictionary<string, object> previous)
+        public Dictionary<string, object> NextValues(Dictionary<string, object> previous)
         {
             var next = new Dictionary<string, object>();
             var now = DateTime.Now;            

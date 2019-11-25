@@ -7,6 +7,7 @@ param (
     [int]$MessageCount = 100,
     [int]$Interval = 1000,
     [string]$Template = '{ \"deviceId\": \"$.DeviceId\", \"temp\": $.Temp, \"Ticks\": $.Ticks, \"Counter\": $.Counter, \"time\": \"$.Time\", \"engine\": \"$.Engine\", \"source\": \"$.MachineName\" }',
+    [string]$Header = '',
     [string]$Variables = '[{name: \"Temp\", random: true, max: 25, min: 23}, {name:\"Counter\", min:100}, {name:\"Engine\", values: [\"on\", \"off\"]}]',
     [Parameter(Mandatory=$true)][string]$IotHubConnectionString,
     [string]$Image = "fbeltrao/azureiot-telemetrysimulator",
@@ -22,7 +23,7 @@ param (
  {
     $i++
     $containerName = "iotsimulator-" + $i.ToString()
-    az container create -g $ResourceGroup --no-wait --location $Location --restart-policy Never --cpu $Cpu --name $containerName --image $Image --environment-variables IotHubConnectionString=$IotHubConnectionString Template=$Template Variables=$Variables DeviceCount=$devicesPerContainer MessageCount=$MessageCount DeviceIndex=$deviceIndex Interval=$Interval
+    az container create -g $ResourceGroup --no-wait --location $Location --restart-policy Never --cpu $Cpu --name $containerName --image $Image --environment-variables IotHubConnectionString=$IotHubConnectionString Template=$Template Variables=$Variables DeviceCount=$devicesPerContainer MessageCount=$MessageCount DeviceIndex=$deviceIndex Interval=$Interval Header=$Header
 
     $deviceIndex = $deviceIndex + $devicesPerContainer
  }

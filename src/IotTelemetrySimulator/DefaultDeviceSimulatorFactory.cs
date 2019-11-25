@@ -4,9 +4,8 @@ namespace IotTelemetrySimulator
 {
     public class DefaultDeviceSimulatorFactory : IDeviceSimulatorFactory
     {
-        public SimulatedDevice Create(int deviceNumber, RunnerConfiguration config)
+        public SimulatedDevice Create(string deviceId, RunnerConfiguration config)
         {
-            var deviceId = $"{config.DevicePrefix}{deviceNumber.ToString("000000")}";
             var deviceClient = DeviceClient.CreateFromConnectionString(
                 config.IotHubConnectionString,
                 deviceId,

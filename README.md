@@ -23,12 +23,14 @@ The amount of devices, their names and telemetry generated can be customized usi
 |Name|Description|
 |-|-|
 |IotHubConnectionString|Iot Hub connection string. "Device" our "Iot Hub owner" scopes are good. Example: HostName=your-iothub-name.azure-devices.net;SharedAccessKeyName=device;SharedAccessKey=your-iothub-key|
+|DeviceList|comma separated list of device identifiers (default = ""). Use it to generate telemetry for specific devices instead of numeric generated identifiers. If the parameter has a value the following parameters are ignored: DevicePrefix, DeviceIndex and DeviceCount are ignored|
 |DevicePrefix|device identifier prefix (default = "sim")|
 |DeviceIndex|starting device number (default = 1)|
 |DeviceCount|amount of simulated devices (default = 1)|
 |MessageCount|amount of messages to send by device (default = 10). Set to zero if you wish to send messages until cancelled|
 |Interval|interval between each message in milliseconds (default = 1000)|
-|Template|telemetry template (see telemetry template)|
+|Template|telemetry payload template (see telemetry template)|
+|Header|telemetry header template (see telemetry template)|
 |Variables|telemetry variables (see telemetry template)|
 
 ## Telemetry template
@@ -38,7 +40,7 @@ The simulator is able to create user customizable telemetry with dynamic variabl
 To generate a custom telemetry it is required to set the template and, optionally, variables.
 
 The **template** defines how the telemetry looks like, having placeholders for variables.
-Variables are declared in the telemetry as `$.VariableName`.
+Variables are declared in the telemetry as `$.VariableName`. The optional **header** defines properties that will be transmitted as message properties.
 
 **Variables** are declared defining how values in the template will be resolved.
 
@@ -146,7 +148,8 @@ The cloud runner can be customized with the following parameters (as `-Parameter
 |ContainerCount|Total amount of container instances to create. The total DeviceCount will be divided among all instances (Default = 1)|
 |MessageCount|Total amount of messages to send per device. 0 means no limit, **causing the container to never end. It is your job to stop and delete it!** (Default = 100)|
 |Interval|Interval in which each device will send messages in milliseconds (Default = 1000)|
-|Template|Telemetry template to be used<br />(Default = '{ \"deviceId\": \"$.DeviceId\", \"temp\": $.Temp, \"Ticks\": $.Ticks, \"Counter\": $.Counter, \"time\": \"$.Time\", \"engine\": \"$.Engine\", \"source\": \"$.MachineName\" }')|
+|Template|Telemetry payload template to be used<br />(Default = '{ \"deviceId\": \"$.DeviceId\", \"temp\": $.Temp, \"Ticks\": $.Ticks, \"Counter\": $.Counter, \"time\": \"$.Time\", \"engine\": \"$.Engine\", \"source\": \"$.MachineName\" }')|
+|Header|Header properties template to be used<br />(Default = '')|
 |Variables|Variables used to create the telemetry<br />(Default = '[{name: \"Temp\", random: true, max: 25, min: 23}, {name:\"Counter\", min:100}, {name:\"Engine\", values: [\"on\", \"off\"]}]')|
 |Cpu|Amount of cpus allocated to each container instance (Default = 1.0)|
 |IotHubConnectionString|Azure Iot Hub connection string|

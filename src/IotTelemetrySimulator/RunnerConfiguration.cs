@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 
 namespace IotTelemetrySimulator
 {
@@ -11,10 +12,13 @@ namespace IotTelemetrySimulator
         public string DevicePrefix { get; set; } = "sim";
         public int DeviceIndex { get; set; } = 1;
         public int DeviceCount { get; set; } = 1;
+        public IReadOnlyList<string> DeviceList { get; set; }
         public int MessageCount { get; set; } = 10;
         public int Interval { get; set; } = 1_000;
 
         public TelemetryTemplate Template { get; set; }
+
+        public TelemetryTemplate Header { get; set; }
 
         public TelemetryValues Variables { get; set; }
 
@@ -34,7 +38,7 @@ namespace IotTelemetrySimulator
             config.IotHubConnectionString = configuration.GetValue<string>(nameof(IotHubConnectionString));
             config.DevicePrefix = configuration.GetValue(nameof(DevicePrefix), config.DevicePrefix);
             config.DeviceIndex = configuration.GetValue(nameof(DeviceIndex), config.DeviceIndex);
-            config.DeviceCount = configuration.GetValue(nameof(DeviceCount), config.DeviceCount);
+            config.DeviceCount = configuration.GetValue(nameof(DeviceCount), config.DeviceCount);            
             config.MessageCount = configuration.GetValue(nameof(MessageCount), config.MessageCount);
             config.Interval = configuration.GetValue(nameof(Interval), config.Interval);
 
@@ -47,6 +51,23 @@ namespace IotTelemetrySimulator
             {
                 logger.LogWarning("Using default telemetry template");
                 config.Template = new TelemetryTemplate();
+            }
+
+            var rawDeviceList = configuration.GetValue<string>(nameof(DeviceList));
+            if (!string.IsNullOrWhiteSpace(rawDeviceList))
+            {
+                config.DeviceList = rawDeviceList.Split(new[] { ';', ',' }, StringSplitOptions.RemoveEmptyEntries);
+                if (config.DeviceList.Count > 0)
+                {
+                    config.DeviceCount = config.DeviceList.Count;
+                    config.DevicePrefix = string.Empty;
+                }
+            }            
+
+            var rawHeaderTemplate = configuration.GetValue<string>(nameof(Header));
+            if (!string.IsNullOrWhiteSpace(rawHeaderTemplate))
+            {
+                config.Header = new TelemetryTemplate(rawHeaderTemplate);
             }
 
             var rawValues = configuration.GetValue<string>(nameof(Variables));

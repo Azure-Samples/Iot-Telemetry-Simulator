@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -35,11 +36,22 @@ namespace IotTelemetrySimulator
         public Task StartAsync(CancellationToken cancellationToken)
         {                        
             devices = new List<SimulatedDevice>(config.DeviceCount);
-            var deviceNumber = config.DeviceIndex;
-            var deviceNumberEnd = deviceNumber + config.DeviceCount;
-            for (; deviceNumber < deviceNumberEnd; deviceNumber++)
+
+            IEnumerable<string> deviceIdentifiers = null;
+
+            if ((config.DeviceList?.Count ?? 0) > 0)
+            {
+                deviceIdentifiers = config.DeviceList;
+            }
+            else
+            {
+                deviceIdentifiers = Enumerable.Range(config.DeviceIndex, config.DeviceCount)
+                                              .Select(n => string.Concat(config.DevicePrefix, n.ToString("000000", CultureInfo.InvariantCulture)));
+            }
+
+            foreach (var deviceId in deviceIdentifiers)
             {               
-                devices.Add(deviceSimulatorFactory.Create(deviceNumber, config));
+                devices.Add(deviceSimulatorFactory.Create(deviceId, config));
             }
 
             runner = Task.Run(RunnerAsync);
@@ -53,17 +65,19 @@ namespace IotTelemetrySimulator
             var timer = Stopwatch.StartNew();
 
             try
-            {                
+            {   
                 Console.WriteLine("========================================================================================================================");
                 Console.WriteLine();
                 Console.WriteLine($"Starting simulator v{Constants.AppVersion}");
                 Console.WriteLine();
-                Console.WriteLine("Devices = " + config.DeviceCount);
-                Console.WriteLine($"Device prefix = {config.DevicePrefix} ({devices[0].DeviceID}-{devices.Last().DeviceID})");
+                Console.WriteLine("Device count = " + config.DeviceCount);
+                Console.WriteLine($"Device prefix = {config.DevicePrefix}");
+                Console.WriteLine($"Device 0-last = ({devices[0].DeviceID}-{devices.Last().DeviceID})");
                 Console.WriteLine("Device index = " + config.DeviceIndex);
                 Console.WriteLine("Message count = " + config.MessageCount);
                 Console.WriteLine("Interval = " + config.Interval + "ms");
                 Console.WriteLine("Template = " + config.Template.GetTemplateDefinition());
+                Console.WriteLine("Header = " + config.Header?.GetTemplateDefinition());
                 Console.WriteLine("========================================================================================================================");
 
 

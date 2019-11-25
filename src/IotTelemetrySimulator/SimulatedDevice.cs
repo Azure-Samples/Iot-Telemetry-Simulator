@@ -1,5 +1,7 @@
 ﻿using Microsoft.Azure.Devices.Client;
 using Microsoft.Azure.Devices.Client.Exceptions;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -17,7 +19,7 @@ namespace IotTelemetrySimulator
         private string deviceId;
         private RunnerConfiguration config;
         private DeviceClient deviceClient;
-        private Dictionary<string, object> telemetryPropertyValues;
+        private Dictionary<string, object> variableValues;
 
         public string DeviceID => deviceId;
 
@@ -85,17 +87,35 @@ namespace IotTelemetrySimulator
 
         public virtual Message CreateMessage()
         {
-            telemetryPropertyValues = config.Variables.NextPropertyValues(telemetryPropertyValues);
-            telemetryPropertyValues[Constants.DeviceIdValueName] = deviceId;
+            variableValues = config.Variables.NextValues(variableValues);
+            variableValues[Constants.DeviceIdValueName] = deviceId;
 
-            var telemetry = config.Template.CreateTelemetry(telemetryPropertyValues);
-
-            var messageBytes = Encoding.UTF8.GetBytes(telemetry);
+            var data = config.Template.Create(variableValues);
+            var messageBytes = Encoding.UTF8.GetBytes(data);
             var msg = new Message(messageBytes)
             {
                 ContentEncoding = Utf8Encoding,
                 ContentType = ApplicationJsonContentType,
             };
+
+
+            if (config.Header != null)
+            {
+                var headerJson = config.Header.Create(variableValues);
+                if (!string.IsNullOrWhiteSpace(headerJson))
+                {
+                    var headerValues = JsonConvert.DeserializeObject<Dictionary<string, string>>(headerJson);
+                    foreach (var kv in headerValues)
+                    {
+                        if (kv.Value != null)
+                        {
+                            msg.Properties[kv.Key] = kv.Value;
+                        }
+                    }
+                }                
+            }
+
+
             return msg;
         }
     }
