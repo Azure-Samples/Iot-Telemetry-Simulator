@@ -1,0 +1,70 @@
+
+{{- range $simulatorIndex, $e := until (.Values.replicaCount | int) -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ printf "%s-sim-%d" (include "iot-telemetry-simulator.fullname" $) $simulatorIndex }}
+  labels:        
+    helm.sh/chart: {{ include "iot-telemetry-simulator.chart" $ }}
+    app.kubernetes.io/name: {{ default $.Chart.Name $.Values.nameOverride | trunc 63 | trimSuffix "-" }}    
+    app.kubernetes.io/instance: {{ $.Release.Name }}
+    {{- if $.Chart.AppVersion }}
+    app.kubernetes.io/version: {{ $.Chart.AppVersion | quote }}
+    {{- end }}
+    app.kubernetes.io/managed-by: {{ $.Release.Service }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ printf "%s-%d" (default $.Chart.Name $.Values.nameOverride | trunc 63 | trimSuffix "-") $simulatorIndex }}
+      app.kubernetes.io/instance: {{ $.Release.Name }}
+  template:
+    metadata:
+      labels:        
+        app.kubernetes.io/name: {{ printf "%s-%d" (default $.Chart.Name $.Values.nameOverride | trunc 63 | trimSuffix "-") $simulatorIndex }}
+        app.kubernetes.io/instance: {{ $.Release.Name }}
+    spec:
+    {{- with $.Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+      containers:
+        - name: {{ $.Chart.Name }}
+          image: "{{ $.Values.image.repository }}:{{ $.Values.image.tag }}"
+          imagePullPolicy: {{ $.Values.image.pullPolicy }}
+          env:
+          - name: IotHubConnectionString
+            value: {{ required "IoT Hub connection string is required" $.Values.iotHubConnectionString | quote }}
+          - name: DevicePrefix
+            value: {{ $.Values.devicePrefix | quote }}
+          - name: DeviceIndex
+            value: {{ add $.Values.deviceIndex (mul $simulatorIndex (div $.Values.deviceCount $.Values.replicaCount)) | quote }}
+          - name: DeviceCount
+            value: {{ div $.Values.deviceCount $.Values.replicaCount | quote}}
+          - name: MessageCount
+            value: {{ $.Values.messageCount | quote }}
+          - name: Interval
+            value: {{ $.Values.interval | quote }}
+          - name: Template
+            value: {{ $.Values.template | quote }}
+          - name: Header
+            value: {{ $.Values.header | quote }}
+          - name: Variables
+            value: {{ $.Values.variables | quote }}
+
+          resources:
+            {{- toYaml $.Values.resources | nindent 12 }}
+      {{- with $.Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+    {{- with $.Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+    {{- with $.Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+    {{- end }}
+---
+{{- end -}}
