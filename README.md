@@ -128,7 +128,11 @@ docker run -it -e "IotHubConnectionString=HostName=your-iothub-name.azure-device
 
 ## Generating high volume of telemetry
 
-In order to generate a constant high volume of messages a single computer might not be enough. Azure has container instances which allow the execution of containers with micro billing. This repository has a PowerShell script that creates azure container instances in your subscription. Requirements are having [az cli installed](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest).
+In order to generate a constant high volume of messages a single computer might not be enough. This section describes two way to run the simulator to ingest a high volume of messages
+
+### Azure Container Instance
+
+Azure has container instances which allow the execution of containers with micro billing. This repository has a PowerShell script that creates azure container instances in your subscription. Requirements are having [az cli installed](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest).
 
 To start the simulator in a single container instance:
 
@@ -153,3 +157,11 @@ The cloud runner can be customized with the following parameters (as `-Parameter
 |Variables|Variables used to create the telemetry<br />(Default = '[{name: \"Temp\", random: true, max: 25, min: 23}, {name:\"Counter\", min:100}, {name:\"Engine\", values: [\"on\", \"off\"]}]')|
 |Cpu|Amount of cpus allocated to each container instance (Default = 1.0)|
 |IotHubConnectionString|Azure Iot Hub connection string|
+
+### Kubernetes
+
+This repository also contains a helm chart to deploy the simulator to a Kubernetes cluster. An example release with helm for 5000 devices in 5 pods:
+
+```bash
+helm install sims iot-telemetry-simulator\. --namespace iotsimulator --set iotHubConnectionString="HostName=xxxx.azure-devices.net;SharedAccessKeyName=iothubowner;SharedAccessKey=xxxxxxx" --set replicaCount=5 --set deviceCount=5000
+```
