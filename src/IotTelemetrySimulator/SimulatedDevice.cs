@@ -4,6 +4,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -15,6 +16,9 @@ namespace IotTelemetrySimulator
         const string ApplicationJsonContentType = "application/json";
         const string Utf8Encoding = "utf8";
         const int WaitTimeOnIotHubError = 5_000;
+        const string ActivityIdPropertyName = "Diagnostic-Id";
+
+
 
         private string deviceId;
         private RunnerConfiguration config;
@@ -40,12 +44,12 @@ namespace IotTelemetrySimulator
             try
             {
                 await deviceClient.OpenAsync();
-                stats.IncrementDeviceConnected();                
+                stats.IncrementDeviceConnected();
 
                 for (var i=0; !cancellationToken.IsCancellationRequested && (config.MessageCount <= 0 || i < config.MessageCount); i++)
                 {
                     await Task.Delay(config.Interval, cancellationToken);
-                    await SendMessageAsync(stats, cancellationToken);                    
+                    await SendMessageAsync(stats, cancellationToken);
                 }
 
                 stats.IncrementCompletedDevice();
@@ -80,23 +84,34 @@ namespace IotTelemetrySimulator
                 catch (IotHubException)
                 {
                     stats.IncrementSendTelemetryErrors();
-                    await Task.Delay(WaitTimeOnIotHubError);                    
+                    await Task.Delay(WaitTimeOnIotHubError);
                 }
             }
         }
 
         public virtual Message CreateMessage()
         {
-            variableValues = config.Variables.NextValues(variableValues);
-            variableValues[Constants.DeviceIdValueName] = deviceId;
+            byte[] messageBytes = config.FixPayload;
+            if (messageBytes == null)
+            {
+                variableValues = config.Variables.NextValues(variableValues);
+                variableValues[Constants.DeviceIdValueName] = deviceId;
 
-            var data = config.Template.Create(variableValues);
-            var messageBytes = Encoding.UTF8.GetBytes(data);
+                var data = config.Template.Create(variableValues);
+                messageBytes = Encoding.UTF8.GetBytes(data);
+            }
+     
             var msg = new Message(messageBytes)
             {
-                ContentEncoding = Utf8Encoding,
-                ContentType = ApplicationJsonContentType,
+                CorrelationId = Guid.NewGuid().ToString(),
             };
+
+            if (config.FixPayload == null)
+            {
+                msg.ContentEncoding = Utf8Encoding;
+                msg.ContentType = ApplicationJsonContentType;
+
+            }
 
 
             if (config.Header != null)
@@ -112,9 +127,12 @@ namespace IotTelemetrySimulator
                             msg.Properties[kv.Key] = kv.Value;
                         }
                     }
-                }                
+                }
             }
 
+            // https://docs.microsoft.com/en-us/azure/iot-hub/iot-hub-distributed-tracing#workaround-for-third-party-clients
+            // https://github.com/Azure/azure-event-hubs-dotnet/blob/8aae6b6ec1af44de69326288854f5811985db539/src/Microsoft.Azure.EventHubs/EventHubsDiagnosticSource.cs
+            //msg.Properties[ActivityIdPropertyName] = ActivitySpanId.CreateRandom().ToHexString();
 
             return msg;
         }

@@ -30,6 +30,8 @@ The amount of devices, their names and telemetry generated can be customized usi
 |MessageCount|amount of messages to send by device (default = 10). Set to zero if you wish to send messages until cancelled|
 |Interval|interval between each message in milliseconds (default = 1000)|
 |Template|telemetry payload template (see telemetry template)|
+|FixPayload|fix telemetry payload in base64 format. Use this setting if the content of the message does not need to change|
+|FixPayloadSize|fix telemetry payload size (in bytes). Use this setting if the content of the message does not need to change (will be an array filled with zeros)|
 |Header|telemetry header template (see telemetry template)|
 |Variables|telemetry variables (see telemetry template)|
 

@@ -11,6 +11,8 @@ devicePrefix: "sim"
 deviceIndex: 1
 messageCount: 0
 interval: 1000
+fixPayload: ''
+fixPayloadSize: 0
 template: "{ \"deviceId\": \"$.DeviceId\", \"temp\": $.Temp, \"Ticks\": $.Ticks, \"Counter\": $.Counter, \"time\": \"$.Time\", \"engine\": \"$.Engine\", \"source\": \"$.MachineName\" }"
 header: ""
 variables: "[{name: \"Temp\", random: true, max: 25, min: 23}, {name:\"Counter\", min:100}, {name:\"Engine\", values: [\"on\", \"off\"]}]"
