@@ -22,6 +22,8 @@ namespace IotTelemetrySimulator
 
         public TelemetryValues Variables { get; set; }
 
+        public byte[] FixPayload { get; set; }
+
         public void EnsureIsValid()
         {
             if (string.IsNullOrEmpty(IotHubConnectionString))
@@ -38,19 +40,33 @@ namespace IotTelemetrySimulator
             config.IotHubConnectionString = configuration.GetValue<string>(nameof(IotHubConnectionString));
             config.DevicePrefix = configuration.GetValue(nameof(DevicePrefix), config.DevicePrefix);
             config.DeviceIndex = configuration.GetValue(nameof(DeviceIndex), config.DeviceIndex);
-            config.DeviceCount = configuration.GetValue(nameof(DeviceCount), config.DeviceCount);            
+            config.DeviceCount = configuration.GetValue(nameof(DeviceCount), config.DeviceCount);
             config.MessageCount = configuration.GetValue(nameof(MessageCount), config.MessageCount);
             config.Interval = configuration.GetValue(nameof(Interval), config.Interval);
 
-            var rawTelemetryTemplate = configuration.GetValue<string>(nameof(Template));
-            if (!string.IsNullOrWhiteSpace(rawTelemetryTemplate))
+            var rawFixTelemetry = configuration.GetValue<string>(nameof(FixPayload));
+            if (rawFixTelemetry != null)
             {
-                config.Template = new TelemetryTemplate(rawTelemetryTemplate);
+                config.FixPayload = Convert.FromBase64String(rawFixTelemetry);
+                logger.LogWarning("Using fix payload telemetry");
+            }
+            else if (int.TryParse(configuration.GetValue<string>("FixPayloadSize"), out var fixPayloadSize) && fixPayloadSize > 0)
+            {
+                config.FixPayload = new byte[fixPayloadSize];
+                logger.LogWarning("Using fix payload telemetry with size {size}", fixPayloadSize);
             }
             else
             {
-                logger.LogWarning("Using default telemetry template");
-                config.Template = new TelemetryTemplate();
+                var rawTelemetryTemplate = configuration.GetValue<string>(nameof(Template));
+                if (!string.IsNullOrWhiteSpace(rawTelemetryTemplate))
+                {
+                    config.Template = new TelemetryTemplate(rawTelemetryTemplate);
+                }
+                else
+                {
+                    logger.LogWarning("Using default telemetry template");
+                    config.Template = new TelemetryTemplate();
+                }
             }
 
             var rawDeviceList = configuration.GetValue<string>(nameof(DeviceList));
@@ -86,7 +102,14 @@ namespace IotTelemetrySimulator
             else
             {
                 logger.LogWarning("No custom telemetry variables found");
-                config.Variables = new TelemetryValues(new TelemetryVariable[0]);
+                config.Variables = new TelemetryValues(new TelemetryVariable[] {
+                    new TelemetryVariable
+                    {
+                        Min = 1,
+                        Name = "Counter",
+                        Step = 1,
+                    }
+                });
             }
 
             return config;

@@ -7,7 +7,7 @@ namespace IotTelemetrySimulator
 {
     public class TelemetryTemplate
     {
-        const string DefaultTemplate = "{\"deviceId\": \"$.DeviceId\", \"time\": $.Time, \"ticks\": $.Ticks}";
+        const string DefaultTemplate = "{\"deviceId\": \"$.DeviceId\", \"time\": \"$.Time\", \"counter\": $.Counter}";
 
         private readonly string template;
         private readonly DefaultObjectPool<StringBuilder> stringBuilderPool;

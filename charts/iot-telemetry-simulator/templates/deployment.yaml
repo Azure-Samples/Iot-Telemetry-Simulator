@@ -51,6 +51,10 @@ spec:
             value: {{ $.Values.header | quote }}
           - name: Variables
             value: {{ $.Values.variables | quote }}
+          - name: FixPayload
+            value: {{ $.Values.fixPayload | quote }}
+          - name: FixPayloadSize
+            value: {{ $.Values.fixPayloadSize | quote }}
 
           resources:
             {{- toYaml $.Values.resources | nindent 12 }}
