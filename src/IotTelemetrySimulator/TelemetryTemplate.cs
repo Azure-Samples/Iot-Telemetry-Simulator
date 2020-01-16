@@ -35,9 +35,12 @@ namespace IotTelemetrySimulator
                 builder.Length = 0;
                 builder.Append(template);
 
-                foreach (var kv in values)
+                if (values != null)
                 {
-                    builder.Replace($"$.{kv.Key}", kv.Value.ToString());
+                    foreach (var kv in values)
+                    {
+                        builder.Replace($"$.{kv.Key}", kv.Value.ToString());
+                    }
                 }
 
                 return builder.ToString();
