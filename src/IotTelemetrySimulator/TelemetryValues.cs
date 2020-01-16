@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace IotTelemetrySimulator
 {
@@ -41,6 +42,10 @@ namespace IotTelemetrySimulator
                         next[val.Name] = random.Next();
                     }
                 }
+                else if (val.CustomLengthString != null)
+                {
+                    next[val.Name] = CreateRandomString(val.CustomLengthString.Value);
+                }
                 else if (val.Values != null && val.Values.Length > 0)
                 {
                     next[val.Name] = val.Values[random.Next(val.Values.Length)];
@@ -65,6 +70,13 @@ namespace IotTelemetrySimulator
             }
 
             return next;
+        }
+
+        public string CreateRandomString(int length)
+        {
+            const string chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+            return new string(Enumerable.Repeat(chars, length)
+              .Select(s => s[random.Next(s.Length)]).ToArray());
         }
     }
 }

@@ -72,6 +72,7 @@ Customizable variables can be created with the following properties:
 |min|For random values defines it's minimum. Otherwise, will be the starting value|
 |max|The maximum value generated|
 |values|Defines an array of possible values. Example ["on", "off"]|
+|customlengthstring|Creates a random string of n bytes. Provide n as parameter|
 
 #### Example 1: Telemetry with temperature between 23 and 25 and a counter starting from 100
 
@@ -84,7 +85,7 @@ Template:
 Variables:
 
 ```json
-[{name: "Temp", "random": true, "max": 25, "min": 23}, {"name":"Counter", "min":100}]
+[{"name": "Temp", "random": true, "max": 25, "min": 23}, {"name":"Counter", "min":100}]
 ```
 
 Output:
@@ -112,7 +113,7 @@ Template:
 Variables:
 
 ```json
-[{name: "Temp", "random": true, "max": 25, "min": 23}, {"name":"Counter", "min":100}, {"name": "Engine", "values": ["on", "off"]}]
+[{"name": "Temp", "random": true, "max": 25, "min": 23}, {"name":"Counter", "min":100}, {"name": "Engine", "values": ["on", "off"]}]
 ```
 
 Output:
