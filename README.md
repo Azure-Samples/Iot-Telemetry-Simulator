@@ -1,3 +1,5 @@
+![Master](https://github.com/fbeltrao/iot-telemetry-simulator/workflows/Master%20test%20and%20push/badge.svg)
+
 # Azure Iot device telemetry simulator
 
 IoT device simulator to test Azure IoT Hub ingest at scale. The implementation is communicating with Azure IoT Hub using multiplexed AMQP connections. A single AMQP connection can handle ~995 devices.
