@@ -29,6 +29,11 @@ namespace IotTelemetrySimulator
             next[Constants.GuidValueName] = Guid.NewGuid().ToString();
             next[Constants.MachineNameValueName] = machineName;
 
+            if (previous != null)
+            {
+                next[Constants.DeviceIdValueName] = previous[Constants.DeviceIdValueName];
+            }
+
             foreach (var val in Variables)
             {
                 if (val.Random)

@@ -10,5 +10,8 @@
         public const string DeviceIdValueName = "DeviceId";
         public const string GuidValueName = "Guid";
         public const string MachineNameValueName = "MachineName";
+
+        public const string TemplateConfigName = "Template";
+        public const string PayloadDistributionConfigName = "PayloadDistribution";
     }
 }

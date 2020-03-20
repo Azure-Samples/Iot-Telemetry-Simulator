@@ -7,7 +7,7 @@ namespace IotTelemetrySimulator
 {
     public class TelemetryTemplate
     {
-        const string DefaultTemplate = "{\"deviceId\": \"$.DeviceId\", \"time\": \"$.Time\", \"counter\": $.Counter}";
+        public const string DefaultTemplate = "{\"deviceId\": \"$.DeviceId\", \"time\": \"$.Time\", \"counter\": $.Counter}";
 
         private readonly string template;
         private readonly DefaultObjectPool<StringBuilder> stringBuilderPool;
@@ -24,7 +24,7 @@ namespace IotTelemetrySimulator
             }
 
             this.template = template;
-            this.stringBuilderPool = new DefaultObjectPool<StringBuilder>(new DefaultPooledObjectPolicy<StringBuilder>(), 100);
+            stringBuilderPool = new DefaultObjectPool<StringBuilder>(new DefaultPooledObjectPolicy<StringBuilder>(), 100);
         }
 
         public string Create(Dictionary<string, object> values)
@@ -53,7 +53,12 @@ namespace IotTelemetrySimulator
 
         internal string GetTemplateDefinition()
         {
-            return this.template;
+            return template;
+        }
+
+        public override string ToString()
+        {
+            return template;
         }
     }
 }

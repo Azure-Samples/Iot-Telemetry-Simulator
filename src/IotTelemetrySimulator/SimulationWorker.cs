@@ -28,9 +28,9 @@ namespace IotTelemetrySimulator
         {
             this.deviceSimulatorFactory = deviceSimulatorFactory;
             this.applicationLifetime = applicationLifetime;
-            this.stopping = new CancellationTokenSource();
-            this.config = RunnerConfiguration.Load(configuration, logger);
-            this.config.EnsureIsValid();
+            stopping = new CancellationTokenSource();
+            config = RunnerConfiguration.Load(configuration, logger);
+            config.EnsureIsValid();
         }
 
         public Task StartAsync(CancellationToken cancellationToken)
@@ -75,15 +75,8 @@ namespace IotTelemetrySimulator
                 Console.WriteLine($"Device 0-last = ({devices[0].DeviceID}-{devices.Last().DeviceID})");
                 Console.WriteLine("Device index = " + config.DeviceIndex);
                 Console.WriteLine("Message count = " + config.MessageCount);
-                Console.WriteLine("Interval = " + config.Interval + "ms");                
-                if (config.FixPayload != null)
-                {
-                    Console.WriteLine("Fix payload = " + config.FixPayload.Length + " bytes");
-                }
-                else if (config.Template != null)
-                {
-                    Console.WriteLine("Template = " + config.Template.GetTemplateDefinition());
-                }
+                Console.WriteLine("Interval = " + config.Interval + "ms");
+                Console.WriteLine("Template = " + config.PayloadGenerator.GetDescription());
                 Console.WriteLine("Header = " + config.Header?.GetTemplateDefinition());
                 Console.WriteLine("========================================================================================================================");
 
