@@ -13,6 +13,8 @@ namespace IotTelemetrySimulator
 
         long messagesSendingStart;
 
+        public long MessagesSent => messagesSent;
+
         public long TotalSendTelemetryErrors => totalSendTelemetryErrors;
 
         public RunnerStats()

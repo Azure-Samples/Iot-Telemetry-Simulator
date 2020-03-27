@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Azure.Devices.Client" Version="1.21.2" />
+    <PackageReference Include="Microsoft.Azure.EventHubs" Version="4.1.0" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="3.0.1" />
     <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="3.0.1" />
     <PackageReference Include="Microsoft.Extensions.ObjectPool" Version="3.0.1" />

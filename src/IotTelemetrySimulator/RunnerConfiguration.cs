@@ -15,6 +15,7 @@ namespace IotTelemetrySimulator
         static Regex templateParser = new Regex(regexExpression, RegexOptions.IgnoreCase | RegexOptions.Singleline);
 
         public string IotHubConnectionString { get; set; }
+        public string EventHubConnectionString { get; set; }
         public string DevicePrefix { get; set; } = "sim";
         public int DeviceIndex { get; set; } = 1;
         public int DeviceCount { get; set; } = 1;
@@ -32,9 +33,9 @@ namespace IotTelemetrySimulator
 
         public void EnsureIsValid()
         {
-            if (string.IsNullOrEmpty(IotHubConnectionString))
-                throw new Exception($"{nameof(IotHubConnectionString)} was not defined");
-
+            if (string.IsNullOrEmpty(IotHubConnectionString) && string.IsNullOrEmpty(EventHubConnectionString))
+                throw new Exception($"{nameof(IotHubConnectionString)} or {nameof(EventHubConnectionString)} was not defined");
+            
             if (Interval <= 0)
                 throw new Exception($"{nameof(Interval)} must be greater than zero");
         }
@@ -44,6 +45,7 @@ namespace IotTelemetrySimulator
         {
             var config = new RunnerConfiguration();
             config.IotHubConnectionString = configuration.GetValue<string>(nameof(IotHubConnectionString));
+            config.EventHubConnectionString = configuration.GetValue<string>(nameof(EventHubConnectionString));
             config.DevicePrefix = configuration.GetValue(nameof(DevicePrefix), config.DevicePrefix);
             config.DeviceIndex = configuration.GetValue(nameof(DeviceIndex), config.DeviceIndex);
             config.DeviceCount = configuration.GetValue(nameof(DeviceCount), config.DeviceCount);

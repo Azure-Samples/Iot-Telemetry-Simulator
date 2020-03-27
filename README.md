@@ -15,7 +15,7 @@ docker run -it -e "IotHubConnectionString=HostName=your-iothub-name.azure-device
 **The simulator expects the devices to already exist**. If you need help creating simulation devices in an Azure IoT Hub use the included project IotSimulatorDeviceProvisioning or the docker image:
 
 ```cmd
-docker run -it -e "IotHubConnectionString=HostName=your-iothub-name.azure-devices.net;SharedAccessKeyName=device;SharedAccessKey=your-iothub-key" -e DeviceCount=1000 fbeltrao/azureiot-simulatordeviceprovisioning
+docker run -it -e "IotHubConnectionString=HostName=your-iothub-name.azure-devices.net;SharedAccessKeyName=registryReadWrite;SharedAccessKey=your-iothub-key" -e DeviceCount=1000 fbeltrao/azureiot-simulatordeviceprovisioning
 ```
 
 ## Simulator input parameters
@@ -25,6 +25,7 @@ The amount of devices, their names and telemetry generated can be customized usi
 |Name|Description|
 |-|-|
 |IotHubConnectionString|Iot Hub connection string. "Device" our "Iot Hub owner" scopes are good. Example: HostName=your-iothub-name.azure-devices.net;SharedAccessKeyName=device;SharedAccessKey=your-iothub-key|
+|EventHubConnectionString|Event Hub connection string. SAS Policy "Send" is required. For EventHub no device registration is required. Example: Endpoint=sb://your-eventhub-namespace.servicebus.windows.net/;SharedAccessKeyName=send;SharedAccessKey=your-send-sas-primary-key;EntityPath=your-eventhub-name.|
 |DeviceList|comma separated list of device identifiers (default = ""). Use it to generate telemetry for specific devices instead of numeric generated identifiers. If the parameter has a value the following parameters are ignored: DevicePrefix, DeviceIndex and DeviceCount are ignored|
 |DevicePrefix|device identifier prefix (default = "sim")|
 |DeviceIndex|starting device number (default = 1)|
