@@ -8,13 +8,13 @@ IoT device simulator to test Azure IoT Hub ingest at scale. The implementation i
 
 The quickest way to generate telemetry is using docker with the following command:
 
-```cmd
+```bash
 docker run -it -e "IotHubConnectionString=HostName=your-iothub-name.azure-devices.net;SharedAccessKeyName=device;SharedAccessKey=your-iothub-key" fbeltrao/azureiot-telemetrysimulator
 ```
 
 **The simulator expects the devices to already exist**. If you need help creating simulation devices in an Azure IoT Hub use the included project IotSimulatorDeviceProvisioning or the docker image:
 
-```cmd
+```bash
 docker run -it -e "IotHubConnectionString=HostName=your-iothub-name.azure-devices.net;SharedAccessKeyName=registryReadWrite;SharedAccessKey=your-iothub-key" -e DeviceCount=1000 fbeltrao/azureiot-simulatordeviceprovisioning
 ```
 
@@ -102,13 +102,13 @@ Output:
 
 Running with docker:
 
-```
+```powershell
 docker run -it -e "IotHubConnectionString=HostName=your-iothub-name.azure-devices.net;SharedAccessKeyName=device;SharedAccessKey=your-iothub-key" -e Template="{ \"deviceId\": \"$.DeviceId\", \"temp\": $.Temp, \"Ticks\": $.Ticks, \"Counter\": $.Counter, \"time\": \"$.Time\" }" -e Variables="[{name: \"Temp\", \"random\": true, \"max\": 25, \"min\": 23}, {\"name\":\"Counter\", \"min\":100} ]" fbeltrao/azureiot-telemetrysimulator
 ```
 
 calling from PowerShell:
 
-```
+```powershell
 docker run -it -e "IotHubConnectionString=HostName=your-iothub-name.azure-devices.net;SharedAccessKeyName=iothubowner;SharedAccessKey=your-iothub-key" -e Template="{ \"""deviceId\""": \"""$.DeviceId\""", \"""temp\""": $.Temp, \"""Ticks\""": $.Ticks, \"""Counter\""": $.Counter, \"""time\""": \"""$.Time\""", \"""engine\""": \"""$.Engine\""" }" -e Variables="[{name: \"""Temp\""", \"""random\""": true, \"""max\""": 25, \"""min\""": 23}, {\"""name\""":\"""Counter\""", \"""min\""":100}, {name:\"""Engine\""", values: [\"""on\""", \"""off\"""]}]" -e DeviceCount=1 -e MessageCount=3 fbeltrao/azureiot-telemetrysimulator
 ```
 
@@ -135,7 +135,7 @@ Output:
 
 Running with docker:
 
-```
+```bash
 docker run -it -e "IotHubConnectionString=HostName=your-iothub-name.azure-devices.net;SharedAccessKeyName=device;SharedAccessKey=your-iothub-key" -e Template="{ \"deviceId\": \"$.DeviceId\", \"temp\": $.Temp, \"Ticks\": $.Ticks, \"Counter\": $.Counter, \"time\": \"$.Time\", \"engine\": \"$.Engine\" }" -e Variables="[{name: \"Temp\", \"random\": true, \"max\": 25, \"min\": 23}, {\"name\":\"Counter\", \"min\":100}, {name:\"Engine\", values: [\"on\", \"off\"]}]" fbeltrao/azureiot-telemetrysimulator
 ```
 
@@ -179,3 +179,7 @@ This repository also contains a helm chart to deploy the simulator to a Kubernet
 ```bash
 helm install sims iot-telemetry-simulator\. --namespace iotsimulator --set iotHubConnectionString="HostName=xxxx.azure-devices.net;SharedAccessKeyName=iothubowner;SharedAccessKey=xxxxxxx" --set replicaCount=5 --set deviceCount=5000
 ```
+
+## Automation
+
+The `IotTelemtrySimulator.Automation` .NET Core 2.1 library allows you to run the IoT Telemetry Simulator as part of a pipeline or any other automation framework. See the [automation guide](automation.md).
