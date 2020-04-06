@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "IotTelemetrySimulator.ConsoleApp": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "AzureServicesAuthConnectionString": "RunAs=Developer; DeveloperTool=AzureCli"
+      }
+    }
+  }
+}

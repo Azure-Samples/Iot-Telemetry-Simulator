@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "IotSimulatorDeviceProvisioning": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "DevicePrefix": "testdevice",
+        "IotHubConnectionString": "HostName=IotHubSE.azure-devices.net;SharedAccessKeyName=iothubowner;SharedAccessKey=uF8QN0B+xPq7Xbs+5KDWgkuFGGUlmZ52bjZ878lgpNo=",
+        "DeviceCount": "100"
+      }
+    }
+  }
+}

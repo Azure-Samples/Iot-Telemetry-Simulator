@@ -1,0 +1,49 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29509.3
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IotTelemetrySimulator", "src\IotTelemetrySimulator\IotTelemetrySimulator.csproj", "{2EA2F1AC-2C5F-4613-9090-011C602225F3}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IotSimulatorDeviceProvisioning", "src\IotSimulatorDeviceProvisioning\IotSimulatorDeviceProvisioning.csproj", "{E7F5291A-5A4E-489D-9CEF-8E4010B22AB4}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IotTelemetrySimulator.Test", "test\IotTelemetrySimulator.Test\IotTelemetrySimulator.Test.csproj", "{255C8A00-962C-4004-8395-2FC084C920B4}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IotTelemetrySimulator.Automation", "src\IotTelemetrySimulator.Automation\IotTelemetrySimulator.Automation.csproj", "{D1FF2893-5248-4E6D-B383-3F1D0D628BEF}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IotTelemetrySimulator.Automation.Console", "src\IotTelemetrySimulator.Automation.Console\IotTelemetrySimulator.Automation.Console.csproj", "{8BE17E86-5509-4759-AA89-CB7C904F9EB9}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{2EA2F1AC-2C5F-4613-9090-011C602225F3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2EA2F1AC-2C5F-4613-9090-011C602225F3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2EA2F1AC-2C5F-4613-9090-011C602225F3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2EA2F1AC-2C5F-4613-9090-011C602225F3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E7F5291A-5A4E-489D-9CEF-8E4010B22AB4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E7F5291A-5A4E-489D-9CEF-8E4010B22AB4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E7F5291A-5A4E-489D-9CEF-8E4010B22AB4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E7F5291A-5A4E-489D-9CEF-8E4010B22AB4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{255C8A00-962C-4004-8395-2FC084C920B4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{255C8A00-962C-4004-8395-2FC084C920B4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{255C8A00-962C-4004-8395-2FC084C920B4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{255C8A00-962C-4004-8395-2FC084C920B4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D1FF2893-5248-4E6D-B383-3F1D0D628BEF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D1FF2893-5248-4E6D-B383-3F1D0D628BEF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D1FF2893-5248-4E6D-B383-3F1D0D628BEF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D1FF2893-5248-4E6D-B383-3F1D0D628BEF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8BE17E86-5509-4759-AA89-CB7C904F9EB9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8BE17E86-5509-4759-AA89-CB7C904F9EB9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8BE17E86-5509-4759-AA89-CB7C904F9EB9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8BE17E86-5509-4759-AA89-CB7C904F9EB9}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {FEB1CE9B-9094-40AF-8C2B-0218D9A62BDE}
+	EndGlobalSection
+EndGlobal
