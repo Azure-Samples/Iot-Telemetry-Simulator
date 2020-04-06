@@ -11,12 +11,12 @@ products:
 - azure-container-registry
 name: "Azure IoT Device Telemetry Simulator"
 urlFragment: azure-iot-device-telemetry-simulator
-description: "The IoT Telemetry Simulator allows you to test Azure IoT Hub or Eventhub ingestion at scale."
+description: "The IoT Telemetry Simulator allows you to test Azure IoT Hub or Event Hub ingestion at scale."
 ---
 
 # Azure IoT Device Telemetry Simulator
 
-The IoT Telemetry Simulator allows you to test Azure IoT Hub or Eventhub ingestion at scale. The implementation is communicating with Azure IoT Hub using multiplexed AMQP connections. An automation library allows you to run it as load test as part of a CI/CD pipeline.
+The IoT Telemetry Simulator allows you to test Azure IoT Hub or Event Hub ingestion at scale. The implementation is communicating with Azure IoT Hub using multiplexed AMQP connections. An automation library allows you to run it as load test as part of a CI/CD pipeline.
 
 A single AMQP connection can handle ~995 devices.
 
