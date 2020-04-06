@@ -9,9 +9,9 @@ products:
 - azure-event-hubs
 - azure-container-instances
 - azure-container-registry
-name: Azure IoT Device Telemetry Simulator
+name: "Azure IoT Device Telemetry Simulator"
 urlFragment: azure-iot-device-telemetry-simulator
-description: The IoT Telemetry Simulator allows you to test Azure IoT Hub or Eventhub ingestion at scale.
+description: "The IoT Telemetry Simulator allows you to test Azure IoT Hub or Eventhub ingestion at scale."
 ---
 
 # Azure IoT Device Telemetry Simulator
