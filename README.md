@@ -14,6 +14,8 @@ urlFragment: azure-iot-device-telemetry-simulator
 description: "The IoT Telemetry Simulator allows you to test Azure IoT Hub or Event Hub ingestion at scale."
 ---
 
+![Build and run Unit Tests](https://github.com/Azure-Samples/Iot-Telemetry-Simulator/workflows/Build%20and%20run%20Unit%20Tests/badge.svg)
+
 # Azure IoT Device Telemetry Simulator
 
 The IoT Telemetry Simulator allows you to test Azure IoT Hub or Event Hub ingestion at scale. The implementation is communicating with Azure IoT Hub using multiplexed AMQP connections. An automation library allows you to run it as load test as part of a CI/CD pipeline.
