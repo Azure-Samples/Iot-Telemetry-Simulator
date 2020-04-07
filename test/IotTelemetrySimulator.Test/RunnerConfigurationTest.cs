@@ -1,22 +1,21 @@
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging.Abstractions;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using Xunit;
-
 namespace IotTelemetrySimulator.Test
 {
-    public class RunnerConfigurationTest
-    {        
+    using System;
+    using System.Collections.Generic;
+    using System.Text;
+    using Microsoft.Extensions.Configuration;
+    using Microsoft.Extensions.Logging.Abstractions;
+    using Xunit;
 
+    public class RunnerConfigurationTest
+    {
         [Fact]
         public void When_Using_Dynamic_Payload_Loads_Correctly()
         {
             var configuration = new ConfigurationBuilder()
                 .AddInMemoryCollection(new Dictionary<string, string>()
                 {
-                    { Constants.PayloadDistributionConfigName, "fixSize(10,12) template(25,    default) fix(65, aaaaBBBBBCCC)" },                    
+                    { Constants.PayloadDistributionConfigName, "fixSize(10,12) template(25,    default) fix(65, aaaaBBBBBCCC)" },
                 })
                 .Build();
 
@@ -63,13 +62,12 @@ namespace IotTelemetrySimulator.Test
             Assert.Equal(rawTemplate, templatedPayload.Template.ToString());
         }
 
-
         [Fact]
         public void When_No_Template_Is_Set_Loads_Default_Template()
         {
             var configuration = new ConfigurationBuilder()
                 .AddInMemoryCollection(new Dictionary<string, string>()
-                {                    
+                {
                 })
                 .Build();
 

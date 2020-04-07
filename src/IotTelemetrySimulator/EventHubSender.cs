@@ -1,25 +1,26 @@
-﻿using Microsoft.Azure.EventHubs;
-using System;
-using System.Threading;
-using System.Threading.Tasks;
-
-namespace IotTelemetrySimulator
+﻿namespace IotTelemetrySimulator
 {
+    using System;
+    using System.Threading;
+    using System.Threading.Tasks;
+    using Microsoft.Azure.EventHubs;
+
     public class EventHubSender : SenderBase<EventData>
     {
         private EventHubClient eventHubClient;
 
-        public EventHubSender(EventHubClient eventHubClient, string deviceId, RunnerConfiguration config) : base(deviceId, config)
+        public EventHubSender(EventHubClient eventHubClient, string deviceId, RunnerConfiguration config)
+            : base(deviceId, config)
         {
             this.eventHubClient = eventHubClient;
         }
 
         protected override async Task SendAsync(EventData msg, CancellationToken cancellationToken)
         {
-            await eventHubClient.SendAsync(msg);
+            await this.eventHubClient.SendAsync(msg);
         }
 
-        public override Task OpenAsync() 
+        public override Task OpenAsync()
         {
             return Task.CompletedTask;
         }

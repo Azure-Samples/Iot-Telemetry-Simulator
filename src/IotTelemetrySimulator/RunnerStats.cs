@@ -1,8 +1,8 @@
-﻿using System;
-using System.Threading;
-
-namespace IotTelemetrySimulator
+﻿namespace IotTelemetrySimulator
 {
+    using System;
+    using System.Threading;
+
     public class RunnerStats
     {
         const long ReportRate = 100;
@@ -13,36 +13,36 @@ namespace IotTelemetrySimulator
 
         long messagesSendingStart;
 
-        public long MessagesSent => messagesSent;
+        public long MessagesSent => this.messagesSent;
 
-        public long TotalSendTelemetryErrors => totalSendTelemetryErrors;
+        public long TotalSendTelemetryErrors => this.totalSendTelemetryErrors;
 
         public RunnerStats()
         {
-            messagesSendingStart = DateTime.UtcNow.Ticks;
+            this.messagesSendingStart = DateTime.UtcNow.Ticks;
         }
 
         internal void IncrementDeviceConnected()
         {
-            var newValue = Interlocked.Increment(ref connectedDevices);
+            var newValue = Interlocked.Increment(ref this.connectedDevices);
             if (newValue % ReportRate == 0)
                 Console.WriteLine($"{DateTime.UtcNow.ToString("o")}: {newValue} devices connected");
         }
 
         internal void IncrementCompletedDevice()
         {
-            var newValue = Interlocked.Increment(ref completedDevices);
-            if (newValue % ReportRate == 0)            
-                Console.WriteLine($"{DateTime.UtcNow.ToString("o")}: {newValue} devices have completed sending messages");            
+            var newValue = Interlocked.Increment(ref this.completedDevices);
+            if (newValue % ReportRate == 0)
+                Console.WriteLine($"{DateTime.UtcNow.ToString("o")}: {newValue} devices have completed sending messages");
         }
 
         internal void IncrementMessageSent()
         {
-            var newValue = Interlocked.Increment(ref messagesSent);
+            var newValue = Interlocked.Increment(ref this.messagesSent);
             if (newValue % ReportRate == 0)
             {
                 var now = DateTime.UtcNow;
-                var currentStart = Interlocked.Exchange(ref messagesSendingStart, now.Ticks);                
+                var currentStart = Interlocked.Exchange(ref this.messagesSendingStart, now.Ticks);
                 var start = new DateTime(currentStart, DateTimeKind.Utc);
                 var elapsedMs = (now - start).TotalMilliseconds;
                 var ratePerSecond = (ReportRate / elapsedMs) * 1000;
@@ -53,10 +53,9 @@ namespace IotTelemetrySimulator
 
         internal void IncrementSendTelemetryErrors()
         {
-            var newValue = Interlocked.Increment(ref totalSendTelemetryErrors);
+            var newValue = Interlocked.Increment(ref this.totalSendTelemetryErrors);
             if (newValue % ReportRate == 0)
                 Console.WriteLine($"{DateTime.UtcNow.ToString("o")}: {newValue} errors sending telemetry");
-
         }
     }
 }

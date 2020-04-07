@@ -1,24 +1,25 @@
-﻿using System.Collections.Generic;
-
-namespace IotTelemetrySimulator
+﻿namespace IotTelemetrySimulator
 {
+    using System.Collections.Generic;
+
     public class FixPayload : PayloadBase
     {
         public byte[] Payload { get; }
 
-        public FixPayload(int distribution, byte[] payload) : base(distribution)
+        public FixPayload(int distribution, byte[] payload)
+            : base(distribution)
         {
-            Payload = payload;
+            this.Payload = payload;
         }
 
         public override (byte[], Dictionary<string, object>) Generate(Dictionary<string, object> variableValues)
         {
-            return (Payload, variableValues);
+            return (this.Payload, variableValues);
         }
 
         public override string GetDescription()
         {
-            return $"Fix: {Payload.Length} bytes";
+            return $"Fix: {this.Payload.Length} bytes";
         }
     }
 }

@@ -1,7 +1,7 @@
 @echo off
 
 if "%~1"=="" (
-    set repo="fbeltrao"
+    set repo="yourreponame"
 ) else (
     set repo=%1
 )

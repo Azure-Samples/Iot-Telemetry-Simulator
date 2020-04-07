@@ -13,9 +13,9 @@
         public string AadClientSecret { get; set; }
 
         public string AzureSubscriptionName { get; set; }
-        
+
         public string AadTenantId { get; set; }
-        
+
         public string AzureSubscriptionId { get; set; }
 
         public string AzureRegion { get; set; }

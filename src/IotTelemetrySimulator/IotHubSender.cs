@@ -1,11 +1,11 @@
-﻿using Microsoft.Azure.Devices.Client;
-using Microsoft.Azure.Devices.Client.Exceptions;
-using System;
-using System.Threading;
-using System.Threading.Tasks;
-
-namespace IotTelemetrySimulator
+﻿namespace IotTelemetrySimulator
 {
+    using System;
+    using System.Threading;
+    using System.Threading.Tasks;
+    using Microsoft.Azure.Devices.Client;
+    using Microsoft.Azure.Devices.Client.Exceptions;
+
     internal class IotHubSender : SenderBase<Message>
     {
         const string ApplicationJsonContentType = "application/json";
@@ -13,19 +13,20 @@ namespace IotTelemetrySimulator
 
         private DeviceClient deviceClient;
 
-        public IotHubSender(DeviceClient deviceClient, string deviceId, RunnerConfiguration config) : base(deviceId, config)
+        public IotHubSender(DeviceClient deviceClient, string deviceId, RunnerConfiguration config)
+            : base(deviceId, config)
         {
             this.deviceClient = deviceClient;
         }
 
         public override async Task OpenAsync()
         {
-            await deviceClient.OpenAsync();
+            await this.deviceClient.OpenAsync();
         }
 
         protected override async Task SendAsync(Message msg, CancellationToken cancellationToken)
         {
-            await deviceClient.SendEventAsync(msg, cancellationToken);
+            await this.deviceClient.SendEventAsync(msg, cancellationToken);
         }
 
         protected override Message BuildMessage(byte[] messageBytes)

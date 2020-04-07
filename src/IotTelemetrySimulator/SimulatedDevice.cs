@@ -1,39 +1,39 @@
-﻿using System;
-using System.Threading;
-using System.Threading.Tasks;
-
-namespace IotTelemetrySimulator
+﻿namespace IotTelemetrySimulator
 {
+    using System;
+    using System.Threading;
+    using System.Threading.Tasks;
+
     public class SimulatedDevice
-    {        
-        private RunnerConfiguration config;
+    {
         private readonly ISender sender;
+        private RunnerConfiguration config;
 
         public string DeviceID { get; private set; }
 
         public SimulatedDevice(string deviceId, RunnerConfiguration config, ISender sender)
         {
-            DeviceID = deviceId;
+            this.DeviceID = deviceId;
             this.config = config;
             this.sender = sender;
         }
 
         public Task Start(RunnerStats stats, CancellationToken cancellationToken)
         {
-            return Task.Run(() => RunnerAsync(stats, cancellationToken), cancellationToken);
+            return Task.Run(() => this.RunnerAsync(stats, cancellationToken), cancellationToken);
         }
 
         async Task RunnerAsync(RunnerStats stats, CancellationToken cancellationToken)
         {
             try
             {
-                await sender.OpenAsync();
+                await this.sender.OpenAsync();
                 stats.IncrementDeviceConnected();
 
-                for (var i = 0; !cancellationToken.IsCancellationRequested && (config.MessageCount <= 0 || i < config.MessageCount); i++)
+                for (var i = 0; !cancellationToken.IsCancellationRequested && (this.config.MessageCount <= 0 || i < this.config.MessageCount); i++)
                 {
-                    await Task.Delay(config.Interval, cancellationToken);
-                    await sender.SendMessageAsync(stats, cancellationToken);
+                    await Task.Delay(this.config.Interval, cancellationToken);
+                    await this.sender.SendMessageAsync(stats, cancellationToken);
                 }
 
                 stats.IncrementCompletedDevice();
@@ -45,6 +45,6 @@ namespace IotTelemetrySimulator
             {
                 Console.Error.WriteLine(ex);
             }
-        }        
+        }
     }
 }

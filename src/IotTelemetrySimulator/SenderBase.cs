@@ -1,19 +1,19 @@
-﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
-
-namespace IotTelemetrySimulator
+﻿namespace IotTelemetrySimulator
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Threading;
+    using System.Threading.Tasks;
+    using Newtonsoft.Json;
+
     public abstract class SenderBase<TMessage> : ISender
     {
         protected const int WaitTimeOnTransientError = 5_000;
         protected const int MaxSendAttempts = 3;
 
-        protected string deviceId;
-        protected RunnerConfiguration config;
-        protected Dictionary<string, object> variableValues;
+        private string deviceId;
+        private RunnerConfiguration config;
+        private Dictionary<string, object> variableValues;
 
         public SenderBase(string deviceId, RunnerConfiguration config)
         {
@@ -25,17 +25,17 @@ namespace IotTelemetrySimulator
 
         public async Task SendMessageAsync(RunnerStats stats, CancellationToken cancellationToken)
         {
-            var msg = CreateMessage();
+            var msg = this.CreateMessage();
 
             for (var attempt = 1; attempt <= MaxSendAttempts; ++attempt)
             {
                 try
                 {
-                    await SendAsync(msg, cancellationToken);
+                    await this.SendAsync(msg, cancellationToken);
                     stats.IncrementMessageSent();
                     break;
                 }
-                catch (Exception ex) when (IsTransientException(ex))
+                catch (Exception ex) when (this.IsTransientException(ex))
                 {
                     stats.IncrementSendTelemetryErrors();
                     await Task.Yield();
@@ -52,22 +52,22 @@ namespace IotTelemetrySimulator
 
         protected TMessage CreateMessage()
         {
-            if (variableValues == null)
+            if (this.variableValues == null)
             {
-                variableValues = new Dictionary<string, object>
+                this.variableValues = new Dictionary<string, object>
                 {
-                    { Constants.DeviceIdValueName, deviceId }
+                    { Constants.DeviceIdValueName, this.deviceId }
                 };
             }
 
-            var (messageBytes, nextVariableValues) = config.PayloadGenerator.Generate(variableValues);
-            variableValues = nextVariableValues;
+            var (messageBytes, nextVariableValues) = this.config.PayloadGenerator.Generate(this.variableValues);
+            this.variableValues = nextVariableValues;
 
-            TMessage msg = BuildMessage(messageBytes);
+            TMessage msg = this.BuildMessage(messageBytes);
 
-            if (config.Header != null)
+            if (this.config.Header != null)
             {
-                var headerJson = config.Header.Create(variableValues);
+                var headerJson = this.config.Header.Create(this.variableValues);
                 if (!string.IsNullOrWhiteSpace(headerJson))
                 {
                     var headerValues = JsonConvert.DeserializeObject<Dictionary<string, string>>(headerJson);
@@ -75,7 +75,7 @@ namespace IotTelemetrySimulator
                     {
                         if (kv.Value != null)
                         {
-                            SetMessageProperty(msg, kv.Key, kv.Value);
+                            this.SetMessageProperty(msg, kv.Key, kv.Value);
                         }
                     }
                 }

@@ -10,23 +10,23 @@
 
     internal class AuthRetryWrapper
     {
-        private readonly Func<Task<IAzure>> _azureFactory;
-        private readonly IAzure _existingInstance;
-        private readonly ILogger _logger;
-        private TaskCompletionSource<IAzure> _tokenRefresh;
-        private readonly SemaphoreSlim _tokenSemaphore = new SemaphoreSlim(1, 1);
-        private DateTime _lastRefresh;
+        private readonly Func<Task<IAzure>> azureFactory;
+        private readonly IAzure existingInstance;
+        private readonly ILogger logger;
+        private readonly SemaphoreSlim tokenSemaphore = new SemaphoreSlim(1, 1);
+        private TaskCompletionSource<IAzure> tokenRefresh;
+        private DateTime lastRefresh;
 
         public AuthRetryWrapper(Func<Task<IAzure>> azureFactory, ILogger logger, IAzure existingInstance = null)
         {
-            _azureFactory = azureFactory;
-            _logger = logger;
-            _existingInstance = existingInstance;
+            this.azureFactory = azureFactory;
+            this.logger = logger;
+            this.existingInstance = existingInstance;
         }
 
         public async Task ExecuteAsync(Action<IAzure> func, CancellationToken cancellationToken = default)
         {
-            var azure = _existingInstance ?? await _azureFactory();
+            var azure = this.existingInstance ?? await this.azureFactory();
 
             while (!cancellationToken.IsCancellationRequested)
             {
@@ -35,53 +35,53 @@
                     await Task.Run(() => func(azure), cancellationToken);
                     return;
                 }
-                catch (AggregateException ex) when (IsRetryAllowed() && ex.Flatten().InnerExceptions.FirstOrDefault(ex => ex is CloudException) != null)
+                catch (AggregateException ex) when (this.IsRetryAllowed() && ex.Flatten().InnerExceptions.FirstOrDefault(ex => ex is CloudException) != null)
                 {
-                    azure = await RefreshToken();
+                    azure = await this.RefreshToken();
                 }
-                catch (CloudException) when (IsRetryAllowed())
+                catch (CloudException) when (this.IsRetryAllowed())
                 {
-                    azure = await RefreshToken();
+                    azure = await this.RefreshToken();
                 }
             }
         }
 
         private Task<IAzure> RefreshToken()
         {
-            _tokenSemaphore.Wait();
+            this.tokenSemaphore.Wait();
 
             try
             {
-                var localRefreshToken = _tokenRefresh;
+                var localRefreshToken = this.tokenRefresh;
                 if (localRefreshToken == null)
                 {
-                    localRefreshToken = _tokenRefresh = new TaskCompletionSource<IAzure>();
+                    localRefreshToken = this.tokenRefresh = new TaskCompletionSource<IAzure>();
 
                     IAzure result = null;
 
                     _ = Task
                         .Run(async () =>
                         {
-                            _logger.Log(LogLevel.Information, $"Re-authenticating to azure");
-                            _lastRefresh = DateTime.UtcNow;
-                            result = await _azureFactory();
+                            this.logger.Log(LogLevel.Information, $"Re-authenticating to azure");
+                            this.lastRefresh = DateTime.UtcNow;
+                            result = await this.azureFactory();
                         })
                         .ContinueWith((t) =>
                         {
                             if (t.IsCompletedSuccessfully)
                             {
-                                _tokenRefresh.TrySetResult(result);
+                                this.tokenRefresh.TrySetResult(result);
                             }
                             else if (t.IsCanceled)
                             {
-                                _tokenRefresh.TrySetCanceled();
+                                this.tokenRefresh.TrySetCanceled();
                             }
                             else if (t.IsFaulted)
                             {
-                                _tokenRefresh.TrySetException(t.Exception);
+                                this.tokenRefresh.TrySetException(t.Exception);
                             }
 
-                            _tokenRefresh = null;
+                            this.tokenRefresh = null;
                         });
                 }
 
@@ -89,14 +89,13 @@
             }
             finally
             {
-                _tokenSemaphore.Release();
+                this.tokenSemaphore.Release();
             }
-
         }
 
         private bool IsRetryAllowed()
         {
-            return _tokenRefresh != null || ((DateTime.UtcNow - _lastRefresh) > TimeSpan.FromMinutes(1));
+            return this.tokenRefresh != null || ((DateTime.UtcNow - this.lastRefresh) > TimeSpan.FromMinutes(1));
         }
     }
 }

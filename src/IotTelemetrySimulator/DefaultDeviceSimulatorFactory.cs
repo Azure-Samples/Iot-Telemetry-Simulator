@@ -1,16 +1,16 @@
-﻿using Microsoft.Azure.Devices.Client;
-using Microsoft.Azure.EventHubs;
-using System;
-
-namespace IotTelemetrySimulator
+﻿namespace IotTelemetrySimulator
 {
+    using System;
+    using Microsoft.Azure.Devices.Client;
+    using Microsoft.Azure.EventHubs;
+
     public class DefaultDeviceSimulatorFactory : IDeviceSimulatorFactory
     {
         private EventHubClient eventHubClient;
 
         public SimulatedDevice Create(string deviceId, RunnerConfiguration config)
         {
-            var sender = GetSender(deviceId, config);
+            var sender = this.GetSender(deviceId, config);
             return new SimulatedDevice(deviceId, config, sender);
         }
 
@@ -23,7 +23,7 @@ namespace IotTelemetrySimulator
 
             if (!string.IsNullOrEmpty(config.EventHubConnectionString))
             {
-                return CreateEventHubSender(deviceId, config);
+                return this.CreateEventHubSender(deviceId, config);
             }
 
             throw new ArgumentException("No connnection string specified");
@@ -52,8 +52,8 @@ namespace IotTelemetrySimulator
         private ISender CreateEventHubSender(string deviceId, RunnerConfiguration config)
         {
             // Reuse the same eventHubClient for all devices
-            eventHubClient = eventHubClient ?? EventHubClient.CreateFromConnectionString(config.EventHubConnectionString);
-            return new EventHubSender(eventHubClient, deviceId, config);
+            this.eventHubClient = this.eventHubClient ?? EventHubClient.CreateFromConnectionString(config.EventHubConnectionString);
+            return new EventHubSender(this.eventHubClient, deviceId, config);
         }
     }
 }

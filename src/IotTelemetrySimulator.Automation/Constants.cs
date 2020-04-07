@@ -2,7 +2,7 @@
 {
     public static class Constants
     {
-        public const string AadEndpointUrl =  "https://login.microsoftonline.com";
+        public const string AadEndpointUrl = "https://login.microsoftonline.com";
         public const string AadGraphResourceId = "https://graph.windows.net/";
         public const string GalleryEndpointUrl = "https://gallery.azure.com/";
         public const string KeyVaultSuffix = "vault.azure.net";

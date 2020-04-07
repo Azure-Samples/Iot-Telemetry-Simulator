@@ -1,4 +1,4 @@
-repo="fbeltrao"
+repo="yourreponame"
 if [ "$1" != "" ]; then
     repo="$1"
 fi

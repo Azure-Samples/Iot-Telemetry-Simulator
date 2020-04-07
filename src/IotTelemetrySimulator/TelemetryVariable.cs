@@ -1,7 +1,7 @@
-﻿using Newtonsoft.Json;
-
-namespace IotTelemetrySimulator
+﻿namespace IotTelemetrySimulator
 {
+    using Newtonsoft.Json;
+
     public class TelemetryVariable
     {
         [JsonProperty("name")]
