@@ -1,8 +1,8 @@
 ﻿namespace IotTelemetrySimulator.Automation.Console
 {
+    using System.Threading.Tasks;
     using IotTelemetrySimulator.Automation;
     using Microsoft.Extensions.Logging;
-    using System.Threading.Tasks;
 
     class Program
     {

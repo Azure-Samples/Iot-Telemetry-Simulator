@@ -1,12 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-
-namespace IotTelemetrySimulator
+﻿namespace IotTelemetrySimulator
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+
     public class PayloadGenerator
     {
         private readonly IRandomizer randomizer;
+
         public PayloadBase[] Payloads { get; }
 
         public PayloadGenerator(IEnumerable<PayloadBase> payloads, IRandomizer randomizer)
@@ -17,17 +18,17 @@ namespace IotTelemetrySimulator
                 throw new ArgumentNullException(nameof(payloads));
             }
 
-            Payloads = payloads.OrderByDescending(x => x.Distribution).ToArray();            
+            this.Payloads = payloads.OrderByDescending(x => x.Distribution).ToArray();
         }
 
         public (byte[], Dictionary<string, object>) Generate(Dictionary<string, object> variableValues)
         {
-            if (Payloads.Length == 1)
-                return Payloads[0].Generate(variableValues);
+            if (this.Payloads.Length == 1)
+                return this.Payloads[0].Generate(variableValues);
 
-            var random = randomizer.GetNext(1, 101);
+            var random = this.randomizer.GetNext(1, 101);
             var currentPercentage = 0;
-            foreach (var payload in Payloads)
+            foreach (var payload in this.Payloads)
             {
                 var currentThreshold = currentPercentage + payload.Distribution;
                 if (currentThreshold >= random)
@@ -39,10 +40,9 @@ namespace IotTelemetrySimulator
             throw new Exception("Invalid payload distribution");
         }
 
-
         public string GetDescription()
         {
-            return string.Join(',', Payloads.Select(x => x.GetDescription()));
+            return string.Join(',', this.Payloads.Select(x => x.GetDescription()));
         }
     }
 }

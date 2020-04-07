@@ -1,17 +1,17 @@
-﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging.Abstractions;
-using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Threading;
-using System.Threading.Tasks;
-using Xunit;
-
-namespace IotTelemetrySimulator.Test
+﻿namespace IotTelemetrySimulator.Test
 {
+    using System;
+    using System.Collections.Concurrent;
+    using System.Collections.Generic;
+    using System.Diagnostics;
+    using System.Linq;
+    using System.Runtime.CompilerServices;
+    using System.Threading;
+    using System.Threading.Tasks;
+    using Microsoft.Extensions.Configuration;
+    using Microsoft.Extensions.Logging.Abstractions;
+    using Xunit;
+
     public class SenderBaseTest
     {
         [Fact]
@@ -51,7 +51,7 @@ namespace IotTelemetrySimulator.Test
 
             Assert.InRange(stopwatch.ElapsedMilliseconds, 0, sender.TransientErrorWaitTime);
             Assert.Equal(0, stats.MessagesSent);
-            Assert.True(1 < stats.TotalSendTelemetryErrors);
+            Assert.True(stats.TotalSendTelemetryErrors > 1);
             Assert.Empty(sender.TestMessages);
         }
 
@@ -87,7 +87,7 @@ namespace IotTelemetrySimulator.Test
             var configuration = new ConfigurationBuilder()
                 .AddInMemoryCollection(new Dictionary<string, string>()
                 {
-                    { "Header", rawTemplate}
+                    { "Header", rawTemplate }
                 })
                 .Build();
 
@@ -103,15 +103,15 @@ namespace IotTelemetrySimulator.Test
             Assert.Single(sender.TestMessages);
         }
 
-
         class TestMessage
         {
             public IDictionary<string, object> Properties { get; private set; } = new Dictionary<string, object>();
+
             public byte[] MessageBytes { get; }
 
             public TestMessage(byte[] messageBytes)
             {
-                MessageBytes = messageBytes;
+                this.MessageBytes = messageBytes;
             }
         }
 
@@ -125,11 +125,13 @@ namespace IotTelemetrySimulator.Test
             private readonly bool throwNonTransientException;
 
             public int TransientErrorWaitTime => WaitTimeOnTransientError;
+
             public int MaxNumberOfSendAttempts => MaxSendAttempts;
 
             public ConcurrentBag<TestMessage> TestMessages { get; private set; } = new ConcurrentBag<TestMessage>();
 
-            public TestSender(bool throwTransientException, bool throwNonTransientException, string deviceId, RunnerConfiguration config) : base(deviceId, config)
+            public TestSender(bool throwTransientException, bool throwNonTransientException, string deviceId, RunnerConfiguration config)
+                : base(deviceId, config)
             {
                 this.throwTransientException = throwTransientException;
                 this.throwNonTransientException = throwNonTransientException;
@@ -152,17 +154,17 @@ namespace IotTelemetrySimulator.Test
 
             protected override Task SendAsync(TestMessage msg, CancellationToken cancellationToken)
             {
-                if (throwTransientException)
+                if (this.throwTransientException)
                 {
                     throw new TestException();
                 }
 
-                if (throwNonTransientException)
+                if (this.throwNonTransientException)
                 {
                     throw new InvalidOperationException();
                 }
 
-                TestMessages.Add(msg);
+                this.TestMessages.Add(msg);
                 return Task.CompletedTask;
             }
 

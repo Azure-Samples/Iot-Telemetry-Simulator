@@ -1,8 +1,8 @@
-﻿using System.Threading;
-using System.Threading.Tasks;
-
-namespace IotTelemetrySimulator
+﻿namespace IotTelemetrySimulator
 {
+    using System.Threading;
+    using System.Threading.Tasks;
+
     public interface ISender
     {
         Task OpenAsync();

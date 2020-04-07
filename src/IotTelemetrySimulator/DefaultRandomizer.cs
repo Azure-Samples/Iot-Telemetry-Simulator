@@ -1,16 +1,16 @@
-﻿using System;
-
-namespace IotTelemetrySimulator
+﻿namespace IotTelemetrySimulator
 {
+    using System;
+
     public class DefaultRandomizer : IRandomizer
     {
-        Random randomGenerator = new Random();        
+        Random randomGenerator = new Random();
 
         public int GetNext(int min, int max)
         {
-            lock (randomGenerator)
+            lock (this.randomGenerator)
             {
-                return randomGenerator.Next(min, max);
+                return this.randomGenerator.Next(min, max);
             }
         }
     }

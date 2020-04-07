@@ -1,10 +1,10 @@
-﻿using Microsoft.Extensions.ObjectPool;
-using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace IotTelemetrySimulator
+﻿namespace IotTelemetrySimulator
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Text;
+    using Microsoft.Extensions.ObjectPool;
+
     public class TelemetryTemplate
     {
         public const string DefaultTemplate = "{\"deviceId\": \"$.DeviceId\", \"time\": \"$.Time\", \"counter\": $.Counter}";
@@ -12,7 +12,8 @@ namespace IotTelemetrySimulator
         private readonly string template;
         private readonly DefaultObjectPool<StringBuilder> stringBuilderPool;
 
-        public TelemetryTemplate() : this(DefaultTemplate)
+        public TelemetryTemplate()
+            : this(DefaultTemplate)
         {
         }
 
@@ -24,16 +25,16 @@ namespace IotTelemetrySimulator
             }
 
             this.template = template;
-            stringBuilderPool = new DefaultObjectPool<StringBuilder>(new DefaultPooledObjectPolicy<StringBuilder>(), 100);
+            this.stringBuilderPool = new DefaultObjectPool<StringBuilder>(new DefaultPooledObjectPolicy<StringBuilder>(), 100);
         }
 
         public string Create(Dictionary<string, object> values)
         {
-            var builder = stringBuilderPool.Get();
+            var builder = this.stringBuilderPool.Get();
             try
             {
                 builder.Length = 0;
-                builder.Append(template);
+                builder.Append(this.template);
 
                 if (values != null)
                 {
@@ -47,18 +48,18 @@ namespace IotTelemetrySimulator
             }
             finally
             {
-                stringBuilderPool.Return(builder);
+                this.stringBuilderPool.Return(builder);
             }
         }
 
         internal string GetTemplateDefinition()
         {
-            return template;
+            return this.template;
         }
 
         public override string ToString()
         {
-            return template;
+            return this.template;
         }
     }
 }

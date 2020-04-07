@@ -1,13 +1,12 @@
-﻿using Microsoft.Azure.Devices;
-using System;
-using System.Threading.Tasks;
-using System.Linq;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Diagnostics;
-
-namespace IotSimulatorDeviceProvisioning
+﻿namespace IotSimulatorDeviceProvisioning
 {
+    using System;
+    using System.Collections.Concurrent;
+    using System.Collections.Generic;
+    using System.Diagnostics;
+    using System.Linq;
+    using System.Threading.Tasks;
+    using Microsoft.Azure.Devices;
 
     class Program
     {
@@ -36,7 +35,7 @@ namespace IotSimulatorDeviceProvisioning
             if (string.IsNullOrWhiteSpace(devicePrefix))
             {
                 devicePrefix = "sim";
-            }           
+            }
 
             if (!int.TryParse(Environment.GetEnvironmentVariable(DeviceCountEnvVar), out var deviceCount) || deviceCount < 1)
             {
@@ -62,7 +61,6 @@ namespace IotSimulatorDeviceProvisioning
                 isCreateOperation = false;
             }
 
-
             RegistryManager registryManager = null;
 
             try
@@ -77,7 +75,7 @@ namespace IotSimulatorDeviceProvisioning
 
             try
             {
-                await registryManager.OpenAsync();                
+                await registryManager.OpenAsync();
             }
             catch (Exception ex)
             {
@@ -125,7 +123,7 @@ namespace IotSimulatorDeviceProvisioning
             }
 
             timer.Stop();
-            Console.WriteLine($"Finished device provisioning");            
+            Console.WriteLine($"Finished device provisioning");
             Console.WriteLine($"Device count = {deviceCount}");
             Console.WriteLine($"Total devices created = {stats.TotalCreated}");
             Console.WriteLine($"Total devices deleted = {stats.TotalDeleted}");
@@ -141,7 +139,7 @@ namespace IotSimulatorDeviceProvisioning
             while (deviceIds.MoveNext())
             {
                 var deviceId = deviceIds.Current;
-                
+
                 devices.Add(new Device(deviceId));
 
                 if (devices.Count == CreateOperationBulkSize)
@@ -152,8 +150,10 @@ namespace IotSimulatorDeviceProvisioning
                 }
             }
 
-            if (devices.Count > 0 )
+            if (devices.Count > 0)
+            {
                 await BulkCreateDevicesAsync(devices, registryManager, stats);
+            }
         }
 
         private static async Task BulkCreateDevicesAsync(List<Device> devices, RegistryManager registryManager, DeviceProvisionStats stats)
@@ -178,7 +178,6 @@ namespace IotSimulatorDeviceProvisioning
                 Console.Error.WriteLine(ex);
             }
         }
-
 
         private static async Task DeleteDevicesAsync(IEnumerator<string> deviceIds, RegistryManager registryManager, DeviceProvisionStats stats)
         {

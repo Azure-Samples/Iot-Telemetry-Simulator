@@ -1,30 +1,32 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace IotTelemetrySimulator
+﻿namespace IotTelemetrySimulator
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Text;
+
     public class TemplatedPayload : PayloadBase
     {
         public TelemetryTemplate Template { get; }
+
         public TelemetryValues Variables { get; }
 
-        public TemplatedPayload(int distribution, TelemetryTemplate template, TelemetryValues variables) : base(distribution)
+        public TemplatedPayload(int distribution, TelemetryTemplate template, TelemetryValues variables)
+            : base(distribution)
         {
-            Template = template;
-            Variables = variables;
+            this.Template = template;
+            this.Variables = variables;
         }
 
         public override (byte[], Dictionary<string, object>) Generate(Dictionary<string, object> variableValues)
         {
-            var nextVariables = Variables.NextValues(variableValues);
-            var data = Template.Create(nextVariables);
+            var nextVariables = this.Variables.NextValues(variableValues);
+            var data = this.Template.Create(nextVariables);
             return (Encoding.UTF8.GetBytes(data), nextVariables);
         }
 
         public override string GetDescription()
         {
-            return $"Template: {Template.ToString()}";
+            return $"Template: {this.Template.ToString()}";
         }
     }
 }

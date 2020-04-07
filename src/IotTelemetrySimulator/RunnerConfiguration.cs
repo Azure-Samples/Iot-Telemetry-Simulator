@@ -1,26 +1,32 @@
-﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text.RegularExpressions;
-
-namespace IotTelemetrySimulator
+﻿namespace IotTelemetrySimulator
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Text.RegularExpressions;
+    using Microsoft.Extensions.Configuration;
+    using Microsoft.Extensions.Logging;
+    using Newtonsoft.Json;
 
     public class RunnerConfiguration
     {
-        const string regexExpression = "(?<type>fixsize|template|fix)(\\()(?<pv>[[0-9a-z,=,\\s]+)";
-        static Regex templateParser = new Regex(regexExpression, RegexOptions.IgnoreCase | RegexOptions.Singleline);
+        private const string RegexExpression = "(?<type>fixsize|template|fix)(\\()(?<pv>[[0-9a-z,=,\\s]+)";
+        static Regex templateParser = new Regex(RegexExpression, RegexOptions.IgnoreCase | RegexOptions.Singleline);
 
         public string IotHubConnectionString { get; set; }
+
         public string EventHubConnectionString { get; set; }
+
         public string DevicePrefix { get; set; } = "sim";
+
         public int DeviceIndex { get; set; } = 1;
+
         public int DeviceCount { get; set; } = 1;
+
         public IReadOnlyList<string> DeviceList { get; set; }
+
         public int MessageCount { get; set; } = 10;
+
         public int Interval { get; set; } = 1_000;
 
         public PayloadGenerator PayloadGenerator { get; private set; }
@@ -33,13 +39,12 @@ namespace IotTelemetrySimulator
 
         public void EnsureIsValid()
         {
-            if (string.IsNullOrEmpty(IotHubConnectionString) && string.IsNullOrEmpty(EventHubConnectionString))
-                throw new Exception($"{nameof(IotHubConnectionString)} or {nameof(EventHubConnectionString)} was not defined");
-            
-            if (Interval <= 0)
-                throw new Exception($"{nameof(Interval)} must be greater than zero");
-        }
+            if (string.IsNullOrEmpty(this.IotHubConnectionString) && string.IsNullOrEmpty(this.EventHubConnectionString))
+                throw new Exception($"{nameof(this.IotHubConnectionString)} or {nameof(this.EventHubConnectionString)} was not defined");
 
+            if (this.Interval <= 0)
+                throw new Exception($"{nameof(this.Interval)} must be greater than zero");
+        }
 
         public static RunnerConfiguration Load(IConfiguration configuration, ILogger logger)
         {
@@ -68,7 +73,8 @@ namespace IotTelemetrySimulator
             else
             {
                 logger.LogWarning("No custom telemetry variables found");
-                config.Variables = new TelemetryValues(new TelemetryVariable[] {
+                config.Variables = new TelemetryValues(new TelemetryVariable[]
+                {
                     new TelemetryVariable
                     {
                         Min = 1,
@@ -79,7 +85,7 @@ namespace IotTelemetrySimulator
             }
 
             config.PayloadGenerator = new PayloadGenerator(LoadPayloads(configuration, config, logger), new DefaultRandomizer());
-            
+
             var rawDeviceList = configuration.GetValue<string>(nameof(DeviceList));
             if (!string.IsNullOrWhiteSpace(rawDeviceList))
             {
@@ -97,8 +103,6 @@ namespace IotTelemetrySimulator
                 config.Header = new TelemetryTemplate(rawHeaderTemplate);
             }
 
-
-
             return config;
         }
 
@@ -115,11 +119,9 @@ namespace IotTelemetrySimulator
             }
             else
             {
-
                 defaultPayloadTemplate = new TelemetryTemplate();
                 isDefaultTemplateContent = true;
             }
-
 
             var rawDynamicPayload = configuration.GetValue<string>(Constants.PayloadDistributionConfigName);
             if (!string.IsNullOrEmpty(rawDynamicPayload))
@@ -138,7 +140,7 @@ namespace IotTelemetrySimulator
                             continue;
                         }
 
-                        if (!int.TryParse(paramValues[0].Replace("%", ""), out var distribution))
+                        if (!int.TryParse(paramValues[0].Replace("%", string.Empty), out var distribution))
                         {
                             logger.LogWarning("Could not parse payload distribution from '{value}'", paramValues[0]);
                             continue;
@@ -151,6 +153,7 @@ namespace IotTelemetrySimulator
                                 {
                                     payloads.Add(new FixPayload(distribution, new byte[fixSize]));
                                 }
+
                                 break;
 
                             case "fix":
@@ -167,6 +170,7 @@ namespace IotTelemetrySimulator
                                         logger.LogWarning("Could not parse base64 payload '{value}'", base64Text);
                                     }
                                 }
+
                                 break;
 
                             case "template":
@@ -194,6 +198,7 @@ namespace IotTelemetrySimulator
                                         }
                                     }
                                 }
+
                                 break;
 
                             default:
