@@ -14,7 +14,7 @@ urlFragment: azure-iot-device-telemetry-simulator
 description: "The IoT Telemetry Simulator allows you to test Azure IoT Hub or Event Hub ingestion at scale."
 ---
 
-![Build and run Unit Tests](https://github.com/Azure-Samples/Iot-Telemetry-Simulator/workflows/Build%20and%20run%20Unit%20Tests/badge.svg)
+![Master test and push](https://github.com/Azure-Samples/Iot-Telemetry-Simulator/workflows/Master%20test%20and%20push/badge.svg)
 
 # Azure IoT Device Telemetry Simulator
 
@@ -27,13 +27,13 @@ A single AMQP connection can handle ~995 devices.
 The quickest way to generate telemetry is using docker with the following command:
 
 ```bash
-docker run -it -e "IotHubConnectionString=HostName=your-iothub-name.azure-devices.net;SharedAccessKeyName=device;SharedAccessKey=your-iothub-key" fbeltrao/azureiot-telemetrysimulator
+docker run -it -e "IotHubConnectionString=HostName=your-iothub-name.azure-devices.net;SharedAccessKeyName=device;SharedAccessKey=your-iothub-key" iottelemetrysimulator/azureiot-telemetrysimulator
 ```
 
 **The simulator expects the devices to already exist in Azure IoT Hub**. If you need help creating simulation devices in an Azure IoT Hub use the included project IotSimulatorDeviceProvisioning or the docker image:
 
 ```bash
-docker run -it -e "IotHubConnectionString=HostName=your-iothub-name.azure-devices.net;SharedAccessKeyName=registryReadWrite;SharedAccessKey=your-iothub-key" -e DeviceCount=1000 fbeltrao/azureiot-simulatordeviceprovisioning
+docker run -it -e "IotHubConnectionString=HostName=your-iothub-name.azure-devices.net;SharedAccessKeyName=registryReadWrite;SharedAccessKey=your-iothub-key" -e DeviceCount=1000 iottelemetrysimulator/azureiot-simulatordeviceprovisioning
 ```
 
 ## Simulator input parameters
@@ -121,13 +121,13 @@ Output:
 Running with docker:
 
 ```powershell
-docker run -it -e "IotHubConnectionString=HostName=your-iothub-name.azure-devices.net;SharedAccessKeyName=device;SharedAccessKey=your-iothub-key" -e Template="{ \"deviceId\": \"$.DeviceId\", \"temp\": $.Temp, \"Ticks\": $.Ticks, \"Counter\": $.Counter, \"time\": \"$.Time\" }" -e Variables="[{name: \"Temp\", \"random\": true, \"max\": 25, \"min\": 23}, {\"name\":\"Counter\", \"min\":100} ]" fbeltrao/azureiot-telemetrysimulator
+docker run -it -e "IotHubConnectionString=HostName=your-iothub-name.azure-devices.net;SharedAccessKeyName=device;SharedAccessKey=your-iothub-key" -e Template="{ \"deviceId\": \"$.DeviceId\", \"temp\": $.Temp, \"Ticks\": $.Ticks, \"Counter\": $.Counter, \"time\": \"$.Time\" }" -e Variables="[{name: \"Temp\", \"random\": true, \"max\": 25, \"min\": 23}, {\"name\":\"Counter\", \"min\":100} ]" iottelemetrysimulator/azureiot-telemetrysimulator
 ```
 
 calling from PowerShell:
 
 ```powershell
-docker run -it -e "IotHubConnectionString=HostName=your-iothub-name.azure-devices.net;SharedAccessKeyName=iothubowner;SharedAccessKey=your-iothub-key" -e Template="{ \"""deviceId\""": \"""$.DeviceId\""", \"""temp\""": $.Temp, \"""Ticks\""": $.Ticks, \"""Counter\""": $.Counter, \"""time\""": \"""$.Time\""", \"""engine\""": \"""$.Engine\""" }" -e Variables="[{name: \"""Temp\""", \"""random\""": true, \"""max\""": 25, \"""min\""": 23}, {\"""name\""":\"""Counter\""", \"""min\""":100}, {name:\"""Engine\""", values: [\"""on\""", \"""off\"""]}]" -e DeviceCount=1 -e MessageCount=3 fbeltrao/azureiot-telemetrysimulator
+docker run -it -e "IotHubConnectionString=HostName=your-iothub-name.azure-devices.net;SharedAccessKeyName=iothubowner;SharedAccessKey=your-iothub-key" -e Template="{ \"""deviceId\""": \"""$.DeviceId\""", \"""temp\""": $.Temp, \"""Ticks\""": $.Ticks, \"""Counter\""": $.Counter, \"""time\""": \"""$.Time\""", \"""engine\""": \"""$.Engine\""" }" -e Variables="[{name: \"""Temp\""", \"""random\""": true, \"""max\""": 25, \"""min\""": 23}, {\"""name\""":\"""Counter\""", \"""min\""":100}, {name:\"""Engine\""", values: [\"""on\""", \"""off\"""]}]" -e DeviceCount=1 -e MessageCount=3 iottelemetrysimulator/azureiot-telemetrysimulator
 ```
 
 #### Example 2: Adding the engine status ("on" or "off") to the telemetry
@@ -154,7 +154,7 @@ Output:
 Running with docker:
 
 ```bash
-docker run -it -e "IotHubConnectionString=HostName=your-iothub-name.azure-devices.net;SharedAccessKeyName=device;SharedAccessKey=your-iothub-key" -e Template="{ \"deviceId\": \"$.DeviceId\", \"temp\": $.Temp, \"Ticks\": $.Ticks, \"Counter\": $.Counter, \"time\": \"$.Time\", \"engine\": \"$.Engine\" }" -e Variables="[{name: \"Temp\", \"random\": true, \"max\": 25, \"min\": 23}, {\"name\":\"Counter\", \"min\":100}, {name:\"Engine\", values: [\"on\", \"off\"]}]" fbeltrao/azureiot-telemetrysimulator
+docker run -it -e "IotHubConnectionString=HostName=your-iothub-name.azure-devices.net;SharedAccessKeyName=device;SharedAccessKey=your-iothub-key" -e Template="{ \"deviceId\": \"$.DeviceId\", \"temp\": $.Temp, \"Ticks\": $.Ticks, \"Counter\": $.Counter, \"time\": \"$.Time\", \"engine\": \"$.Engine\" }" -e Variables="[{name: \"Temp\", \"random\": true, \"max\": 25, \"min\": 23}, {\"name\":\"Counter\", \"min\":100}, {name:\"Engine\", values: [\"on\", \"off\"]}]" iottelemetrysimulator/azureiot-telemetrysimulator
 ```
 
 ## Generating high volume of telemetry
