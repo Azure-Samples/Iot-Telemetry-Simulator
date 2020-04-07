@@ -1,0 +1,40 @@
+name: Master test and push
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 3.1.101
+    - name: Build
+      run: dotnet build --configuration Release
+    - name: Unit Tests
+      run: dotnet test
+    - name: Build and push Simulator Docker Image
+      uses: docker/build-push-action@v1.0.0
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+        repository: iottelemetrysimulator/azureiot-telemetrysimulator
+        tags: latest
+        dockerfile: src/IotTelemetrySimulator/Dockerfile
+        push: true
+        
+    - name: Build and push Provisioning Docker Image
+      uses: docker/build-push-action@v1.0.0
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+        repository: iottelemetrysimulator/azureiot-simulatordeviceprovisioning
+        tags: latest
+        dockerfile: src/IotSimulatorDeviceProvisioning/Dockerfile
+        push: true
