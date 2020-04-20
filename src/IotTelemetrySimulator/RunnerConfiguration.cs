@@ -112,7 +112,7 @@
 
             var isDefaultTemplateContent = false;
             TelemetryTemplate defaultPayloadTemplate = null;
-            var rawTelemetryTemplate = configuration.GetValue<string>(nameof(Constants.TemplateConfigName));
+            var rawTelemetryTemplate = configuration.GetValue<string>(Constants.TemplateConfigName);
             if (!string.IsNullOrWhiteSpace(rawTelemetryTemplate))
             {
                 defaultPayloadTemplate = new TelemetryTemplate(rawTelemetryTemplate);
