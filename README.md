@@ -200,4 +200,4 @@ helm install sims iot-telemetry-simulator\. --namespace iotsimulator --set iotHu
 
 ## Automation
 
-The `IotTelemtrySimulator.Automation` .NET Core 2.1 library allows you to run the IoT Telemetry Simulator as part of a pipeline or any other automation framework. See the [automation guide](automation.md).
+The `IotTelemtrySimulator.Automation` .NET Core 2.1 library allows you to run the IoT Telemetry Simulator as part of a pipeline or any other automation framework. See the [automation guide](AUTOMATION.md).
