@@ -9,7 +9,7 @@
     internal class IotHubSender : SenderBase<Message>
     {
         const string ApplicationJsonContentType = "application/json";
-        const string Utf8Encoding = "utf8";
+        const string Utf8Encoding = "utf-8";
 
         private DeviceClient deviceClient;
 
