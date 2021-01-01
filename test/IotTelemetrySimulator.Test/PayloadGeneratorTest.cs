@@ -35,7 +35,7 @@
 
             foreach (var tt in t)
             {
-                randomizer.Setup(x => x.GetNext(It.IsAny<int>(), It.IsAny<int>())).Returns(tt.distribution);
+                randomizer.Setup(x => x.Next(It.IsAny<int>(), It.IsAny<int>())).Returns(tt.distribution);
                 var (p, v) = target.Generate(null);
                 Assert.Equal(tt.expectedPayload, Encoding.UTF8.GetString(p));
             }

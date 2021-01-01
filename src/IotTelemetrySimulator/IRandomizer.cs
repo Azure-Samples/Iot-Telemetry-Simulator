@@ -2,6 +2,10 @@
 {
     public interface IRandomizer
     {
-        int GetNext(int min, int max);
+        int Next();
+
+        int Next(int max);
+
+        int Next(int min, int max);
     }
 }
