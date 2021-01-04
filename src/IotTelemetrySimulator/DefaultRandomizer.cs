@@ -1,17 +1,26 @@
 ﻿namespace IotTelemetrySimulator
 {
     using System;
+    using System.Threading;
 
     public class DefaultRandomizer : IRandomizer
     {
-        Random randomGenerator = new Random();
+        private readonly ThreadLocal<Random> generator
+            = new ThreadLocal<Random>(() => new Random());
 
-        public int GetNext(int min, int max)
+        public int Next()
         {
-            lock (this.randomGenerator)
-            {
-                return this.randomGenerator.Next(min, max);
-            }
+            return this.generator.Value.Next();
+        }
+
+        public int Next(int max)
+        {
+            return this.generator.Value.Next(max);
+        }
+
+        public int Next(int min, int max)
+        {
+            return this.generator.Value.Next(min, max);
         }
     }
 }

@@ -6,7 +6,7 @@
 
     public class TelemetryValues
     {
-        Random random = new Random();
+        private IRandomizer random = new DefaultRandomizer();
         string machineName;
 
         public IList<TelemetryVariable> Variables { get; }
@@ -79,9 +79,8 @@
 
         public string CreateRandomString(int length)
         {
-            Random rnd = new Random();
             const string chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-            return new string(Enumerable.Repeat(chars, length).Select(s => s[rnd.Next(s.Length)]).ToArray());
+            return new string(Enumerable.Repeat(chars, length).Select(s => s[this.random.Next(s.Length)]).ToArray());
         }
     }
 }

@@ -26,7 +26,7 @@
             if (this.Payloads.Length == 1)
                 return this.Payloads[0].Generate(variableValues);
 
-            var random = this.randomizer.GetNext(1, 101);
+            var random = this.randomizer.Next(1, 101);
             var currentPercentage = 0;
             foreach (var payload in this.Payloads)
             {
