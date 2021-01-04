@@ -1,12 +1,15 @@
 ﻿namespace IotTelemetrySimulator
 {
     using System;
+    using System.Linq;
+    using Confluent.Kafka;
     using Microsoft.Azure.Devices.Client;
     using Microsoft.Azure.EventHubs;
 
     public class DefaultDeviceSimulatorFactory : IDeviceSimulatorFactory
     {
         private EventHubClient eventHubClient;
+        private IProducer<Null, byte[]> kafkaProducer;
 
         public SimulatedDevice Create(string deviceId, RunnerConfiguration config)
         {
@@ -24,6 +27,11 @@
             if (!string.IsNullOrEmpty(config.EventHubConnectionString))
             {
                 return this.CreateEventHubSender(deviceId, config);
+            }
+
+            if (config.KafkaConnectionProperties != null)
+            {
+                return this.CreateKafkaSender(deviceId, config);
             }
 
             throw new ArgumentException("No connnection string specified");
@@ -54,6 +62,13 @@
             // Reuse the same eventHubClient for all devices
             this.eventHubClient = this.eventHubClient ?? EventHubClient.CreateFromConnectionString(config.EventHubConnectionString);
             return new EventHubSender(this.eventHubClient, deviceId, config);
+        }
+
+        private ISender CreateKafkaSender(string deviceId, RunnerConfiguration config)
+        {
+            // Reuse the same KafkaProducer for all devices
+            this.kafkaProducer ??= new ProducerBuilder<Null, byte[]>(config.KafkaConnectionProperties.ToList()).Build();
+            return new KafkaSender(this.kafkaProducer, deviceId, config, config.KafkaTopic);
         }
     }
 }
