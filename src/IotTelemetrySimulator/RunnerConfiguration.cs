@@ -34,6 +34,8 @@
 
         public int Interval { get; set; } = 1_000;
 
+        public int DuplicateEvery { get; private set; }
+
         public PayloadGenerator PayloadGenerator { get; private set; }
 
         public TelemetryTemplate Header { get; set; }
@@ -83,6 +85,9 @@
 
             if (this.Interval <= 0)
                 throw new Exception($"{nameof(this.Interval)} must be greater than zero");
+
+            if (this.DuplicateEvery < 0)
+                throw new Exception($"{nameof(this.DuplicateEvery)} must be greater than or equal to zero");
         }
 
         public static RunnerConfiguration Load(IConfiguration configuration, ILogger logger)
@@ -95,6 +100,7 @@
             config.DeviceCount = configuration.GetValue(nameof(DeviceCount), config.DeviceCount);
             config.MessageCount = configuration.GetValue(nameof(MessageCount), config.MessageCount);
             config.Interval = configuration.GetValue(nameof(Interval), config.Interval);
+            config.DuplicateEvery = configuration.GetValue(nameof(DuplicateEvery), config.DuplicateEvery);
 
             var kafkaProperties = configuration.GetValue<string>(nameof(KafkaConnectionProperties));
             if (!string.IsNullOrWhiteSpace(kafkaProperties))

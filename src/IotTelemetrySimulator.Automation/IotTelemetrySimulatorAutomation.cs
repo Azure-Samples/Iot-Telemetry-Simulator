@@ -37,6 +37,7 @@
                 { "PartitionKey", this.configuration.PartitionKey },
                 { "MessageCount", this.configuration.MessageCount.ToString() },
                 { "Interval", this.configuration.Interval.ToString() },
+                { "DuplicateEvery", this.configuration.DuplicateEvery.ToString() },
                 { "DeviceCount", this.devicesPerContainer.ToString() },
                 { "DeviceIndex", string.Empty }
             };

@@ -57,8 +57,9 @@ The amount of devices, their names and telemetry generated can be customized usi
 |FixPayloadSize|fix telemetry payload size (in bytes). Use this setting if the content of the message does not need to change (will be an array filled with zeros)|
 |PayloadDistribution|Allows the generation of payloads based on a distribution<br />Example: "fixSize(10, 12) template(25, default) fix(65, aaaaBBBBBCCC)" generates 10% a fix payload of 10 bytes, 25% a template generated payload and 65% of the time a fix payload from values aaaaBBBBBCCC|
 |Header|telemetry header template (see telemetry template)|
-|PartitionKey|optional [partition key](https://docs.microsoft.com/en-us/azure/event-hubs/event-hubs-features#partitions) template for Event Hubs (see telemetry template)|
+|PartitionKey|optional [partition key](https://docs.microsoft.com/en-us/azure/event-hubs/event-hubs-features#partitions) template for Event Hubs (see telemetry template and [Advanced options](#advanced-options))|
 |Variables|telemetry variables (see telemetry template)|
+|DuplicateEveryNEvents|if > 0, send duplicates of the given fraction of messages. See [Advanced options](#advanced-options) (default = 0)|
 
 ## Telemetry template
 
@@ -204,3 +205,8 @@ helm install sims iot-telemetry-simulator\. --namespace iotsimulator --set iotHu
 ## Automation
 
 The `IotTelemtrySimulator.Automation` .NET Core 2.1 library allows you to run the IoT Telemetry Simulator as part of a pipeline or any other automation framework. See the [automation guide](AUTOMATION.md).
+
+## Advanced options
+
+* *PartitionKey option for Event Hubs*: When processing events downstream with a distributed engine, it is often more efficient to have related messages in the same partition. For example, if computing values over windows of events per device in Spark, having all the events for a given device in the same partition ensures they are received by a single compute node and ordered. On the other hand, the default round-robin behavior has advantages too, such as ensuring all partitions have equal load and that the system remains available even if a partition fails. Therefore, it is good to give the user control over the partition key.
+* *DuplicateEvery option to duplicate events*: Upstream systems generating events usually offer at-least-once delivery guarantees. Given that there is no mechanism in IoT Hub / Event Hubs for distributed transactions, it is always possible for the client not to receive the response from the server after sending a message, or crashing before persisting the response, and therefore to retry sending an event. This results in message duplicates. When testing event processing solution, it's important to inject such behavior so as to test if/how the system reacts to it, e.g. by deduplication. The option `DuplicateEvery` allows randomly duplicating a fraction of messages, e.g. setting `DuplicateEvery` to 1000 will duplicate messages with a probability of 1/1000 for each, i.e. will duplicate on average every 1000th message. Note that messages may be duplicated more than once: a message will be duplicated N times with a probability of `1/(DuplicateEvery)^N`.
