@@ -36,6 +36,10 @@
 
         public string EventHubConnectionString { get; set; }
 
+        public string KafkaConnectionProperties { get; set; }
+
+        public string KafkaTopic { get; set; }
+
         public string PayloadDistribution { get; set; }
 
         public string Template1 { get; set; }

@@ -26,6 +26,8 @@
             {
                 { "IotHubConnectionString", this.configuration.IotHubConnectionString },
                 { "EventHubConnectionString", this.configuration.EventHubConnectionString },
+                { "KafkaConnectionProperties", this.configuration.KafkaConnectionProperties },
+                { "KafkaTopic", this.configuration.KafkaTopic },
                 { "PayloadDistribution", this.configuration.PayloadDistribution },
                 { "Template1", this.configuration.Template1 },
                 { "Template2", this.configuration.Template2 },
