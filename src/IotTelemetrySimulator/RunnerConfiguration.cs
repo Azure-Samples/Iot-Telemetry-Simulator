@@ -10,12 +10,17 @@
 
     public class RunnerConfiguration
     {
+        public const string DefaultTemplate = "{\"deviceId\": \"$.DeviceId\", \"time\": \"$.Time\", \"counter\": $.Counter}";
         private const string RegexExpression = "(?<type>fixsize|template|fix)(\\()(?<pv>[[0-9a-z,=,\\s]+)";
         static Regex templateParser = new Regex(RegexExpression, RegexOptions.IgnoreCase | RegexOptions.Singleline);
 
         public string IotHubConnectionString { get; set; }
 
         public string EventHubConnectionString { get; set; }
+
+        public IDictionary<string, string> KafkaConnectionProperties { get; set; }
+
+        public string KafkaTopic { get; set; }
 
         public string DevicePrefix { get; set; } = "sim";
 
@@ -35,14 +40,48 @@
 
         public TelemetryTemplate Header { get; set; }
 
+        public TelemetryTemplate PartitionKey { get; set; }
+
         public TelemetryValues Variables { get; set; }
 
         public byte[] FixPayload { get; set; }
 
         public void EnsureIsValid()
         {
-            if (string.IsNullOrEmpty(this.IotHubConnectionString) && string.IsNullOrEmpty(this.EventHubConnectionString))
-                throw new Exception($"{nameof(this.IotHubConnectionString)} or {nameof(this.EventHubConnectionString)} was not defined");
+            var numberOfConnectionSettings = 0;
+            if (!string.IsNullOrWhiteSpace(this.IotHubConnectionString))
+                numberOfConnectionSettings++;
+            if (!string.IsNullOrWhiteSpace(this.EventHubConnectionString))
+                numberOfConnectionSettings++;
+            if (this.KafkaConnectionProperties != null)
+                numberOfConnectionSettings++;
+            if (numberOfConnectionSettings != 1)
+            {
+                throw new Exception(
+                    $"Exactly one of {nameof(this.IotHubConnectionString)}, {nameof(this.EventHubConnectionString)} or {nameof(this.KafkaConnectionProperties)} must be defined");
+            }
+
+            if (this.KafkaConnectionProperties != null
+                && string.IsNullOrWhiteSpace(this.KafkaTopic))
+            {
+                throw new Exception(
+                    $"{nameof(this.KafkaTopic)} is required");
+            }
+
+            if (this.KafkaConnectionProperties == null
+                && !string.IsNullOrWhiteSpace(this.KafkaTopic))
+            {
+                throw new Exception(
+                    $"{nameof(this.KafkaConnectionProperties)} is required");
+            }
+
+            if (this.KafkaConnectionProperties != null
+                && (!this.KafkaConnectionProperties.ContainsKey("bootstrap.servers")
+                || string.IsNullOrWhiteSpace(this.KafkaConnectionProperties["bootstrap.servers"])))
+            {
+                throw new Exception(
+                    $"{nameof(this.KafkaConnectionProperties)} should contain at least a value for bootstrap.servers");
+            }
 
             if (this.Interval <= 0)
                 throw new Exception($"{nameof(this.Interval)} must be greater than zero");
@@ -62,6 +101,22 @@
             config.MessageCount = configuration.GetValue(nameof(MessageCount), config.MessageCount);
             config.Interval = configuration.GetValue(nameof(Interval), config.Interval);
             config.DuplicateEvery = configuration.GetValue(nameof(DuplicateEvery), config.DuplicateEvery);
+
+            var kafkaProperties = configuration.GetValue<string>(nameof(KafkaConnectionProperties));
+            if (!string.IsNullOrWhiteSpace(kafkaProperties))
+            {
+                try
+                {
+                    var values = JsonConvert.DeserializeObject<Dictionary<string, string>>(kafkaProperties);
+                    config.KafkaConnectionProperties = values;
+                }
+                catch (JsonReaderException ex)
+                {
+                    throw new Exception($"Failed to parse properties from: {kafkaProperties}", ex);
+                }
+            }
+
+            config.KafkaTopic = configuration.GetValue<string>(nameof(KafkaTopic));
 
             var rawValues = configuration.GetValue<string>(nameof(Variables));
             if (!string.IsNullOrWhiteSpace(rawValues))
@@ -103,13 +158,16 @@
                 }
             }
 
-            var rawHeaderTemplate = configuration.GetValue<string>(nameof(Header));
-            if (!string.IsNullOrWhiteSpace(rawHeaderTemplate))
-            {
-                config.Header = new TelemetryTemplate(rawHeaderTemplate);
-            }
+            config.Header = GetTelemetryTemplate(configuration, nameof(Header));
+            config.PartitionKey = GetTelemetryTemplate(configuration, nameof(PartitionKey));
 
             return config;
+        }
+
+        private static TelemetryTemplate GetTelemetryTemplate(IConfiguration configuration, string headerName)
+        {
+            var rawHeaderTemplate = configuration.GetValue<string>(headerName);
+            return !string.IsNullOrWhiteSpace(rawHeaderTemplate) ? new TelemetryTemplate(rawHeaderTemplate) : null;
         }
 
         private static List<PayloadBase> LoadPayloads(IConfiguration configuration, RunnerConfiguration config, ILogger logger)
@@ -125,7 +183,7 @@
             }
             else
             {
-                defaultPayloadTemplate = new TelemetryTemplate();
+                defaultPayloadTemplate = new TelemetryTemplate(DefaultTemplate);
                 isDefaultTemplateContent = true;
             }
 

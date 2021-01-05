@@ -36,6 +36,10 @@
 
         public string EventHubConnectionString { get; set; }
 
+        public string KafkaConnectionProperties { get; set; }
+
+        public string KafkaTopic { get; set; }
+
         public string PayloadDistribution { get; set; }
 
         public string Template1 { get; set; }
@@ -47,6 +51,8 @@
         public string DevicePrefix { get; set; }
 
         public string Header { get; set; }
+
+        public string PartitionKey { get; set; }
 
         public int DeviceCount { get; set; }
 
