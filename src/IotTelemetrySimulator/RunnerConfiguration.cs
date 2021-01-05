@@ -17,6 +17,10 @@
 
         public string EventHubConnectionString { get; set; }
 
+        public IDictionary<string, string> KafkaConnectionProperties { get; set; }
+
+        public string KafkaTopic { get; set; }
+
         public string DevicePrefix { get; set; } = "sim";
 
         public int DeviceIndex { get; set; } = 1;
@@ -39,8 +43,40 @@
 
         public void EnsureIsValid()
         {
-            if (string.IsNullOrEmpty(this.IotHubConnectionString) && string.IsNullOrEmpty(this.EventHubConnectionString))
-                throw new Exception($"{nameof(this.IotHubConnectionString)} or {nameof(this.EventHubConnectionString)} was not defined");
+            var numberOfConnectionSettings = 0;
+            if (!string.IsNullOrWhiteSpace(this.IotHubConnectionString))
+                numberOfConnectionSettings++;
+            if (!string.IsNullOrWhiteSpace(this.EventHubConnectionString))
+                numberOfConnectionSettings++;
+            if (this.KafkaConnectionProperties != null)
+                numberOfConnectionSettings++;
+            if (numberOfConnectionSettings != 1)
+            {
+                throw new Exception(
+                    $"Exactly one of {nameof(this.IotHubConnectionString)}, {nameof(this.EventHubConnectionString)} or {nameof(this.KafkaConnectionProperties)} must be defined");
+            }
+
+            if (this.KafkaConnectionProperties != null
+                && string.IsNullOrWhiteSpace(this.KafkaTopic))
+            {
+                throw new Exception(
+                    $"{nameof(this.KafkaTopic)} is required");
+            }
+
+            if (this.KafkaConnectionProperties == null
+                && !string.IsNullOrWhiteSpace(this.KafkaTopic))
+            {
+                throw new Exception(
+                    $"{nameof(this.KafkaConnectionProperties)} is required");
+            }
+
+            if (this.KafkaConnectionProperties != null
+                && (!this.KafkaConnectionProperties.ContainsKey("bootstrap.servers")
+                || string.IsNullOrWhiteSpace(this.KafkaConnectionProperties["bootstrap.servers"])))
+            {
+                throw new Exception(
+                    $"{nameof(this.KafkaConnectionProperties)} should contain at least a value for bootstrap.servers");
+            }
 
             if (this.Interval <= 0)
                 throw new Exception($"{nameof(this.Interval)} must be greater than zero");
@@ -56,6 +92,22 @@
             config.DeviceCount = configuration.GetValue(nameof(DeviceCount), config.DeviceCount);
             config.MessageCount = configuration.GetValue(nameof(MessageCount), config.MessageCount);
             config.Interval = configuration.GetValue(nameof(Interval), config.Interval);
+
+            var kafkaProperties = configuration.GetValue<string>(nameof(KafkaConnectionProperties));
+            if (!string.IsNullOrWhiteSpace(kafkaProperties))
+            {
+                try
+                {
+                    var values = JsonConvert.DeserializeObject<Dictionary<string, string>>(kafkaProperties);
+                    config.KafkaConnectionProperties = values;
+                }
+                catch (JsonReaderException ex)
+                {
+                    throw new Exception($"Failed to parse properties from: {kafkaProperties}", ex);
+                }
+            }
+
+            config.KafkaTopic = configuration.GetValue<string>(nameof(KafkaTopic));
 
             var rawValues = configuration.GetValue<string>(nameof(Variables));
             if (!string.IsNullOrWhiteSpace(rawValues))

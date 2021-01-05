@@ -11,14 +11,14 @@ products:
 - azure-container-registry
 name: "Azure IoT Device Telemetry Simulator"
 urlFragment: azure-iot-device-telemetry-simulator
-description: "The IoT Telemetry Simulator allows you to test Azure IoT Hub or Event Hub ingestion at scale."
+description: "The IoT Telemetry Simulator allows you to test Azure IoT Hub, Event Hub or Kafka ingestion at scale."
 ---
 
 ![Master test and push](https://github.com/Azure-Samples/Iot-Telemetry-Simulator/workflows/Master%20test%20and%20push/badge.svg)
 
 # Azure IoT Device Telemetry Simulator
 
-The IoT Telemetry Simulator allows you to test Azure IoT Hub or Event Hub ingestion at scale. The implementation is communicating with Azure IoT Hub using multiplexed AMQP connections. An automation library allows you to run it as load test as part of a CI/CD pipeline.
+The IoT Telemetry Simulator allows you to test Azure IoT Hub, Event Hub or Kafka ingestion at scale. The implementation is communicating with Azure IoT Hub using multiplexed AMQP connections. An automation library allows you to run it as load test as part of a CI/CD pipeline.
 
 A single AMQP connection can handle ~995 devices.
 
@@ -44,6 +44,8 @@ The amount of devices, their names and telemetry generated can be customized usi
 |-|-|
 |IotHubConnectionString|Iot Hub connection string. "Device" our "Iot Hub owner" scopes are good. Example: HostName=your-iothub-name.azure-devices.net;SharedAccessKeyName=device;SharedAccessKey=your-iothub-key|
 |EventHubConnectionString|Event Hub connection string. SAS Policy "Send" is required. For EventHub no device registration is required. Example: Endpoint=sb://your-eventhub-namespace.servicebus.windows.net/;SharedAccessKeyName=send;SharedAccessKey=your-send-sas-primary-key;EntityPath=your-eventhub-name.|
+|KafkaConnectionProperties|Kafka connection properties as a JSON string. Example: `{"bootstrap.servers=kafka"}`.|
+|KafkaTopic|Kafka topic name.|
 |DeviceList|comma separated list of device identifiers (default = ""). Use it to generate telemetry for specific devices instead of numeric generated identifiers. If the parameter has a value the following parameters are ignored: DevicePrefix, DeviceIndex and DeviceCount are ignored|
 |DevicePrefix|device identifier prefix (default = "sim")|
 |DeviceIndex|starting device number (default = 1)|
