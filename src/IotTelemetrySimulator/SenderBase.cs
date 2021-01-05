@@ -35,8 +35,8 @@
                 {
                     await this.SendAsync(msg, cancellationToken);
                     stats.IncrementMessageSent();
-                    if (this.config.DuplicateEvery <= 0
-                        || this.random.Next(this.config.DuplicateEvery) != 0)
+                    if (this.Config.DuplicateEvery <= 0
+                        || this.random.Next(this.Config.DuplicateEvery) != 0)
                         break;
                     attempt = 1;
                 }
