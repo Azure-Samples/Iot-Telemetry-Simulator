@@ -10,6 +10,7 @@
 
     public class RunnerConfiguration
     {
+        public const string DefaultTemplate = "{\"deviceId\": \"$.DeviceId\", \"time\": \"$.Time\", \"counter\": $.Counter}";
         private const string RegexExpression = "(?<type>fixsize|template|fix)(\\()(?<pv>[[0-9a-z,=,\\s]+)";
         static Regex templateParser = new Regex(RegexExpression, RegexOptions.IgnoreCase | RegexOptions.Singleline);
 
@@ -32,6 +33,8 @@
         public PayloadGenerator PayloadGenerator { get; private set; }
 
         public TelemetryTemplate Header { get; set; }
+
+        public TelemetryTemplate PartitionKey { get; set; }
 
         public TelemetryValues Variables { get; set; }
 
@@ -97,13 +100,16 @@
                 }
             }
 
-            var rawHeaderTemplate = configuration.GetValue<string>(nameof(Header));
-            if (!string.IsNullOrWhiteSpace(rawHeaderTemplate))
-            {
-                config.Header = new TelemetryTemplate(rawHeaderTemplate);
-            }
+            config.Header = GetTelemetryTemplate(configuration, nameof(Header));
+            config.PartitionKey = GetTelemetryTemplate(configuration, nameof(PartitionKey));
 
             return config;
+        }
+
+        private static TelemetryTemplate GetTelemetryTemplate(IConfiguration configuration, string headerName)
+        {
+            var rawHeaderTemplate = configuration.GetValue<string>(headerName);
+            return !string.IsNullOrWhiteSpace(rawHeaderTemplate) ? new TelemetryTemplate(rawHeaderTemplate) : null;
         }
 
         private static List<PayloadBase> LoadPayloads(IConfiguration configuration, RunnerConfiguration config, ILogger logger)
@@ -119,7 +125,7 @@
             }
             else
             {
-                defaultPayloadTemplate = new TelemetryTemplate();
+                defaultPayloadTemplate = new TelemetryTemplate(DefaultTemplate);
                 isDefaultTemplateContent = true;
             }
 

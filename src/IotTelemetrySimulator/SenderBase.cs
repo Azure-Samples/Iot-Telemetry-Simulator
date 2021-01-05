@@ -12,13 +12,14 @@
         protected const int MaxSendAttempts = 3;
 
         private string deviceId;
-        private RunnerConfiguration config;
         private Dictionary<string, object> variableValues;
+
+        protected RunnerConfiguration Config { get; }
 
         public SenderBase(string deviceId, RunnerConfiguration config)
         {
             this.deviceId = deviceId;
-            this.config = config;
+            this.Config = config;
         }
 
         public abstract Task OpenAsync();
@@ -60,28 +61,30 @@
                 };
             }
 
-            var (messageBytes, nextVariableValues) = this.config.PayloadGenerator.Generate(this.variableValues);
+            var (messageBytes, nextVariableValues) = this.Config.PayloadGenerator.Generate(this.variableValues);
             this.variableValues = nextVariableValues;
 
             TMessage msg = this.BuildMessage(messageBytes);
 
-            if (this.config.Header != null)
+            var headerJson = this.FillTelemetryTemplate(this.Config.Header);
+            if (!string.IsNullOrWhiteSpace(headerJson))
             {
-                var headerJson = this.config.Header.Create(this.variableValues);
-                if (!string.IsNullOrWhiteSpace(headerJson))
+                var headerValues = JsonConvert.DeserializeObject<Dictionary<string, string>>(headerJson);
+                foreach (var kv in headerValues)
                 {
-                    var headerValues = JsonConvert.DeserializeObject<Dictionary<string, string>>(headerJson);
-                    foreach (var kv in headerValues)
+                    if (kv.Value != null)
                     {
-                        if (kv.Value != null)
-                        {
-                            this.SetMessageProperty(msg, kv.Key, kv.Value);
-                        }
+                        this.SetMessageProperty(msg, kv.Key, kv.Value);
                     }
                 }
             }
 
             return msg;
+        }
+
+        protected string FillTelemetryTemplate(TelemetryTemplate telemetryTemplate)
+        {
+            return telemetryTemplate?.Create(this.variableValues);
         }
 
         protected abstract void SetMessageProperty(TMessage msg, string key, string value);

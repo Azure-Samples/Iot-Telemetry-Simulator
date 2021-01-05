@@ -76,7 +76,7 @@ namespace IotTelemetrySimulator.Test
             Assert.Single(target.PayloadGenerator.Payloads);
 
             var templatedPayload = Assert.IsType<TemplatedPayload>(target.PayloadGenerator.Payloads[0]);
-            Assert.Equal(TelemetryTemplate.DefaultTemplate, templatedPayload.Template.ToString());
+            Assert.Equal(RunnerConfiguration.DefaultTemplate, templatedPayload.Template.ToString());
             Assert.Equal(100, target.PayloadGenerator.Payloads[0].Distribution);
         }
 
@@ -104,7 +104,7 @@ namespace IotTelemetrySimulator.Test
 
             var templatedPayload = Assert.IsType<TemplatedPayload>(target.PayloadGenerator.Payloads[1]);
             Assert.Equal(25, templatedPayload.Distribution);
-            Assert.Equal(TelemetryTemplate.DefaultTemplate, templatedPayload.Template.ToString());
+            Assert.Equal(RunnerConfiguration.DefaultTemplate, templatedPayload.Template.ToString());
 
             var fixPayload10 = Assert.IsType<FixPayload>(target.PayloadGenerator.Payloads[2]);
             Assert.Equal(10, fixPayload10.Distribution);

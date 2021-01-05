@@ -32,6 +32,7 @@
                 { "Variables", this.configuration.Variables },
                 { "DevicePrefix", this.configuration.DevicePrefix },
                 { "Header", this.configuration.Header },
+                { "PartitionKey", this.configuration.PartitionKey },
                 { "MessageCount", this.configuration.MessageCount.ToString() },
                 { "Interval", this.configuration.Interval.ToString() },
                 { "DeviceCount", this.devicesPerContainer.ToString() },

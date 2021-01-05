@@ -17,7 +17,16 @@
 
         protected override async Task SendAsync(EventData msg, CancellationToken cancellationToken)
         {
-            await this.eventHubClient.SendAsync(msg);
+            string partitionKey = this.FillTelemetryTemplate(this.Config.PartitionKey);
+
+            if (string.IsNullOrWhiteSpace(partitionKey))
+            {
+                await this.eventHubClient.SendAsync(msg);
+            }
+            else
+            {
+                await this.eventHubClient.SendAsync(msg, partitionKey);
+            }
         }
 
         public override Task OpenAsync()
