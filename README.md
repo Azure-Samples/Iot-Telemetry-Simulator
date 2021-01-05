@@ -57,6 +57,7 @@ The amount of devices, their names and telemetry generated can be customized usi
 |FixPayloadSize|fix telemetry payload size (in bytes). Use this setting if the content of the message does not need to change (will be an array filled with zeros)|
 |PayloadDistribution|Allows the generation of payloads based on a distribution<br />Example: "fixSize(10, 12) template(25, default) fix(65, aaaaBBBBBCCC)" generates 10% a fix payload of 10 bytes, 25% a template generated payload and 65% of the time a fix payload from values aaaaBBBBBCCC|
 |Header|telemetry header template (see telemetry template)|
+|PartitionKey|optional [partition key](https://docs.microsoft.com/en-us/azure/event-hubs/event-hubs-features#partitions) template for Event Hubs (see telemetry template)|
 |Variables|telemetry variables (see telemetry template)|
 
 ## Telemetry template

@@ -7,15 +7,8 @@
 
     public class TelemetryTemplate
     {
-        public const string DefaultTemplate = "{\"deviceId\": \"$.DeviceId\", \"time\": \"$.Time\", \"counter\": $.Counter}";
-
         private readonly string template;
         private readonly DefaultObjectPool<StringBuilder> stringBuilderPool;
-
-        public TelemetryTemplate()
-            : this(DefaultTemplate)
-        {
-        }
 
         public TelemetryTemplate(string template)
         {

@@ -52,6 +52,8 @@
 
         public string Header { get; set; }
 
+        public string PartitionKey { get; set; }
+
         public int DeviceCount { get; set; }
 
         public int MessageCount { get; set; }
