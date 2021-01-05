@@ -54,6 +54,8 @@
 
         public int Interval { get; set; }
 
+        public int DuplicateEvery { get; set; }
+
         public int ContainerCount { get; set; }
 
         public int CpuCores { get; set; }

@@ -11,6 +11,7 @@
         protected const int WaitTimeOnTransientError = 5_000;
         protected const int MaxSendAttempts = 3;
 
+        private readonly IRandomizer random = new DefaultRandomizer();
         private string deviceId;
         private RunnerConfiguration config;
         private Dictionary<string, object> variableValues;
@@ -33,7 +34,10 @@
                 {
                     await this.SendAsync(msg, cancellationToken);
                     stats.IncrementMessageSent();
-                    break;
+                    if (this.config.DuplicateEvery <= 0
+                        || this.random.Next(this.config.DuplicateEvery) != 0)
+                        break;
+                    attempt = 1;
                 }
                 catch (Exception ex) when (this.IsTransientException(ex))
                 {

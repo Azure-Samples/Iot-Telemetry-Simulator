@@ -56,6 +56,7 @@ The amount of devices, their names and telemetry generated can be customized usi
 |PayloadDistribution|Allows the generation of payloads based on a distribution<br />Example: "fixSize(10, 12) template(25, default) fix(65, aaaaBBBBBCCC)" generates 10% a fix payload of 10 bytes, 25% a template generated payload and 65% of the time a fix payload from values aaaaBBBBBCCC|
 |Header|telemetry header template (see telemetry template)|
 |Variables|telemetry variables (see telemetry template)|
+|DuplicateEveryNEvents|if > 0, send duplicates of the given fraction of messages (default = 0)|
 
 ## Telemetry template
 
