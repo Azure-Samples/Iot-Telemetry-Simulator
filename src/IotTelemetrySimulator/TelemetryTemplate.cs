@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Text;
     using Microsoft.Extensions.ObjectPool;
 
@@ -31,9 +32,12 @@
 
                 if (values != null)
                 {
-                    foreach (var kv in values)
+                    // Replace the longer keys first. Otherwise, if one variable is a prefix of
+                    // another (e.g. Var1 and Var12), replacing "$.Var1" before "$.Var12" will
+                    // spoil all instances of "$.Var12".
+                    foreach (var (key, value) in values.OrderByDescending(kv => kv.Key.Length))
                     {
-                        builder.Replace($"$.{kv.Key}", kv.Value.ToString());
+                        builder.Replace($"$.{key}", value.ToString());
                     }
                 }
 
