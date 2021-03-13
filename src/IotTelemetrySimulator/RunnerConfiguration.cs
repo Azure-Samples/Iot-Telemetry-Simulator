@@ -134,7 +134,7 @@
             else
             {
                 logger.LogWarning("No custom telemetry variables found");
-                config.Variables = new TelemetryValues(new TelemetryVariable[]
+                config.Variables = new TelemetryValues(new[]
                 {
                     new TelemetryVariable
                     {
@@ -145,7 +145,11 @@
                 });
             }
 
-            config.PayloadGenerator = new PayloadGenerator(LoadPayloads(configuration, config, logger), new DefaultRandomizer());
+            var futureVariableNames = config.Variables.NextValues(previous: null).Keys;
+
+            config.PayloadGenerator = new PayloadGenerator(
+                LoadPayloads(configuration, config, logger, futureVariableNames),
+                new DefaultRandomizer());
 
             var rawDeviceList = configuration.GetValue<string>(nameof(DeviceList));
             if (!string.IsNullOrWhiteSpace(rawDeviceList))
@@ -158,19 +162,24 @@
                 }
             }
 
-            config.Header = GetTelemetryTemplate(configuration, nameof(Header));
-            config.PartitionKey = GetTelemetryTemplate(configuration, nameof(PartitionKey));
+            config.Header = GetTelemetryTemplate(configuration, nameof(Header), futureVariableNames);
+            config.PartitionKey = GetTelemetryTemplate(configuration, nameof(PartitionKey), futureVariableNames);
 
             return config;
         }
 
-        private static TelemetryTemplate GetTelemetryTemplate(IConfiguration configuration, string headerName)
+        private static TelemetryTemplate GetTelemetryTemplate(IConfiguration configuration, string headerName, IEnumerable<string> futureVariableNames)
         {
             var rawHeaderTemplate = configuration.GetValue<string>(headerName);
-            return !string.IsNullOrWhiteSpace(rawHeaderTemplate) ? new TelemetryTemplate(rawHeaderTemplate) : null;
+            if (string.IsNullOrWhiteSpace(rawHeaderTemplate))
+            {
+                return null;
+            }
+
+            return new TelemetryTemplate(rawHeaderTemplate, futureVariableNames);
         }
 
-        private static List<PayloadBase> LoadPayloads(IConfiguration configuration, RunnerConfiguration config, ILogger logger)
+        private static List<PayloadBase> LoadPayloads(IConfiguration configuration, RunnerConfiguration config, ILogger logger, ICollection<string> futureVariableNames)
         {
             var payloads = new List<PayloadBase>();
 
@@ -179,11 +188,11 @@
             var rawTelemetryTemplate = configuration.GetValue<string>(Constants.TemplateConfigName);
             if (!string.IsNullOrWhiteSpace(rawTelemetryTemplate))
             {
-                defaultPayloadTemplate = new TelemetryTemplate(rawTelemetryTemplate);
+                defaultPayloadTemplate = new TelemetryTemplate(rawTelemetryTemplate, futureVariableNames);
             }
             else
             {
-                defaultPayloadTemplate = new TelemetryTemplate(DefaultTemplate);
+                defaultPayloadTemplate = new TelemetryTemplate(DefaultTemplate, futureVariableNames);
                 isDefaultTemplateContent = true;
             }
 
@@ -258,7 +267,7 @@
                                         }
                                         else
                                         {
-                                            payloads.Add(new TemplatedPayload(distribution, new TelemetryTemplate(rawTemplateValue), config.Variables));
+                                            payloads.Add(new TemplatedPayload(distribution, new TelemetryTemplate(rawTemplateValue, futureVariableNames), config.Variables));
                                         }
                                     }
                                 }
