@@ -7,7 +7,7 @@
     public class TelemetryTemplate
     {
         private readonly string template;
-        private List<object> templateTokens;
+        private List<Func<Dictionary<string, object>, string>> templateTokens;
 
         public TelemetryTemplate(string template, IEnumerable<string> variableNames)
         {
@@ -24,10 +24,7 @@
         {
             return string.Join(
                 string.Empty,
-                this.templateTokens.Select(
-                    token => token is Func<Dictionary<string, object>, string> varSubstitution
-                    ? varSubstitution(values)
-                    : token.ToString()));
+                this.templateTokens.Select(varSubstitution => varSubstitution(values)));
         }
 
         internal string GetTemplateDefinition()
@@ -42,7 +39,7 @@
 
         private void TokenizeTemplate(IEnumerable<string> variableNames)
         {
-            this.templateTokens = new List<object> { this.template };
+            var tokens = new List<object> { this.template };
 
             // Replace the longer keys first. Otherwise, if one variable is a prefix of
             // another (e.g. Var1 and Var12), replacing "$.Var1" before "$.Var12" will
@@ -51,7 +48,7 @@
             {
                 Func<Dictionary<string, object>, string> substituteFunc = translations => translations[key].ToString();
 
-                this.templateTokens = this.templateTokens.SelectMany(token =>
+                tokens = tokens.SelectMany(token =>
                 {
                     if (token is string stringToken)
                     {
@@ -65,6 +62,11 @@
                     return new[] { token };
                 }).ToList();
             }
+
+            this.templateTokens = tokens.Select(
+                token => token is Func<Dictionary<string, object>, string> substitutionFunc
+                    ? substitutionFunc
+                    : _ => token.ToString()).ToList();
         }
     }
 }
