@@ -19,7 +19,7 @@
         {
             if (string.IsNullOrWhiteSpace(template))
             {
-                throw new ArgumentException("Invalid _template", nameof(template));
+                throw new ArgumentException("Invalid template", nameof(template));
             }
 
             this.template = template;
@@ -33,7 +33,7 @@
         {
             return string.Join(
                 string.Empty,
-                this.templateTokens.Select(varSubstitution => varSubstitution(variables)));
+                this.templateTokens.Select(token => token(variables)));
         }
 
         internal string GetTemplateDefinition()
@@ -84,25 +84,25 @@
             // spoil all instances of "$.Var12".
             foreach (var varName in variableNames.OrderByDescending(s => s.Length))
             {
-                TemplateToken varSubstitution = variables => variables[varName].ToString();
+                string Substitute(Dictionary<string, object> variables) => variables[varName].ToString();
 
                 // In all template substrings, replace all occurrences of $.varName
                 // with the corresponding TemplateToken.
-                substringsAndTokens = substringsAndTokens.SelectMany(token =>
+                substringsAndTokens = substringsAndTokens.SelectMany(elem =>
                 {
-                    if (token is string stringToken)
+                    if (elem is string substring)
                     {
-                        var parts = stringToken.Split("$." + varName);
+                        var parts = substring.Split("$." + varName);
                         if (parts.Length > 1)
                         {
-                            // Interleave all parts with varSubstitution
+                            // Interleave all parts with the token
                             return parts
-                                .SelectMany(p => new List<object> { p, varSubstitution })
-                                .SkipLast(1); // SelectMany adds an extra varSubstitution at the end - we don't need it
+                                .SelectMany(p => new List<object> { p, (TemplateToken)Substitute })
+                                .SkipLast(1); // SelectMany adds an extra token at the end - we don't need it
                         }
                     }
 
-                    return new[] { token };
+                    return new[] { elem };
                 }).ToList();
             }
 
@@ -110,9 +110,9 @@
             substringsAndTokens.RemoveAll(x => x is string substr && substr == string.Empty);
 
             this.templateTokens = substringsAndTokens.Select(
-                substringOrToken => substringOrToken is TemplateToken token
+                elem => elem is TemplateToken token
                     ? token
-                    : _ => substringOrToken.ToString()) // convert strings to dummy TemplateTokens for uniformity
+                    : _ => elem.ToString()) // convert strings to dummy TemplateTokens for uniformity
                     .ToList();
         }
     }

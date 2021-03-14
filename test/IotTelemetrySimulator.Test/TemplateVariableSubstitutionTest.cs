@@ -27,9 +27,9 @@
 
             var telemetryTemplate = new TelemetryTemplate(
                 template,
-                variables.NextValues(null).Keys);
+                variables.NextValues(previous: null).Keys);
 
-            var generatedPayload = telemetryTemplate.Create(variables.NextValues(null));
+            var generatedPayload = telemetryTemplate.Create(variables.NextValues(previous: null));
 
             Assert.Equal(expectedPayload, generatedPayload);
         }
