@@ -17,12 +17,7 @@
 
         public TelemetryTemplate(string template, IEnumerable<string> variableNames)
         {
-            if (string.IsNullOrWhiteSpace(template))
-            {
-                throw new ArgumentException("Invalid template", nameof(template));
-            }
-
-            this.template = template;
+            this.template = template ?? throw new ArgumentNullException(nameof(template), "Template can't be null");
             this.TokenizeTemplate(variableNames);
         }
 
@@ -59,15 +54,15 @@
         /// will be represented as a list of functions:
         /// [
         ///     (vars) => "Hello, ",
-        ///     (vars) => vars["name"],
+        ///     (vars) => vars["name"].ToString(),
         ///     (vars) => "! I like ",
-        ///     (vars) => "vars["var1"]",
+        ///     (vars) => vars["var1"].ToString(),
         ///     (vars) => ", ",
-        ///     (vars) => "vars["var11"]",
+        ///     (vars) => vars["var11"].ToString(),
         ///     (vars) => " and ",
-        ///     (vars) => "vars["var12"]",
+        ///     (vars) => vars["var12"].ToString(),
         ///     (vars) => ", ",
-        ///     (vars) => "vars["name"]",
+        ///     (vars) => vars["name"].ToString(),
         ///     (vars) => ".",
         /// ].
         /// </summary>

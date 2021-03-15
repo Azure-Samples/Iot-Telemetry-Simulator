@@ -53,12 +53,20 @@
                 "Only 1",
             };
 
-            // Should ignore extra variables
+            // Should allow empty template
             yield return new object[]
             {
                 new Dictionary<string, object> { { "var1", 1 }, { "var2", 2 } },
-                "Only $.var1",
-                "Only 1",
+                string.Empty,
+                string.Empty,
+            };
+
+            // Should allow empty variables
+            yield return new object[]
+            {
+                new Dictionary<string, object>(),
+                "$.something",
+                "$.something",
             };
 
             // Should ignore non-existent variables in the template
