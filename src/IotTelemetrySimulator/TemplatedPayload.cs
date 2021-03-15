@@ -1,6 +1,5 @@
 ﻿namespace IotTelemetrySimulator
 {
-    using System;
     using System.Collections.Generic;
     using System.Text;
 
@@ -26,7 +25,7 @@
 
         public override string GetDescription()
         {
-            return $"Template: {this.Template.ToString()}";
+            return $"Template: {this.Template}";
         }
     }
 }

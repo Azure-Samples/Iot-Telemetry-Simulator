@@ -39,7 +39,7 @@
                 { "Interval", this.configuration.Interval.ToString() },
                 { "DuplicateEvery", this.configuration.DuplicateEvery.ToString() },
                 { "DeviceCount", this.devicesPerContainer.ToString() },
-                { "DeviceIndex", string.Empty }
+                { "DeviceIndex", string.Empty },
             };
         }
 
@@ -86,7 +86,7 @@
 
                 var tempVars = new Dictionary<string, string>(this.envVars)
                 {
-                    ["DeviceIndex"] = deviceIndex.ToString()
+                    ["DeviceIndex"] = deviceIndex.ToString(),
                 };
 
                 taskList[i - 1] = Task.Run(() =>
@@ -106,7 +106,7 @@
 
                 foreach (var taskContainerGroupToAwait in taskContainerGroupList)
                 {
-                    taskList[taskCount++] = wrapper.ExecuteAsync((azure) => azureHelper.WaitForContainerGroupToEnterState(azure, taskContainerGroupToAwait, "Running"));
+                    taskList[taskCount++] = wrapper.ExecuteAsync(az => azureHelper.WaitForContainerGroupToEnterState(az, taskContainerGroupToAwait, "Running"));
                 }
 
                 Task.WaitAll(taskList);
@@ -116,7 +116,7 @@
                 taskCount = 0;
                 foreach (var taskContainerGroupToAwait in taskContainerGroupList)
                 {
-                    taskList[taskCount++] = wrapper.ExecuteAsync((azure) => azureHelper.WaitForContainerGroupToEnterState(azure, taskContainerGroupToAwait, "Terminated"));
+                    taskList[taskCount++] = wrapper.ExecuteAsync(az => azureHelper.WaitForContainerGroupToEnterState(az, taskContainerGroupToAwait, "Terminated"));
                 }
 
                 Task.WaitAll(taskList);

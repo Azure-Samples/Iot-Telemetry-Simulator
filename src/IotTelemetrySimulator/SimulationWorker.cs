@@ -11,12 +11,12 @@
     using Microsoft.Extensions.Hosting;
     using Microsoft.Extensions.Logging;
 
-    class SimulationWorker : IHostedService
+    internal class SimulationWorker : IHostedService
     {
         private readonly IDeviceSimulatorFactory deviceSimulatorFactory;
         private readonly IHostApplicationLifetime applicationLifetime;
-        private CancellationTokenSource stopping;
-        private RunnerConfiguration config;
+        private readonly CancellationTokenSource stopping;
+        private readonly RunnerConfiguration config;
         private RunnerStats stats;
         private List<SimulatedDevice> devices;
         private Task runner;
@@ -55,7 +55,7 @@
                 this.devices.Add(this.deviceSimulatorFactory.Create(deviceId, this.config));
             }
 
-            this.runner = Task.Run(this.RunnerAsync);
+            this.runner = Task.Run(this.RunnerAsync, cancellationToken);
 
             return Task.CompletedTask;
         }
@@ -84,8 +84,8 @@
                 await Task.WhenAll(this.devices.Select(x => x.Start(this.stats, this.stopping.Token)));
 
                 timer.Stop();
-                Console.WriteLine($"{DateTime.UtcNow.ToString("o")}: Errors sending telemetry == {this.stats.TotalSendTelemetryErrors}");
-                Console.WriteLine($"{DateTime.UtcNow.ToString("o")}: Telemetry generation ended after {timer.ElapsedMilliseconds}ms");
+                Console.WriteLine($"{DateTime.UtcNow:o}: Errors sending telemetry == {this.stats.TotalSendTelemetryErrors}");
+                Console.WriteLine($"{DateTime.UtcNow:o}: Telemetry generation ended after {timer.ElapsedMilliseconds}ms");
             }
             catch (OperationCanceledException) when (this.stopping.Token.IsCancellationRequested)
             {
@@ -106,18 +106,14 @@
 
             if (this.runner != null)
             {
-                using (var cts = new CancellationTokenSource(maxWaitTime))
+                using var cts = new CancellationTokenSource(maxWaitTime);
+                using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, cts.Token);
+                try
                 {
-                    using (var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, cts.Token))
-                    {
-                        try
-                        {
-                            await Task.WhenAny(this.runner, Task.Delay(Timeout.Infinite, linkedCts.Token));
-                        }
-                        catch (OperationCanceledException)
-                        {
-                        }
-                    }
+                    await Task.WhenAny(this.runner, Task.Delay(Timeout.Infinite, linkedCts.Token));
+                }
+                catch (OperationCanceledException)
+                {
                 }
             }
         }

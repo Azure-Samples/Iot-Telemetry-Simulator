@@ -1,6 +1,5 @@
 namespace IotTelemetrySimulator.Test
 {
-    using System;
     using System.Collections.Generic;
     using System.Text;
     using Microsoft.Extensions.Configuration;
@@ -41,10 +40,10 @@ namespace IotTelemetrySimulator.Test
         {
             const string rawTemplate = "{\"deviceId\": \"$.DeviceId\" }";
             var configuration = new ConfigurationBuilder()
-                .AddInMemoryCollection(new Dictionary<string, string>()
+                .AddInMemoryCollection(new Dictionary<string, string>
                 {
                     { Constants.PayloadDistributionConfigName, "fixSize(51,12) template(49, mytemplate)" },
-                    { "mytemplate", rawTemplate }
+                    { "mytemplate", rawTemplate },
                 })
                 .Build();
 
@@ -66,9 +65,7 @@ namespace IotTelemetrySimulator.Test
         public void When_No_Template_Is_Set_Loads_Default_Template()
         {
             var configuration = new ConfigurationBuilder()
-                .AddInMemoryCollection(new Dictionary<string, string>()
-                {
-                })
+                .AddInMemoryCollection(new Dictionary<string, string>())
                 .Build();
 
             var target = RunnerConfiguration.Load(configuration, NullLogger.Instance);
@@ -85,10 +82,10 @@ namespace IotTelemetrySimulator.Test
         {
             const string rawTemplate = "{\"deviceId\": \"$.DeviceId\" }";
             var configuration = new ConfigurationBuilder()
-                .AddInMemoryCollection(new Dictionary<string, string>()
+                .AddInMemoryCollection(new Dictionary<string, string>
                 {
                     { Constants.PayloadDistributionConfigName, "fix(10, MTA=) template(25, default) fix(65, NjU=)" },
-                    { "mytemplate", rawTemplate }
+                    { "mytemplate", rawTemplate },
                 })
                 .Build();
 

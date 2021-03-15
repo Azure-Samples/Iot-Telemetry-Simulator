@@ -10,19 +10,19 @@
 
     class Program
     {
-        const int ParallelizationLevel = 4;
-        const int CreateOperationBulkSize = 50;
-        const string IotHubConnectionStringEnvVar = "IotHubConnectionString";
-        const string DevicePrefixEnvVar = "DevicePrefix";
-        const string DeviceCountEnvVar = "DeviceCount";
-        const string DeviceIndexEnvVar = "DeviceIndex";
+        private const int ParallelizationLevel = 4;
+        private const int CreateOperationBulkSize = 50;
+        private const string IotHubConnectionStringEnvVar = "IotHubConnectionString";
+        private const string DevicePrefixEnvVar = "DevicePrefix";
+        private const string DeviceCountEnvVar = "DeviceCount";
+        private const string DeviceIndexEnvVar = "DeviceIndex";
 
-        const string OperationNameEnvVar = "Operation";
-        const string DeleteOperationNameEnvVar = "Delete";
-        const string DeleteConfirmationEnvVar = "ConfirmDelete";
-        const string DeleteConfirmationResponseEnvVar = "yes";
+        private const string OperationNameEnvVar = "Operation";
+        private const string DeleteOperationNameEnvVar = "Delete";
+        private const string DeleteConfirmationEnvVar = "ConfirmDelete";
+        private const string DeleteConfirmationResponseEnvVar = "yes";
 
-        static async Task<int> Main(string[] args)
+        static async Task<int> Main()
         {
             var connectionString = Environment.GetEnvironmentVariable(IotHubConnectionStringEnvVar);
             if (string.IsNullOrWhiteSpace(connectionString))
@@ -61,7 +61,7 @@
                 isCreateOperation = false;
             }
 
-            RegistryManager registryManager = null;
+            RegistryManager registryManager;
 
             try
             {
@@ -69,7 +69,7 @@
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine("Failed connecting to IoT Hub registry, check the connection string value\n" + ex.ToString());
+                Console.Error.WriteLine("Failed connecting to IoT Hub registry, check the connection string value\n" + ex);
                 return 1;
             }
 
@@ -79,39 +79,25 @@
             }
             catch (Exception ex)
             {
-                Console.Error.WriteLine("Failed connecting to IoT Hub registry.\n" + ex.ToString());
+                Console.Error.WriteLine("Failed connecting to IoT Hub registry.\n" + ex);
                 return 1;
             }
 
             var deviceIdCollection = Enumerable.Range(deviceIndex, deviceCount)
-                .Select(n => $"{devicePrefix}{n.ToString("000000")}");
-
-            var registryManagerTasks = new List<Task>();
+                .Select(n => $"{devicePrefix}{n:000000}");
 
             var stats = new DeviceProvisionStats();
 
-            if (isCreateOperation)
-            {
-                Console.WriteLine($"Starting device provisioning");
-            }
-            else
-            {
-                Console.WriteLine($"Starting device deletion");
-            }
+            Console.WriteLine(isCreateOperation ? "Starting device provisioning" : "Starting device deletion");
 
             var timer = Stopwatch.StartNew();
 
-            foreach (var partition in Partitioner.Create(deviceIdCollection).GetPartitions(ParallelizationLevel))
-            {
-                if (isCreateOperation)
-                {
-                    registryManagerTasks.Add(Task.Run(() => CreateDevicesAsync(partition, registryManager, stats)));
-                }
-                else
-                {
-                    registryManagerTasks.Add(Task.Run(() => DeleteDevicesAsync(partition, registryManager, stats)));
-                }
-            }
+            var registryManagerTasks = Partitioner.Create(deviceIdCollection)
+                .GetPartitions(ParallelizationLevel)
+                .Select(partition => isCreateOperation
+                    ? Task.Run(() => CreateDevicesAsync(partition, registryManager, stats))
+                    : Task.Run(() => DeleteDevicesAsync(partition, registryManager, stats)))
+                .ToList();
 
             try
             {

@@ -85,9 +85,9 @@
             const string propertyValue = "My Propert Value";
             var rawTemplate = $"{{ \"{propertyKey}\": \"{propertyValue}\" }}";
             var configuration = new ConfigurationBuilder()
-                .AddInMemoryCollection(new Dictionary<string, string>()
+                .AddInMemoryCollection(new Dictionary<string, string>
                 {
-                    { "Header", rawTemplate }
+                    { "Header", rawTemplate },
                 })
                 .Build();
 
@@ -103,11 +103,11 @@
             Assert.Single(sender.TestMessages);
         }
 
-        class TestMessage
+        private class TestMessage
         {
-            public IDictionary<string, object> Properties { get; private set; } = new Dictionary<string, object>();
+            public IDictionary<string, object> Properties { get; } = new Dictionary<string, object>();
 
-            public byte[] MessageBytes { get; }
+            private byte[] MessageBytes { get; }
 
             public TestMessage(byte[] messageBytes)
             {
@@ -115,11 +115,11 @@
             }
         }
 
-        class TestException : Exception
+        private class TestException : Exception
         {
         }
 
-        class TestSender : SenderBase<TestMessage>
+        private class TestSender : SenderBase<TestMessage>
         {
             private readonly bool throwTransientException;
             private readonly bool throwNonTransientException;
@@ -128,7 +128,7 @@
 
             public int MaxNumberOfSendAttempts => MaxSendAttempts;
 
-            public ConcurrentBag<TestMessage> TestMessages { get; private set; } = new ConcurrentBag<TestMessage>();
+            public ConcurrentBag<TestMessage> TestMessages { get; } = new ConcurrentBag<TestMessage>();
 
             public TestSender(bool throwTransientException, bool throwNonTransientException, string deviceId, RunnerConfiguration config)
                 : base(deviceId, config)

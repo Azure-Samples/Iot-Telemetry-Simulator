@@ -1,6 +1,5 @@
 ﻿namespace IotTelemetrySimulator.Test
 {
-    using System;
     using System.Text;
     using Moq;
     using Xunit;
@@ -33,11 +32,11 @@
                 (100, "15"),
             };
 
-            foreach (var tt in t)
+            foreach (var (distribution, expectedPayload) in t)
             {
-                randomizer.Setup(x => x.Next(It.IsAny<int>(), It.IsAny<int>())).Returns(tt.distribution);
-                var (p, v) = target.Generate(null);
-                Assert.Equal(tt.expectedPayload, Encoding.UTF8.GetString(p));
+                randomizer.Setup(x => x.Next(It.IsAny<int>(), It.IsAny<int>())).Returns(distribution);
+                var (p, _) = target.Generate(null);
+                Assert.Equal(expectedPayload, Encoding.UTF8.GetString(p));
             }
         }
     }

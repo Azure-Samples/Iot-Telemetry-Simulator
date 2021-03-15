@@ -35,7 +35,9 @@
                     await Task.Run(() => func(azure), cancellationToken);
                     return;
                 }
-                catch (AggregateException ex) when (this.IsRetryAllowed() && ex.Flatten().InnerExceptions.FirstOrDefault(ex => ex is CloudException) != null)
+                catch (AggregateException ex) when (
+                    this.IsRetryAllowed() &&
+                    ex.Flatten().InnerExceptions.Any(innerEx => innerEx is CloudException))
                 {
                     azure = await this.RefreshToken();
                 }
@@ -62,11 +64,11 @@
                     _ = Task
                         .Run(async () =>
                         {
-                            this.logger.Log(LogLevel.Information, $"Re-authenticating to azure");
+                            this.logger.Log(LogLevel.Information, "Re-authenticating to azure");
                             this.lastRefresh = DateTime.UtcNow;
                             result = await this.azureFactory();
                         })
-                        .ContinueWith((t) =>
+                        .ContinueWith(t =>
                         {
                             if (t.IsCompletedSuccessfully)
                             {

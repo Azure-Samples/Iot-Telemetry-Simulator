@@ -1,7 +1,7 @@
 ﻿namespace IotTelemetrySimulator.Automation
 {
     using System;
-    using System.Collections.ObjectModel;
+    using System.Linq;
     using System.Reflection;
 
     public static class ExceptionHandler
@@ -26,15 +26,11 @@
                 else if (exception is AggregateException aggregateException)
                 {
                     // AggregateExceptions have a collection of inner exceptions, which may themselves be other
-                    // wrapping exceptions (including nested AggregateExceptions).  Recursively walk this
-                    // hierarchy.  The (singular) InnerException is included in the collection.
-                    ReadOnlyCollection<Exception> innerExceptions = aggregateException.InnerExceptions;
-                    foreach (Exception innerException in innerExceptions)
+                    // wrapping exceptions (including nested AggregateExceptions). Recursively walk this
+                    // hierarchy. The (singular) InnerException is included in the collection.
+                    if (aggregateException.InnerExceptions.Any(IsFatal))
                     {
-                        if (IsFatal(innerException))
-                        {
-                            return true;
-                        }
+                        return true;
                     }
 
                     break;

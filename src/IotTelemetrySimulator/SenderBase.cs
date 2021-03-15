@@ -12,12 +12,12 @@
         protected const int MaxSendAttempts = 3;
 
         private readonly IRandomizer random = new DefaultRandomizer();
-        private string deviceId;
+        private readonly string deviceId;
         private Dictionary<string, object> variableValues;
 
         protected RunnerConfiguration Config { get; }
 
-        public SenderBase(string deviceId, RunnerConfiguration config)
+        protected SenderBase(string deviceId, RunnerConfiguration config)
         {
             this.deviceId = deviceId;
             this.Config = config;
@@ -48,37 +48,34 @@
                 catch (Exception)
                 {
                     stats.IncrementSendTelemetryErrors();
-                    await Task.Delay(WaitTimeOnTransientError);
+                    await Task.Delay(WaitTimeOnTransientError, cancellationToken);
                 }
             }
         }
 
         protected abstract Task SendAsync(TMessage msg, CancellationToken cancellationToken);
 
-        protected TMessage CreateMessage()
+        private TMessage CreateMessage()
         {
-            if (this.variableValues == null)
+            this.variableValues ??= new Dictionary<string, object>
             {
-                this.variableValues = new Dictionary<string, object>
-                {
-                    { Constants.DeviceIdValueName, this.deviceId }
-                };
-            }
+                { Constants.DeviceIdValueName, this.deviceId },
+            };
 
             var (messageBytes, nextVariableValues) = this.Config.PayloadGenerator.Generate(this.variableValues);
             this.variableValues = nextVariableValues;
 
-            TMessage msg = this.BuildMessage(messageBytes);
+            var msg = this.BuildMessage(messageBytes);
 
             var headerJson = this.FillTelemetryTemplate(this.Config.Header);
             if (!string.IsNullOrWhiteSpace(headerJson))
             {
                 var headerValues = JsonConvert.DeserializeObject<Dictionary<string, string>>(headerJson);
-                foreach (var kv in headerValues)
+                foreach (var (key, value) in headerValues)
                 {
-                    if (kv.Value != null)
+                    if (value != null)
                     {
-                        this.SetMessageProperty(msg, kv.Key, kv.Value);
+                        this.SetMessageProperty(msg, key, value);
                     }
                 }
             }

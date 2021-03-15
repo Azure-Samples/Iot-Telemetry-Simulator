@@ -34,7 +34,7 @@
                 return this.CreateKafkaSender(deviceId, config);
             }
 
-            throw new ArgumentException("No connnection string specified");
+            throw new ArgumentException("No connection string specified");
         }
 
         private static ISender GetIotHubSender(string deviceId, RunnerConfiguration config)
@@ -47,11 +47,11 @@
                 {
                     new AmqpTransportSettings(Microsoft.Azure.Devices.Client.TransportType.Amqp_Tcp_Only)
                     {
-                        AmqpConnectionPoolSettings = new AmqpConnectionPoolSettings()
+                        AmqpConnectionPoolSettings = new AmqpConnectionPoolSettings
                         {
                             Pooling = true,
-                        }
-                    }
+                        },
+                    },
                 });
 
             return new IotHubSender(deviceClient, deviceId, config);
@@ -60,7 +60,7 @@
         private ISender CreateEventHubSender(string deviceId, RunnerConfiguration config)
         {
             // Reuse the same eventHubClient for all devices
-            this.eventHubClient = this.eventHubClient ?? EventHubClient.CreateFromConnectionString(config.EventHubConnectionString);
+            this.eventHubClient ??= EventHubClient.CreateFromConnectionString(config.EventHubConnectionString);
             return new EventHubSender(this.eventHubClient, deviceId, config);
         }
 

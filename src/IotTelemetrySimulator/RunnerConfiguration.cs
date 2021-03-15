@@ -12,7 +12,7 @@
     {
         public const string DefaultTemplate = "{\"deviceId\": \"$.DeviceId\", \"time\": \"$.Time\", \"counter\": $.Counter}";
         private const string RegexExpression = "(?<type>fixsize|template|fix)(\\()(?<pv>[[0-9a-z,=,\\s]+)";
-        static Regex templateParser = new Regex(RegexExpression, RegexOptions.IgnoreCase | RegexOptions.Singleline);
+        private static readonly Regex TemplateParser = new Regex(RegexExpression, RegexOptions.IgnoreCase | RegexOptions.Singleline);
 
         public string IotHubConnectionString { get; set; }
 
@@ -141,7 +141,7 @@
                         Min = 1,
                         Name = "Counter",
                         Step = 1,
-                    }
+                    },
                 });
             }
 
@@ -184,7 +184,7 @@
             var payloads = new List<PayloadBase>();
 
             var isDefaultTemplateContent = false;
-            TelemetryTemplate defaultPayloadTemplate = null;
+            TelemetryTemplate defaultPayloadTemplate;
             var rawTelemetryTemplate = configuration.GetValue<string>(Constants.TemplateConfigName);
             if (!string.IsNullOrWhiteSpace(rawTelemetryTemplate))
             {
@@ -199,7 +199,7 @@
             var rawDynamicPayload = configuration.GetValue<string>(Constants.PayloadDistributionConfigName);
             if (!string.IsNullOrEmpty(rawDynamicPayload))
             {
-                var matches = templateParser.Matches(rawDynamicPayload);
+                var matches = TemplateParser.Matches(rawDynamicPayload);
                 foreach (Match m in matches)
                 {
                     if (m.Groups.TryGetValue("type", out var templateType) && m.Groups.TryGetValue("pv", out var paramValuesRaw))

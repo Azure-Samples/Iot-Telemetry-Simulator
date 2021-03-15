@@ -7,7 +7,7 @@
 
     public class EventHubSender : SenderBase<EventData>
     {
-        private EventHubClient eventHubClient;
+        private readonly EventHubClient eventHubClient;
 
         public EventHubSender(EventHubClient eventHubClient, string deviceId, RunnerConfiguration config)
             : base(deviceId, config)

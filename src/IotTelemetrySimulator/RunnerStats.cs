@@ -5,13 +5,13 @@
 
     public class RunnerStats
     {
-        const long ReportRate = 100;
-        long connectedDevices;
-        long completedDevices;
-        long messagesSent;
-        long totalSendTelemetryErrors;
+        private const long ReportRate = 100;
+        private long connectedDevices;
+        private long completedDevices;
+        private long messagesSent;
+        private long totalSendTelemetryErrors;
 
-        long messagesSendingStart;
+        private long messagesSendingStart;
 
         public long MessagesSent => this.messagesSent;
 
@@ -26,14 +26,14 @@
         {
             var newValue = Interlocked.Increment(ref this.connectedDevices);
             if (newValue % ReportRate == 0)
-                Console.WriteLine($"{DateTime.UtcNow.ToString("o")}: {newValue} devices connected");
+                Console.WriteLine($"{DateTime.UtcNow:o}: {newValue} devices connected");
         }
 
         internal void IncrementCompletedDevice()
         {
             var newValue = Interlocked.Increment(ref this.completedDevices);
             if (newValue % ReportRate == 0)
-                Console.WriteLine($"{DateTime.UtcNow.ToString("o")}: {newValue} devices have completed sending messages");
+                Console.WriteLine($"{DateTime.UtcNow:o}: {newValue} devices have completed sending messages");
         }
 
         internal void IncrementMessageSent()
@@ -47,7 +47,7 @@
                 var elapsedMs = (now - start).TotalMilliseconds;
                 var ratePerSecond = (ReportRate / elapsedMs) * 1000;
 
-                Console.WriteLine($"{DateTime.UtcNow.ToString("o")}: {newValue} total messages have been sent @ {ratePerSecond.ToString("0.00")} msgs/sec");
+                Console.WriteLine($"{DateTime.UtcNow:o}: {newValue} total messages have been sent @ {ratePerSecond:0.00} msgs/sec");
             }
         }
 
@@ -55,7 +55,7 @@
         {
             var newValue = Interlocked.Increment(ref this.totalSendTelemetryErrors);
             if (newValue % ReportRate == 0)
-                Console.WriteLine($"{DateTime.UtcNow.ToString("o")}: {newValue} errors sending telemetry");
+                Console.WriteLine($"{DateTime.UtcNow:o}: {newValue} errors sending telemetry");
         }
     }
 }

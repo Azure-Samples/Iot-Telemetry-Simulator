@@ -8,10 +8,10 @@
     public class SimulatedDevice
     {
         private readonly ISender sender;
-        private RunnerConfiguration config;
-        private IRandomizer random = new DefaultRandomizer();
+        private readonly RunnerConfiguration config;
+        private readonly IRandomizer random = new DefaultRandomizer();
 
-        public string DeviceID { get; private set; }
+        public string DeviceID { get; }
 
         public SimulatedDevice(string deviceId, RunnerConfiguration config, ISender sender)
         {
@@ -25,7 +25,7 @@
             return Task.Run(() => this.RunnerAsync(stats, cancellationToken), cancellationToken);
         }
 
-        async Task RunnerAsync(RunnerStats stats, CancellationToken cancellationToken)
+        private async Task RunnerAsync(RunnerStats stats, CancellationToken cancellationToken)
         {
             try
             {

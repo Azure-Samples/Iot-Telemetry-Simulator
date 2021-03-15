@@ -5,21 +5,21 @@
 
     class DeviceProvisionStats
     {
-        const int ReportRate = 100;
+        private const int ReportRate = 100;
 
-        int lastReportedCreatedCount = 0;
-        long lastReportedCreateTime = DateTime.UtcNow.Ticks;
-        int createdCount;
+        private int lastReportedCreatedCount = 0;
+        private long lastReportedCreateTime = DateTime.UtcNow.Ticks;
+        private int createdCount;
 
         internal int TotalCreated => this.createdCount;
 
-        int lastReportedDeletedCount = 0;
-        long lastReportedDeleteTime = DateTime.UtcNow.Ticks;
-        int deletedCount;
+        private int lastReportedDeletedCount = 0;
+        private long lastReportedDeleteTime = DateTime.UtcNow.Ticks;
+        private int deletedCount;
 
         internal int TotalDeleted => this.deletedCount;
 
-        int errorCount;
+        private int errorCount;
 
         internal int TotalErrors => this.errorCount;
 
@@ -48,7 +48,7 @@
             {
                 var elapsed = DateTime.UtcNow - new DateTime(cycleStart, DateTimeKind.Utc);
                 var amountPerSec = deviceCountInCurrentCycle / elapsed.TotalSeconds;
-                Console.WriteLine($"{DateTime.UtcNow.ToString("o")}: {totalDevicesToReport} devices have been created @ {amountPerSec.ToString("0.00")}/sec");
+                Console.WriteLine($"{DateTime.UtcNow:o}: {totalDevicesToReport} devices have been created @ {amountPerSec:0.00}/sec");
             }
         }
 
@@ -82,7 +82,7 @@
             {
                 var elapsed = DateTime.UtcNow - new DateTime(cycleStart, DateTimeKind.Utc);
                 var amountPerSec = countInCurrentCycle / elapsed.TotalSeconds;
-                Console.WriteLine($"{DateTime.UtcNow.ToString("o")}: {totalDevicesToReport} devices have been deleted @ {amountPerSec.ToString("0.00")}/sec");
+                Console.WriteLine($"{DateTime.UtcNow:o}: {totalDevicesToReport} devices have been deleted @ {amountPerSec:0.00}/sec");
             }
         }
     }

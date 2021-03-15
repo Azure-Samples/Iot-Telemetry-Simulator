@@ -8,10 +8,10 @@
 
     internal class IotHubSender : SenderBase<Message>
     {
-        const string ApplicationJsonContentType = "application/json";
-        const string Utf8Encoding = "utf-8";
+        private const string ApplicationJsonContentType = "application/json";
+        private const string Utf8Encoding = "utf-8";
 
-        private DeviceClient deviceClient;
+        private readonly DeviceClient deviceClient;
 
         public IotHubSender(DeviceClient deviceClient, string deviceId, RunnerConfiguration config)
             : base(deviceId, config)
@@ -34,10 +34,9 @@
             var msg = new Message(messageBytes)
             {
                 CorrelationId = Guid.NewGuid().ToString(),
+                ContentEncoding = Utf8Encoding,
+                ContentType = ApplicationJsonContentType,
             };
-
-            msg.ContentEncoding = Utf8Encoding;
-            msg.ContentType = ApplicationJsonContentType;
 
             return msg;
         }

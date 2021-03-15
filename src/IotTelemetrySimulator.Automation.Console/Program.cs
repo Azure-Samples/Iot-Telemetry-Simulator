@@ -4,15 +4,15 @@
     using IotTelemetrySimulator.Automation;
     using Microsoft.Extensions.Logging;
 
-    class Program
+    internal class Program
     {
-        private enum ExitCode : int
+        private enum ExitCode
         {
             Error = -1,
             Success = 0,
         }
 
-        static async Task<int> Main()
+        private static async Task<int> Main()
         {
             var loggerFactory = LoggerFactory.Create(builder =>
             {

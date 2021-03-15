@@ -5,9 +5,9 @@
 
     public abstract class PayloadBase
     {
-        public int Distribution { get; set; }
+        public int Distribution { get; }
 
-        public PayloadBase(int distribution)
+        protected PayloadBase(int distribution)
         {
             if (distribution < 1 || distribution > 100)
                 throw new ArgumentOutOfRangeException(nameof(distribution), "Distribution must be between 1 and 100");

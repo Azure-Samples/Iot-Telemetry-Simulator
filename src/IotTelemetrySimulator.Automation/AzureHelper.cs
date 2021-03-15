@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.Threading.Tasks;
+    using Microsoft.Azure.Management.AppService.Fluent.Models;
     using Microsoft.Azure.Management.ContainerInstance.Fluent;
     using Microsoft.Azure.Management.ContainerInstance.Fluent.ContainerGroup.Definition;
     using Microsoft.Azure.Management.ContainerInstance.Fluent.Models;
@@ -12,6 +13,8 @@
     using Microsoft.Azure.Management.ResourceManager.Fluent.Core;
     using Microsoft.Azure.Services.AppAuthentication;
     using Microsoft.Extensions.Logging;
+    using Microsoft.Rest;
+    using LogLevel = Microsoft.Extensions.Logging.LogLevel;
 
     public class AzureHelper
     {
@@ -29,13 +32,13 @@
             IAzure azure;
             ISubscription subscription;
 
-            var servicePrincipalLoginInformation = new ServicePrincipalLoginInformation()
+            var servicePrincipalLoginInformation = new ServicePrincipalLoginInformation
             {
                 ClientId = this.configuration.AadClientId,
                 ClientSecret = this.configuration.AadClientSecret,
             };
 
-            var environment = new AzureEnvironment()
+            var environment = new AzureEnvironment
             {
                 AuthenticationEndpoint = Constants.AadEndpointUrl,
                 GraphEndpoint = Constants.AadGraphResourceId,
@@ -50,7 +53,7 @@
 
             try
             {
-                this.logger.Log(LogLevel.Information, $"Authenticating with Azure");
+                this.logger.Log(LogLevel.Information, "Authenticating with Azure");
 
                 azure = Azure.Authenticate(azureCredentials).WithDefaultSubscription();
                 subscription = azure.GetCurrentSubscription();
@@ -73,13 +76,13 @@
 
             var azureServiceTokenProvider = new AzureServiceTokenProvider();
             var accessToken = await azureServiceTokenProvider.GetAccessTokenAsync("https://management.azure.com/").ConfigureAwait(false);
-            var restTokenCredentials = new Microsoft.Rest.TokenCredentials(accessToken);
+            var restTokenCredentials = new TokenCredentials(accessToken);
             var azCred = new AzureCredentials(restTokenCredentials, null, this.configuration.AadTenantId, AzureEnvironment.AzureGlobalCloud);
             var rest = RestClient.Configure().WithEnvironment(AzureEnvironment.AzureGlobalCloud).WithCredentials(azCred).Build();
 
             try
             {
-                this.logger.LogDebug($"Authenticating with Azure");
+                this.logger.LogDebug("Authenticating with Azure");
                 azure = Azure.Authenticate(rest, this.configuration.AadTenantId).WithSubscription(this.configuration.AzureSubscriptionId);
                 subscription = azure.GetCurrentSubscription();
             }
@@ -112,7 +115,7 @@
                 throw;
             }
 
-            if (resourceGroupCreated.ProvisioningState != Microsoft.Azure.Management.AppService.Fluent.Models.ProvisioningState.Succeeded.ToString())
+            if (resourceGroupCreated.ProvisioningState != ProvisioningState.Succeeded.ToString())
             {
                 this.logger.Log(LogLevel.Error, $"Failed to create resource group '{this.configuration.ResourceGroupName}' with state {resourceGroupCreated.ProvisioningState}");
                 return false;
@@ -164,7 +167,7 @@
                 throw;
             }
 
-            if (containerGroup.ProvisioningState != Microsoft.Azure.Management.AppService.Fluent.Models.ProvisioningState.Succeeded.ToString())
+            if (containerGroup.ProvisioningState != ProvisioningState.Succeeded.ToString())
             {
                 this.logger.Log(LogLevel.Error, $"Failed to create container group '{containerGroupName}' with state {containerGroup.ProvisioningState}");
                 return false;
@@ -245,7 +248,7 @@
             catch (Exception ex)
             {
                 this.logger.Log(LogLevel.Error, $"Error deleting container group '{containerGroupName}': {ex.Message}");
-                if (ExceptionHandler.IsFatal(ex))
+                if (ex.IsFatal())
                 {
                     throw;
                 }
@@ -262,7 +265,7 @@
             catch (Exception ex)
             {
                 this.logger.Log(LogLevel.Error, $"Error deleting resource group'{this.configuration.ResourceGroupName}': {ex.Message}");
-                if (ExceptionHandler.IsFatal(ex))
+                if (ex.IsFatal())
                 {
                     throw;
                 }
