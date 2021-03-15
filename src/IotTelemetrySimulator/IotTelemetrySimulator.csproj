@@ -15,10 +15,6 @@
     <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="3.0.1" />
     <PackageReference Include="Microsoft.Extensions.ObjectPool" Version="3.0.1" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.9.5" />
-    <PackageReference Include="StyleCop.Analyzers" Version="1.1.118">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
   </ItemGroup>
 
   <ItemGroup>
