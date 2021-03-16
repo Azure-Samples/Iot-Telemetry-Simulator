@@ -15,6 +15,11 @@
         // Internal representation of the template that allows fast variable substitution.
         private List<TemplateToken> templateTokens;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TelemetryTemplate"/> class.
+        /// <param name="variableNames">All possible variable names that will be substituted
+        /// in this template in the future.</param>
+        /// </summary>
         public TelemetryTemplate(string template, IEnumerable<string> variableNames)
         {
             if (string.IsNullOrWhiteSpace(template))
@@ -59,15 +64,15 @@
         /// will be represented as a list of functions:
         /// [
         ///     (vars) => "Hello, ",
-        ///     (vars) => vars["name"],
+        ///     (vars) => vars.Contains("name") ? vars["name"].ToString() : "$.name",
         ///     (vars) => "! I like ",
-        ///     (vars) => "vars["var1"]",
+        ///     (vars) => vars.Contains("var1") ? vars["var1"].ToString() : "$.var1",
         ///     (vars) => ", ",
-        ///     (vars) => "vars["var11"]",
+        ///     (vars) => vars.Contains("var11") ? vars["var11"].ToString() : "$.var11",
         ///     (vars) => " and ",
-        ///     (vars) => "vars["var12"]",
+        ///     (vars) => vars.Contains("var12") ? vars["var12"].ToString() : "$.var12",
         ///     (vars) => ", ",
-        ///     (vars) => "vars["name"]",
+        ///     (vars) => vars.Contains("name") ? vars["name"].ToString() : "$.name",
         ///     (vars) => ".",
         /// ].
         /// </summary>
@@ -84,7 +89,11 @@
             // spoil all instances of "$.Var12".
             foreach (var varName in variableNames.OrderByDescending(s => s.Length))
             {
-                string Substitute(Dictionary<string, object> variables) => variables[varName].ToString();
+                string Substitute(Dictionary<string, object> variables)
+                {
+                    variables.TryGetValue(varName, out var result);
+                    return result == null ? "$." + varName : result.ToString();
+                }
 
                 // In all template substrings, replace all occurrences of $.varName
                 // with the corresponding TemplateToken.

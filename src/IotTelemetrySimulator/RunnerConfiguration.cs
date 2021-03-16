@@ -145,7 +145,7 @@
                 });
             }
 
-            var futureVariableNames = config.Variables.NextValues(previous: null).Keys;
+            var futureVariableNames = config.Variables.VariableNames().ToList();
 
             config.PayloadGenerator = new PayloadGenerator(
                 LoadPayloads(configuration, config, logger, futureVariableNames),

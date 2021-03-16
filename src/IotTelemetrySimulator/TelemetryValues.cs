@@ -77,6 +77,14 @@
             return next;
         }
 
+        /// <summary>
+        /// All possible variable names this object can produce.
+        /// </summary>
+        public IEnumerable<string> VariableNames()
+        {
+            return this.Variables.Select(v => v.Name).Concat(Constants.AllSpecialValueNames);
+        }
+
         public string CreateRandomString(int length)
         {
             const string chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
