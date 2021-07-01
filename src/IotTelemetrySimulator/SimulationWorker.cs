@@ -55,7 +55,7 @@
                 this.devices.Add(this.deviceSimulatorFactory.Create(deviceId, this.config));
             }
 
-            this.runner = Task.Run(this.RunnerAsync);
+            this.runner = Task.Run(this.RunnerAsync, cancellationToken);
 
             return Task.CompletedTask;
         }
