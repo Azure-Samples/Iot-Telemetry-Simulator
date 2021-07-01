@@ -38,7 +38,7 @@
         {
             this.devices = new List<SimulatedDevice>(this.config.DeviceCount);
 
-            IEnumerable<string> deviceIdentifiers = null;
+            IEnumerable<string> deviceIdentifiers;
 
             if ((this.config.DeviceList?.Count ?? 0) > 0)
             {
