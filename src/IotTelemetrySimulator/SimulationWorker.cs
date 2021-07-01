@@ -106,18 +106,14 @@
 
             if (this.runner != null)
             {
-                using (var cts = new CancellationTokenSource(maxWaitTime))
+                using var cts = new CancellationTokenSource(maxWaitTime);
+                using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, cts.Token);
+                try
                 {
-                    using (var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, cts.Token))
-                    {
-                        try
-                        {
-                            await Task.WhenAny(this.runner, Task.Delay(Timeout.Infinite, linkedCts.Token));
-                        }
-                        catch (OperationCanceledException)
-                        {
-                        }
-                    }
+                    await Task.WhenAny(this.runner, Task.Delay(Timeout.Infinite, linkedCts.Token));
+                }
+                catch (OperationCanceledException)
+                {
                 }
             }
         }
