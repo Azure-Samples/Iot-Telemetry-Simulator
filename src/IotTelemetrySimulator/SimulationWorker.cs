@@ -84,8 +84,13 @@
                 await Task.WhenAll(this.devices.Select(x => x.Start(this.stats, this.stopping.Token)));
 
                 timer.Stop();
-                Console.WriteLine($"{DateTime.UtcNow.ToString("o")}: Errors sending telemetry == {this.stats.TotalSendTelemetryErrors}");
-                Console.WriteLine($"{DateTime.UtcNow.ToString("o")}: Telemetry generation ended after {timer.ElapsedMilliseconds}ms");
+
+                Console.WriteLine(
+                    this.stats.TotalSendTelemetryErrors != 0
+                    ? $"{DateTime.UtcNow:o}: Errors sending telemetry == {this.stats.TotalSendTelemetryErrors}"
+                    : $"{DateTime.UtcNow:o}: No errors sending telemetry");
+
+                Console.WriteLine($"{DateTime.UtcNow:o}: Telemetry generation ended after {timer.ElapsedMilliseconds}ms");
             }
             catch (OperationCanceledException) when (this.stopping.Token.IsCancellationRequested)
             {
