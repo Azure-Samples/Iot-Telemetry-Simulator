@@ -52,5 +52,5 @@ jobs:
     - run: |
         docker build -f src/IotSimulatorDeviceProvisioning/Dockerfile -t ${{ secrets.ACR_URL }}/public/oss/azure-samples/azureiot-simulatordeviceprovisioning:latest .
         docker push ${{ secrets.ACR_URL }}/public/oss/azure-samples/azureiot-simulatordeviceprovisioning:latest
-        docker build -f src/IotTelemetrySimulator/Dockerfile -t ${{ secrets.ACR_URL }}/public/oss/azure-samples/azureiot-telemetrysimulator:$latest .
+        docker build -f src/IotTelemetrySimulator/Dockerfile -t ${{ secrets.ACR_URL }}/public/oss/azure-samples/azureiot-telemetrysimulator:latest .
         docker push ${{ secrets.ACR_URL }}/public/oss/azure-samples/azureiot-telemetrysimulator:latest
