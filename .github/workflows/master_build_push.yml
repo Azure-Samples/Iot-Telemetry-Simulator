@@ -15,11 +15,14 @@ jobs:
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 3.1.101
+    
     - name: Build
       run: dotnet build --configuration Release
+    
     - name: Unit Tests
       run: dotnet test
-    - name: Build and push Simulator Docker Image
+    
+    - name: DockerHub Build and push Simulator Docker Image
       uses: docker/build-push-action@v1.0.0
       with:
         username: ${{ secrets.DOCKER_USERNAME }}
@@ -38,3 +41,19 @@ jobs:
         tags: latest
         dockerfile: src/IotSimulatorDeviceProvisioning/Dockerfile
         push: true
+
+    - uses: azure/docker-login@v1
+      with:
+        login-server: ${{ secrets.ACR_URL }}
+        username: ${{ secrets.ACR_USERNAME }}
+        password: ${{ secrets.ACR_PASSWORD }}
+
+    - run: |
+        docker build . -t ${{ secrets.ACR_URL }}/public/oss/azure-samples/azureiot-simulatordeviceprovisioning:${{ github.sha }}
+        docker push ${{ secrets.ACR_URL }}/public/oss/azure-samples/azureiot-simulatordeviceprovisioning:${{ github.sha }}
+        docker tag ${{ secrets.ACR_URL }}/public/oss/azure-samples/azureiot-simulatordeviceprovisioning:${{ github.sha }}  ${{ secrets.ACR_URL }}/public/oss/azure-samples/azureiot-simulatordeviceprovisioning:latest
+        docker push ${{ secrets.ACR_URL }}/public/oss/azure-samples/azureiot-simulatordeviceprovisioning:latest
+        docker build . -t ${{ secrets.ACR_URL }}/public/oss/azure-samples/azureiot-telemetrysimulator:${{ github.sha }}
+        docker push ${{ secrets.ACR_URL }}/public/oss/azure-samples/azureiot-telemetrysimulator:${{ github.sha }}
+        docker tag ${{ secrets.ACR_URL }}/public/oss/azure-samples/azureiot-telemetrysimulator:${{ github.sha }}  ${{ secrets.ACR_URL }}/public/oss/azure-samples/azureiot-telemetrysimulator:latest
+        docker push ${{ secrets.ACR_URL }}/public/oss/azure-samples/azureiot-telemetrysimulator:latest
