@@ -15,6 +15,7 @@ jobs:
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 3.1.101
+        fetch-depth: '0'
     
     - name: Build
       run: dotnet build --configuration Release
@@ -22,13 +23,21 @@ jobs:
     - name: Unit Tests
       run: dotnet test
     
+    - name: Bump version and push tag
+      uses: anothrNick/github-tag-action@9885a4f9af674ba472de91fb3c0cb033ecb32b7e
+      id: new_version
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        INITIAL_VERSION: 1.0.0
+        WITH_V: true
+    
     - name: DockerHub Build and push Simulator Docker Image
       uses: docker/build-push-action@v1.0.0
       with:
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
         repository: iottelemetrysimulator/azureiot-telemetrysimulator
-        tags: latest
+        tags: latest, ${{ steps.new_version.outputs.tag }}
         dockerfile: src/IotTelemetrySimulator/Dockerfile
         push: true
         
@@ -38,7 +47,7 @@ jobs:
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
         repository: iottelemetrysimulator/azureiot-simulatordeviceprovisioning
-        tags: latest
+        tags: latest, ${{ steps.new_version.outputs.tag }}
         dockerfile: src/IotSimulatorDeviceProvisioning/Dockerfile
         push: true
 
@@ -50,7 +59,12 @@ jobs:
         password: ${{ secrets.ACR_PASSWORD }}
 
     - run: |
-        docker build -f src/IotSimulatorDeviceProvisioning/Dockerfile -t ${{ secrets.ACR_URL }}/public/oss/azure-samples/azureiot-simulatordeviceprovisioning:latest .
+        docker build -f src/IotTelemetrySimulator/Dockerfile -t ${{ secrets.ACR_URL }}/public/oss/azure-samples/azureiot-simulatordeviceprovisioning:${{ steps.new_version.outputs.tag }}
+        docker push ${{ secrets.ACR_URL }}/public/oss/azure-samples/azureiot-simulatordeviceprovisioning:${{ steps.new_version.outputs.tag }}
+        docker tag ${{ secrets.ACR_URL }}/public/oss/azure-samples/azureiot-simulatordeviceprovisioning:${{ steps.new_version.outputs.tag }}  ${{ secrets.ACR_URL }}/public/oss/azure-samples/azureiot-telemetrysimulator:latest
         docker push ${{ secrets.ACR_URL }}/public/oss/azure-samples/azureiot-simulatordeviceprovisioning:latest
-        docker build -f src/IotTelemetrySimulator/Dockerfile -t ${{ secrets.ACR_URL }}/public/oss/azure-samples/azureiot-telemetrysimulator:latest .
+        
+        docker build -f src/IotTelemetrySimulator/Dockerfile -t ${{ secrets.ACR_URL }}/public/oss/azure-samples/azureiot-telemetrysimulator:${{ steps.new_version.outputs.tag }}
+        docker push ${{ secrets.ACR_URL }}/public/oss/azure-samples/azureiot-telemetrysimulator:${{ steps.new_version.outputs.tag }}
+        docker tag ${{ secrets.ACR_URL }}/public/oss/azure-samples/azureiot-telemetrysimulator:${{ steps.new_version.outputs.tag }}  ${{ secrets.ACR_URL }}/public/oss/azure-samples/azureiot-telemetrysimulator:latest
         docker push ${{ secrets.ACR_URL }}/public/oss/azure-samples/azureiot-telemetrysimulator:latest
