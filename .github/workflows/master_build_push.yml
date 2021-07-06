@@ -50,11 +50,11 @@ jobs:
         password: ${{ secrets.ACR_PASSWORD }}
 
     - run: |
-        docker build . -t ${{ secrets.ACR_URL }}/public/oss/azure-samples/azureiot-simulatordeviceprovisioning:${{ github.sha }}
+        docker build src\IotSimulatorDeviceProvisioning\Dockerfile -t ${{ secrets.ACR_URL }}/public/oss/azure-samples/azureiot-simulatordeviceprovisioning:${{ github.sha }}
         docker push ${{ secrets.ACR_URL }}/public/oss/azure-samples/azureiot-simulatordeviceprovisioning:${{ github.sha }}
         docker tag ${{ secrets.ACR_URL }}/public/oss/azure-samples/azureiot-simulatordeviceprovisioning:${{ github.sha }}  ${{ secrets.ACR_URL }}/public/oss/azure-samples/azureiot-simulatordeviceprovisioning:latest
         docker push ${{ secrets.ACR_URL }}/public/oss/azure-samples/azureiot-simulatordeviceprovisioning:latest
-        docker build . -t ${{ secrets.ACR_URL }}/public/oss/azure-samples/azureiot-telemetrysimulator:${{ github.sha }}
+        docker build src\IotTelemetrySimulator\Dockerfile -t ${{ secrets.ACR_URL }}/public/oss/azure-samples/azureiot-telemetrysimulator:${{ github.sha }}
         docker push ${{ secrets.ACR_URL }}/public/oss/azure-samples/azureiot-telemetrysimulator:${{ github.sha }}
         docker tag ${{ secrets.ACR_URL }}/public/oss/azure-samples/azureiot-telemetrysimulator:${{ github.sha }}  ${{ secrets.ACR_URL }}/public/oss/azure-samples/azureiot-telemetrysimulator:latest
         docker push ${{ secrets.ACR_URL }}/public/oss/azure-samples/azureiot-telemetrysimulator:latest
