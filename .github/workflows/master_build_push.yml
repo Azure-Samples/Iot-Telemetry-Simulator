@@ -1,7 +1,6 @@
 name: Master test and push
 
 on:
-  workflow_dispatch:
   push:
     branches: [ master ]
 
@@ -33,7 +32,7 @@ jobs:
         dockerfile: src/IotTelemetrySimulator/Dockerfile
         push: true
         
-    - name: Build and push Provisioning Docker Image
+    - name: DockerHub Build and push Provisioning Docker Image
       uses: docker/build-push-action@v1.0.0
       with:
         username: ${{ secrets.DOCKER_USERNAME }}
@@ -43,18 +42,15 @@ jobs:
         dockerfile: src/IotSimulatorDeviceProvisioning/Dockerfile
         push: true
 
-    - uses: azure/docker-login@v1
+    - name: Azure Coontainer Registry Build and push Docker Images
+      uses: azure/docker-login@v1
       with:
         login-server: ${{ secrets.ACR_URL }}
         username: ${{ secrets.ACR_USERNAME }}
         password: ${{ secrets.ACR_PASSWORD }}
 
     - run: |
-        docker build . -t ${{ secrets.ACR_URL }}/public/oss/azure-samples/azureiot-simulatordeviceprovisioning:${{ github.sha }}
-        docker push ${{ secrets.ACR_URL }}/public/oss/azure-samples/azureiot-simulatordeviceprovisioning:${{ github.sha }}
-        docker tag ${{ secrets.ACR_URL }}/public/oss/azure-samples/azureiot-simulatordeviceprovisioning:${{ github.sha }}  ${{ secrets.ACR_URL }}/public/oss/azure-samples/azureiot-simulatordeviceprovisioning:latest
+        docker build src\IotSimulatorDeviceProvisioning\Dockerfile -t ${{ secrets.ACR_URL }}/public/oss/azure-samples/azureiot-simulatordeviceprovisioning:latest
         docker push ${{ secrets.ACR_URL }}/public/oss/azure-samples/azureiot-simulatordeviceprovisioning:latest
-        docker build . -t ${{ secrets.ACR_URL }}/public/oss/azure-samples/azureiot-telemetrysimulator:${{ github.sha }}
-        docker push ${{ secrets.ACR_URL }}/public/oss/azure-samples/azureiot-telemetrysimulator:${{ github.sha }}
-        docker tag ${{ secrets.ACR_URL }}/public/oss/azure-samples/azureiot-telemetrysimulator:${{ github.sha }}  ${{ secrets.ACR_URL }}/public/oss/azure-samples/azureiot-telemetrysimulator:latest
+        docker build src\IotTelemetrySimulator\Dockerfile -t ${{ secrets.ACR_URL }}/public/oss/azure-samples/azureiot-telemetrysimulator:$latest
         docker push ${{ secrets.ACR_URL }}/public/oss/azure-samples/azureiot-telemetrysimulator:latest
