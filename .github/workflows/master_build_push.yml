@@ -33,7 +33,7 @@ jobs:
         dockerfile: src/IotTelemetrySimulator/Dockerfile
         push: true
         
-    - name: Build and push Provisioning Docker Image
+    - name: DockerHub Build and push Provisioning Docker Image
       uses: docker/build-push-action@v1.0.0
       with:
         username: ${{ secrets.DOCKER_USERNAME }}
@@ -43,7 +43,8 @@ jobs:
         dockerfile: src/IotSimulatorDeviceProvisioning/Dockerfile
         push: true
 
-    - uses: azure/docker-login@v1
+    - name: Azure Coontainer Registry Build and push Docker Images
+      uses: azure/docker-login@v1
       with:
         login-server: ${{ secrets.ACR_URL }}
         username: ${{ secrets.ACR_USERNAME }}
