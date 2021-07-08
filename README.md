@@ -24,13 +24,13 @@ A single AMQP connection can handle ~995 devices.
 
 ## Quick start
 
-The quickest way to generate telemetry is using docker with the following command:
+The quickest way to generate telemetry is using Docker with the following command:
 
 ```bash
 docker run -it -e "IotHubConnectionString=HostName=your-iothub-name.azure-devices.net;SharedAccessKeyName=device;SharedAccessKey=your-iothub-key" iottelemetrysimulator/azureiot-telemetrysimulator
 ```
 
-**The simulator expects the devices to already exist in Azure IoT Hub**. If you need help creating simulation devices in an Azure IoT Hub use the included project IotSimulatorDeviceProvisioning or the docker image:
+**The simulator expects the devices to already exist in Azure IoT Hub**. If you need help creating simulation devices in an Azure IoT Hub use the included project IotSimulatorDeviceProvisioning or the Docker image:
 
 ```bash
 docker run -it -e "IotHubConnectionString=HostName=your-iothub-name.azure-devices.net;SharedAccessKeyName=registryReadWrite;SharedAccessKey=your-iothub-key" -e DeviceCount=1000 iottelemetrysimulator/azureiot-simulatordeviceprovisioning
@@ -122,7 +122,7 @@ Output:
 { "deviceId": "sim000001", "temp": 24, "Ticks": 637097550116627320, "Counter": 102, "time": "2019-11-19T10:10:11.6627320Z" }
 ```
 
-Running with docker:
+Running with Docker:
 
 ```powershell
 docker run -it -e "IotHubConnectionString=HostName=your-iothub-name.azure-devices.net;SharedAccessKeyName=device;SharedAccessKey=your-iothub-key" -e Template="{ \"deviceId\": \"$.DeviceId\", \"temp\": $.Temp, \"Ticks\": $.Ticks, \"Counter\": $.Counter, \"time\": \"$.Time\" }" -e Variables="[{name: \"Temp\", \"random\": true, \"max\": 25, \"min\": 23}, {\"name\":\"Counter\", \"min\":100} ]" iottelemetrysimulator/azureiot-telemetrysimulator
@@ -155,7 +155,7 @@ Output:
 { "deviceId": "sim000001", "temp": 24, "Ticks": 637097644550326096, "Counter": 101, "time": "2019-11-19T12:47:35.0326096Z", "engine": "on" }
 ```
 
-Running with docker:
+Running with Docker:
 
 ```bash
 docker run -it -e "IotHubConnectionString=HostName=your-iothub-name.azure-devices.net;SharedAccessKeyName=device;SharedAccessKey=your-iothub-key" -e Template="{ \"deviceId\": \"$.DeviceId\", \"temp\": $.Temp, \"Ticks\": $.Ticks, \"Counter\": $.Counter, \"time\": \"$.Time\", \"engine\": \"$.Engine\" }" -e Variables="[{name: \"Temp\", \"random\": true, \"max\": 25, \"min\": 23}, {\"name\":\"Counter\", \"min\":100}, {name:\"Engine\", values: [\"on\", \"off\"]}]" iottelemetrysimulator/azureiot-telemetrysimulator
