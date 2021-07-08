@@ -20,7 +20,7 @@ description: "The IoT Telemetry Simulator allows you to test Azure IoT Hub, Even
 
 The IoT Telemetry Simulator allows you to test Azure IoT Hub, Event Hub or Kafka ingestion at scale. The implementation is communicating with Azure IoT Hub using multiplexed AMQP connections. An automation library allows you to run it as load test as part of a CI/CD pipeline.
 
-A single AMQP connection can handle ~995 devices.
+A single AMQP connection can handle approximately 995 devices.
 
 ## Quick Start
 
