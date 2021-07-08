@@ -22,7 +22,7 @@ The IoT Telemetry Simulator allows you to test Azure IoT Hub, Event Hub or Kafka
 
 A single AMQP connection can handle ~995 devices.
 
-## Quick start
+## Quick Start
 
 The quickest way to generate telemetry is using Docker with the following command:
 
