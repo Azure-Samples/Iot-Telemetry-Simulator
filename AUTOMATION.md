@@ -28,11 +28,11 @@ To use *Service Principal* authentication, in the configuration, put **Authentic
 
 To use *Managed identity* authentication, in the configuration, put **AuthenticationMehtod = 'Managed Identity'** and provide the following two settings: **AadTenantId** and **AzureSubscriptionId**.
 
-## Using Azure Container Registry vs. a public registry / DockerHub
+## Using Azure Container Registry vs. the Microsoft Container Registry
 
-To have the Azure Container Instance pull the image from an Azure Container Registry, set the **ContainerImage** setting to the full image name including the registry: `acrname.azurecr.io/azureiot-telemetrysimulator:latest` and provide the settings for **AcrServer**, **AcrUsername** and **AcrPassword**. 
+To have the Azure Container Instance pull the image from an Azure Container Registry, set the **ContainerImage** setting to the full image name including the registry: `acrname.azurecr.io/azureiot-telemetrysimulator:latest` and provide the settings for **AcrServer**, **AcrUsername** and **AcrPassword**.
 
-To use a public registry or DockerHub, set the **ContainerImage** to the full image name including the registry again: `registryname/azureiot-telemetrysimulator:latest` but leave the settings for **AcrServer**, **AcrUsername** and **AcrPassword** empty.
+To use the image published to the Microsoft Container Registry, set the **ContainerImage** to the full image name including the registry again: `mcr.microsoft.com/oss/azure-samples/azureiot-telemetrysimulator:latest` but leave the settings for **AcrServer**, **AcrUsername** and **AcrPassword** empty.
 
 ## Configuration
 
@@ -49,7 +49,7 @@ The configuration for the automation component is kept in [appsettings.json](/sr
 |AzureRegion|Azure Region as formatted in the Fluent SDK [Core.Region Class' Fields](https://docs.microsoft.com/en-us/dotnet/api/microsoft.azure.management.resourcemanager.fluent.core.region?view=azure-dotnet)<br/>All resources will be created in this region.|
 |ResourceGroupName|The name of the Azure Resource Group created by to host the Container Groups|
 |ContainerGroupName|The name prefix under which the Azure Container Groups will be created|
-|ContainerImage|The full path to the docker image to be pulled by the Azure Container Instances.<br/> For example: `acrname.azurecr.io/azureiot-telemetrysimulator:latest`<br/> to use an Azure Container Registry or `registryname/azureiot-telemetrysimulator:latest`<br/> to use a public container registry / DockerHub|
+|ContainerImage|The full path to the docker image to be pulled by the Azure Container Instances.<br/> For example: `acrname.azurecr.io/azureiot-telemetrysimulator:latest`<br/> to use an Azure Container Registry or `mcr.microsoft.com/oss/azure-samples/azureiot-telemetrysimulator:latest`<br/> to use a public container registry / DockerHub|
 |AcrServer|The name of the Azure Container Registry. I.e. `acrname.azurecr.io<br/>Leave blank to use a public container registry|
 |AcrUsername|The name of user with which to access the Azure Container Registry<br/>Leave blank to use a public container registry|
 |AcrPassword|The above user's Azure Container Registry password<br/>Leave blank to use a public container registry|

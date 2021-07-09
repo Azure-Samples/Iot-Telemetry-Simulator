@@ -18,7 +18,7 @@ header: ""
 variables: "[{name: \"Temp\", random: true, max: 25, min: 23}, {name:\"Counter\", min:100}, {name:\"Engine\", values: [\"on\", \"off\"]}]"
 
 image:
-  repository: iottelemetrysimulator/azureiot-telemetrysimulator
+  repository: mcr.microsoft.com/oss/azure-samples/azureiot-telemetrysimulator
   tag: latest
   pullPolicy: IfNotPresent
 

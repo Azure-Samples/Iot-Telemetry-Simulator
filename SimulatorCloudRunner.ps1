@@ -12,7 +12,7 @@ param (
     [string]$Header = '',
     [string]$Variables = '[{name: \"Temp\", random: true, max: 25, min: 23}, {name:\"Counter\", min:100}, {name:\"Engine\", values: [\"on\", \"off\"]}]',
     [Parameter(Mandatory=$true)][string]$IotHubConnectionString,
-    [string]$Image = "iottelemetrysimulator/azureiot-telemetrysimulator:latest",
+    [string]$Image = "mcr.microsoft.com/oss/azure-samples/azureiot-telemetrysimulator:latest",
     [double]$Cpu = 1.0,
     [double]$Memory = 1.5
  )
