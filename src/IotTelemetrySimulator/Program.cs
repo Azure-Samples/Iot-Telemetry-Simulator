@@ -1,11 +1,7 @@
 ﻿namespace IotTelemetrySimulator
 {
     using System;
-    using System.Collections.Generic;
-    using System.Diagnostics;
-    using System.Linq;
-    using System.Threading;
-    using System.Threading.Tasks;
+    using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Hosting;
 
@@ -22,6 +18,20 @@
 #if DEBUG
                 .UseEnvironment("Development")
 #endif
+                .ConfigureAppConfiguration(builder =>
+                {
+                    var tempConfig = builder.Build();
+                    var fileConfig = tempConfig["File"];
+                    if (!string.IsNullOrEmpty(fileConfig))
+                    {
+                        builder.AddJsonFile(fileConfig, false, false);
+                    }
+
+                    if (tempConfig is IDisposable diposableConfig)
+                    {
+                        diposableConfig.Dispose();
+                    }
+                })
                 .ConfigureServices((hostContext, services) =>
                 {
                     services.AddSingleton<IDeviceSimulatorFactory, DefaultDeviceSimulatorFactory>();

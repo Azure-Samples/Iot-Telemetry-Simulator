@@ -11,7 +11,12 @@
         public TelemetryValues Variables { get; }
 
         public TemplatedPayload(int distribution, TelemetryTemplate template, TelemetryValues variables)
-            : base(distribution)
+            : this(distribution, null, template, variables)
+        {
+        }
+
+        public TemplatedPayload(int distribution, string deviceId, TelemetryTemplate template, TelemetryValues variables)
+            : base(distribution, deviceId)
         {
             this.Template = template;
             this.Variables = variables;

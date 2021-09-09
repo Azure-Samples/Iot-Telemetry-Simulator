@@ -1,0 +1,42 @@
+﻿{
+  "Variables": [
+    {
+      "name": "DeviceSequenceValue1",
+      "sequence": true,
+      "values": [ "$.Counter", "$.Counter", "$.Counter", "$.Counter", "$.Counter", "true", "false", "$.Counter" ]
+    },
+    {
+      "name": "Device1Tags",
+      "sequence": true,
+      "values": [ "['ProducedPartCount']", "['ProducedPartCount']", "['ProducedPartCount']", "['ProducedPartCount']", "['ProducedPartCount']", "['Downtime']", "['Downtime']", "['ProducedPartCount']" ]
+    },
+    {
+      "name": "Device1Downtime",
+      "values": [ "true", "true", "true", "true", "false" ]
+    },
+    {
+      "name": "Counter"
+    }
+  ],
+  "Intervals": {
+    "sim000001": 10000,
+    "sim000002": 100
+  },
+  "Payloads": [
+    {
+      "type": "template",
+      "deviceId": "sim000001",
+      "template": "{\"device\":\"$.DeviceId\",\"value\":\"$.DeviceSequenceValue1\",\"tags\": $.Device1Tags}"
+    },
+    {
+      "type": "fix",
+      "deviceId": "sim000002",
+      "value": "{\"value\":\"myfixvalue\"}"
+    },
+    {
+      "type": "template",
+      "deviceId": "sim000003",
+      "template": "{\"device\":\"$.DeviceId\",\"a\":\"b\",\"value\":\"$.DeviceSequenceValue1\"}"
+    }
+  ]
+}

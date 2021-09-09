@@ -27,13 +27,13 @@ A single AMQP connection can handle approximately 995 devices.
 The quickest way to generate telemetry is using Docker with the following command:
 
 ```bash
-docker run -it -e "IotHubConnectionString=HostName=your-iothub-name.azure-devices.net;SharedAccessKeyName=device;SharedAccessKey=your-iothub-key" mcr.microsoft.com/oss/azure-samples/azureiot-telemetrysimulator:latest
+docker run -it -e "IotHubConnectionString=HostName=your-iothub-name.azure-devices.net;SharedAccessKeyName=device;SharedAccessKey=your-iothub-key" mcr.microsoft.com/oss/azure-samples/azureiot-telemetrysimulator
 ```
 
 **The simulator expects the devices to already exist in Azure IoT Hub**. If you need help creating simulation devices in an Azure IoT Hub use the included project IotSimulatorDeviceProvisioning or the Docker image:
 
 ```bash
-docker run -it -e "IotHubConnectionString=HostName=your-iothub-name.azure-devices.net;SharedAccessKeyName=registryReadWrite;SharedAccessKey=your-iothub-key" -e DeviceCount=1000 mcr.microsoft.com/oss/azure-samples/azureiot-simulatordeviceprovisioning:latest
+docker run -it -e "IotHubConnectionString=HostName=your-iothub-name.azure-devices.net;SharedAccessKeyName=registryReadWrite;SharedAccessKey=your-iothub-key" -e DeviceCount=1000 mcr.microsoft.com/oss/azure-samples/azureiot-simulatordeviceprovisioning
 ```
 
 ## Simulator input parameters
@@ -60,6 +60,8 @@ The amount of devices, their names and telemetry generated can be customized usi
 |PartitionKey|optional [partition key](https://docs.microsoft.com/en-us/azure/event-hubs/event-hubs-features#partitions) template for Event Hubs (see telemetry template and [Advanced options](#advanced-options))|
 |Variables|telemetry variables (see telemetry template)|
 |DuplicateEveryNEvents|if > 0, send duplicates of the given fraction of messages. See [Advanced options](#advanced-options) (default = 0)|
+|File|Defines a json file where templates, variables and device based intervals can be defined. File and environment variable configuration can be used in conjunction.|
+|Intervals|Allows customizing the message interval per device|
 
 ## Telemetry template
 
@@ -99,6 +101,7 @@ Customizable variables can be created with the following properties:
 |max|The maximum value generated|
 |values|Defines an array of possible values. Example ["on", "off"]|
 |customlengthstring|Creates a random string of n bytes. Provide n as parameter|
+|sequence|Create a sequence of values as defined in `values` property, producing each one. The values itself can reference other variables|
 
 #### Example 1: Telemetry with temperature between 23 and 25 and a counter starting from 100
 
@@ -125,13 +128,13 @@ Output:
 Running with Docker:
 
 ```powershell
-docker run -it -e "IotHubConnectionString=HostName=your-iothub-name.azure-devices.net;SharedAccessKeyName=device;SharedAccessKey=your-iothub-key" -e Template="{ \"deviceId\": \"$.DeviceId\", \"temp\": $.Temp, \"Ticks\": $.Ticks, \"Counter\": $.Counter, \"time\": \"$.Time\" }" -e Variables="[{name: \"Temp\", \"random\": true, \"max\": 25, \"min\": 23}, {\"name\":\"Counter\", \"min\":100} ]" mcr.microsoft.com/oss/azure-samples/azureiot-telemetrysimulator:latest
+docker run -it -e "IotHubConnectionString=HostName=your-iothub-name.azure-devices.net;SharedAccessKeyName=device;SharedAccessKey=your-iothub-key" -e Template="{ \"deviceId\": \"$.DeviceId\", \"temp\": $.Temp, \"Ticks\": $.Ticks, \"Counter\": $.Counter, \"time\": \"$.Time\" }" -e Variables="[{name: \"Temp\", \"random\": true, \"max\": 25, \"min\": 23}, {\"name\":\"Counter\", \"min\":100} ]" mcr.microsoft.com/oss/azure-samples/azureiot-telemetrysimulator
 ```
 
 calling from PowerShell:
 
 ```powershell
-docker run -it -e "IotHubConnectionString=HostName=your-iothub-name.azure-devices.net;SharedAccessKeyName=iothubowner;SharedAccessKey=your-iothub-key" -e Template="{ \"""deviceId\""": \"""$.DeviceId\""", \"""temp\""": $.Temp, \"""Ticks\""": $.Ticks, \"""Counter\""": $.Counter, \"""time\""": \"""$.Time\""", \"""engine\""": \"""$.Engine\""" }" -e Variables="[{name: \"""Temp\""", \"""random\""": true, \"""max\""": 25, \"""min\""": 23}, {\"""name\""":\"""Counter\""", \"""min\""":100}, {name:\"""Engine\""", values: [\"""on\""", \"""off\"""]}]" -e DeviceCount=1 -e MessageCount=3 mcr.microsoft.com/oss/azure-samples/azureiot-telemetrysimulator:latest
+docker run -it -e "IotHubConnectionString=HostName=your-iothub-name.azure-devices.net;SharedAccessKeyName=iothubowner;SharedAccessKey=your-iothub-key" -e Template="{ \"""deviceId\""": \"""$.DeviceId\""", \"""temp\""": $.Temp, \"""Ticks\""": $.Ticks, \"""Counter\""": $.Counter, \"""time\""": \"""$.Time\""", \"""engine\""": \"""$.Engine\""" }" -e Variables="[{name: \"""Temp\""", \"""random\""": true, \"""max\""": 25, \"""min\""": 23}, {\"""name\""":\"""Counter\""", \"""min\""":100}, {name:\"""Engine\""", values: [\"""on\""", \"""off\"""]}]" -e DeviceCount=1 -e MessageCount=3 mcr.microsoft.com/oss/azure-samples/azureiot-telemetrysimulator
 ```
 
 #### Example 2: Adding the engine status ("on" or "off") to the telemetry
@@ -158,7 +161,61 @@ Output:
 Running with Docker:
 
 ```bash
-docker run -it -e "IotHubConnectionString=HostName=your-iothub-name.azure-devices.net;SharedAccessKeyName=device;SharedAccessKey=your-iothub-key" -e Template="{ \"deviceId\": \"$.DeviceId\", \"temp\": $.Temp, \"Ticks\": $.Ticks, \"Counter\": $.Counter, \"time\": \"$.Time\", \"engine\": \"$.Engine\" }" -e Variables="[{name: \"Temp\", \"random\": true, \"max\": 25, \"min\": 23}, {\"name\":\"Counter\", \"min\":100}, {name:\"Engine\", values: [\"on\", \"off\"]}]" mcr.microsoft.com/oss/azure-samples/azureiot-telemetrysimulator:latest
+docker run -it -e "IotHubConnectionString=HostName=your-iothub-name.azure-devices.net;SharedAccessKeyName=device;SharedAccessKey=your-iothub-key" -e Template="{ \"deviceId\": \"$.DeviceId\", \"temp\": $.Temp, \"Ticks\": $.Ticks, \"Counter\": $.Counter, \"time\": \"$.Time\", \"engine\": \"$.Engine\" }" -e Variables="[{name: \"Temp\", \"random\": true, \"max\": 25, \"min\": 23}, {\"name\":\"Counter\", \"min\":100}, {name:\"Engine\", values: [\"on\", \"off\"]}]" mcr.microsoft.com/oss/azure-samples/azureiot-telemetrysimulator
+```
+
+#### Example 3: Using a configuration file to customize simulation
+
+```bash
+docker run -it -e "IotHubConnectionString=HostName=your-iothub-name.azure-devices.net;SharedAccessKeyName=device;SharedAccessKey=your-iothub-key" -e "File=/config_files/test4-config-multiple-internals-per-device.json" -e DeviceCount=3 --mount type=bind,source=$pwd\test\IotTelemetrySimulator.Test\test_files,target=/config_files,readonly mcr.microsoft.com/oss/azure-samples/azureiot-telemetrysimulator
+```
+
+Where the file content is:
+
+```plain
+{
+  "Variables": [
+    {
+      "name": "DeviceSequenceValue1",
+      "sequence": true,
+      "values": [ "$.Counter", "$.Counter", "$.Counter", "$.Counter", "$.Counter", "true", "false", "$.Counter" ]
+    },
+    {
+      "name": "Device1Tags",
+      "sequence": true,
+      "values": [ "['ProducedPartCount']", "['ProducedPartCount']", "['ProducedPartCount']", "['ProducedPartCount']", "['ProducedPartCount']", "['Downtime']", "['Downtime']", "['ProducedPartCount']" ]
+    },
+    {
+      "name": "Device1Downtime",
+      "values": [ "true", "true", "true", "true", "false" ]
+    },
+    {
+      "name": "Counter"
+    }
+  ],
+  "Intervals": {
+    "sim000001": 10000,
+    "sim000002": 100
+  },
+  "Payloads": [
+    {
+      "type": "template",
+      "deviceId": "sim000001",
+      "template": "{\"device\":\"$.DeviceId\",\"value\":\"$.DeviceSequenceValue1\",\"tags\": $.Device1Tags}"
+    },
+    {
+      "type": "fix",
+      "deviceId": "sim000002",
+      "value": "{\"value\":\"myfixvalue\"}"
+    },
+    {
+      "type": "template",
+      "deviceId": "sim000003",
+      "template": "{\"device\":\"$.DeviceId\",\"a\":\"b\",\"value\":\"$.DeviceSequenceValue1\"}"
+    }
+  ]
+}
+
 ```
 
 ## Generating high volume of telemetry

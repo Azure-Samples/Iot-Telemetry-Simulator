@@ -8,8 +8,9 @@
     public class SimulatedDevice
     {
         private readonly ISender sender;
-        private RunnerConfiguration config;
-        private IRandomizer random = new DefaultRandomizer();
+        private readonly int interval;
+        private readonly RunnerConfiguration config;
+        private readonly IRandomizer random = new DefaultRandomizer();
 
         public string DeviceID { get; private set; }
 
@@ -18,6 +19,7 @@
             this.DeviceID = deviceId;
             this.config = config;
             this.sender = sender;
+            this.interval = config.GetMessageIntervalForDevice(deviceId);
         }
 
         public Task Start(RunnerStats stats, CancellationToken cancellationToken)
@@ -33,7 +35,7 @@
                 stats.IncrementDeviceConnected();
 
                 // Delay first event by a random amount to avoid bursts
-                await Task.Delay(this.random.Next(this.config.Interval), cancellationToken);
+                await Task.Delay(this.random.Next(this.interval), cancellationToken);
 
                 var stopwatch = new Stopwatch();
                 stopwatch.Start();
@@ -41,7 +43,7 @@
                 {
                     await this.sender.SendMessageAsync(stats, cancellationToken);
 
-                    var millisecondsDelay = Math.Max(0, this.config.Interval * i - stopwatch.ElapsedMilliseconds);
+                    var millisecondsDelay = Math.Max(0, this.interval * i - stopwatch.ElapsedMilliseconds);
                     await Task.Delay((int)millisecondsDelay, cancellationToken);
                 }
 

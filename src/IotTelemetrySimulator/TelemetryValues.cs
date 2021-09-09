@@ -6,8 +6,8 @@
 
     public class TelemetryValues
     {
-        private IRandomizer random = new DefaultRandomizer();
-        string machineName;
+        private readonly IRandomizer random = new DefaultRandomizer();
+        readonly string machineName;
 
         public IList<TelemetryVariable> Variables { get; }
 
@@ -22,21 +22,34 @@
             var next = new Dictionary<string, object>();
             var now = DateTime.Now;
 
+            var iterationNumber = 0ul;
+            if (previous != null && previous.TryGetValue(Constants.IterationNumberValueName, out var previousIterationNumber))
+            {
+                iterationNumber = (ulong)previousIterationNumber + 1;
+            }
+
             next[Constants.TimeValueName] = now.ToUniversalTime().ToString("o");
             next[Constants.LocalTimeValueName] = now.ToString("o");
             next[Constants.TicksValueName] = now.Ticks;
             next[Constants.EpochValueName] = new DateTimeOffset(now).ToUnixTimeSeconds();
             next[Constants.GuidValueName] = Guid.NewGuid().ToString();
             next[Constants.MachineNameValueName] = this.machineName;
+            next[Constants.IterationNumberValueName] = iterationNumber;
 
             if (previous != null)
             {
                 next[Constants.DeviceIdValueName] = previous[Constants.DeviceIdValueName];
             }
 
+            var hasSequenceVars = false;
+
             foreach (var val in this.Variables)
             {
-                if (val.Random)
+                if (val.Sequence)
+                {
+                    hasSequenceVars = true;
+                }
+                else if (val.Random)
                 {
                     if (val.Min.HasValue && val.Max.HasValue && val.Max > val.Min)
                     {
@@ -70,6 +83,47 @@
                     else
                     {
                         next[val.Name] = val.Min ?? 1;
+                    }
+                }
+            }
+
+            if (hasSequenceVars)
+            {
+                foreach (var seqVar in this.Variables.Where(x => x.Sequence))
+                {
+                    var value = seqVar.Values[iterationNumber % (ulong)seqVar.Values.Length];
+                    string usedVariable = null;
+                    if (value is string valueString && valueString.StartsWith("$."))
+                    {
+                        usedVariable = valueString[2..];
+                        if (next.TryGetValue(usedVariable, out var valueFromVariable))
+                        {
+                            next[seqVar.Name] = valueFromVariable;
+                        }
+                        else
+                        {
+                            next[seqVar.Name] = value;
+                        }
+                    }
+                    else
+                    {
+                        next[seqVar.Name] = value;
+                    }
+
+                    var referencedVariables = seqVar.GetReferenceVariableNames();
+                    foreach (var referenceVariable in referencedVariables)
+                    {
+                        if (referenceVariable != usedVariable)
+                        {
+                            if (previous != null && previous.TryGetValue(referenceVariable, out var previousValue))
+                            {
+                                next[referenceVariable] = previousValue;
+                            }
+                            else
+                            {
+                                next.Remove(referenceVariable);
+                            }
+                        }
                     }
                 }
             }
