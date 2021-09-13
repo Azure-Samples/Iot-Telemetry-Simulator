@@ -2,13 +2,13 @@
 {
     using System;
     using System.Linq;
+    using Azure.Messaging.EventHubs.Producer;
     using Confluent.Kafka;
     using Microsoft.Azure.Devices.Client;
-    using Microsoft.Azure.EventHubs;
 
     public class DefaultDeviceSimulatorFactory : IDeviceSimulatorFactory
     {
-        private EventHubClient eventHubClient;
+        private EventHubProducerClient eventHubProducerClient;
         private IProducer<Null, byte[]> kafkaProducer;
 
         public SimulatedDevice Create(string deviceId, RunnerConfiguration config)
@@ -60,8 +60,8 @@
         private ISender CreateEventHubSender(string deviceId, RunnerConfiguration config)
         {
             // Reuse the same eventHubClient for all devices
-            this.eventHubClient = this.eventHubClient ?? EventHubClient.CreateFromConnectionString(config.EventHubConnectionString);
-            return new EventHubSender(this.eventHubClient, deviceId, config);
+            this.eventHubProducerClient = this.eventHubProducerClient ?? new EventHubProducerClient(config.EventHubConnectionString);
+            return new EventHubSender(this.eventHubProducerClient, deviceId, config);
         }
 
         private ISender CreateKafkaSender(string deviceId, RunnerConfiguration config)
