@@ -3,16 +3,17 @@
     using System;
     using System.Threading;
     using System.Threading.Tasks;
-    using Microsoft.Azure.EventHubs;
+    using Azure.Messaging.EventHubs;
+    using Azure.Messaging.EventHubs.Producer;
 
     public class EventHubSender : SenderBase<EventData>
     {
-        private EventHubClient eventHubClient;
+        private readonly EventHubProducerClient eventHubProducer;
 
-        public EventHubSender(EventHubClient eventHubClient, string deviceId, RunnerConfiguration config)
+        public EventHubSender(EventHubProducerClient eventHubProducer, string deviceId, RunnerConfiguration config)
             : base(deviceId, config)
         {
-            this.eventHubClient = eventHubClient;
+            this.eventHubProducer = eventHubProducer;
         }
 
         protected override async Task SendAsync(EventData msg, CancellationToken cancellationToken)
@@ -21,11 +22,11 @@
 
             if (string.IsNullOrWhiteSpace(partitionKey))
             {
-                await this.eventHubClient.SendAsync(msg);
+                await this.eventHubProducer.SendAsync(new EventData[] { msg });
             }
             else
             {
-                await this.eventHubClient.SendAsync(msg, partitionKey);
+                await this.eventHubProducer.SendAsync(new EventData[] { msg }, new SendEventOptions { PartitionKey = partitionKey });
             }
         }
 
@@ -46,7 +47,7 @@
 
         protected override bool IsTransientException(Exception exception)
         {
-            return exception is EventHubsCommunicationException;
+            return exception is EventHubsException eventHubsException && eventHubsException.IsTransient;
         }
     }
 }
