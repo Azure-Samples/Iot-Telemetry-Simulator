@@ -101,7 +101,7 @@ Customizable variables can be created with the following properties:
 |max|The maximum value generated|
 |values|Defines an array of possible values. Example ["on", "off"]|
 |customlengthstring|Creates a random string of n bytes. Provide n as parameter|
-|sequence|Create a sequence of values as defined in `values` property, producing each one. The values itself can reference other variables|
+|sequence|Create a sequence of values as defined in `values` property, producing one after the other. Values can reference other variables|
 
 #### Example 1: Telemetry with temperature between 23 and 25 and a counter starting from 100
 
@@ -215,7 +215,6 @@ Where the file content is:
     }
   ]
 }
-
 ```
 
 ## Generating high volume of telemetry
