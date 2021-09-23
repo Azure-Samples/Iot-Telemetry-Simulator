@@ -131,6 +131,10 @@
 
             config.KafkaTopic = configuration.GetValue<string>(nameof(KafkaTopic));
 
+            // Variables can come in 2 forms: 
+            // - Configuration section, when reading configuration from a JSON file;
+            // - JSON string, when reading configuration from CLI parameters.
+
             var variablesSection = configuration.GetSection(nameof(Variables));
             if (variablesSection.Exists() && variablesSection.Value is not string)
             {

@@ -22,7 +22,7 @@
             var next = new Dictionary<string, object>();
             var now = DateTime.Now;
 
-            var iterationNumber = 0ul;
+            ulong iterationNumber = 0
             if (previous != null && previous.TryGetValue(Constants.IterationNumberValueName, out var previousIterationNumber))
             {
                 iterationNumber = (ulong)previousIterationNumber + 1;
@@ -87,6 +87,8 @@
                 }
             }
 
+            // We generate values of sequence vars after the non-sequence vars, because
+            // sequence vars might reference non-sequence vars.
             if (hasSequenceVars)
             {
                 foreach (var seqVar in this.Variables.Where(x => x.Sequence))
