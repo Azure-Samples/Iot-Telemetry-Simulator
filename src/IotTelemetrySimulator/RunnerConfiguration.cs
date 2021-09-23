@@ -231,9 +231,16 @@
                 payloads = LoadPayloadsSimple(configuration, config, logger, futureVariableNames);
             }
 
-            if (payloads.GroupBy(x => x.DeviceId).Any(g => g.Select(x => x.Distribution).Sum() != 100))
+            foreach (var group in payloads.GroupBy(x => x.DeviceId))
             {
-                logger.LogWarning("Payload percentage distribution is not equal 100");
+                var totalDistribution = group.Select(x => x.Distribution).Sum();
+                if (totalDistribution != 100)
+                {
+                    logger.LogWarning(
+                        "Payload percentage distribution is {Total} != 100 for device {DeviceId}",
+                        totalDistribution,
+                        group.Key);
+                }
             }
 
             return payloads;
@@ -391,13 +398,8 @@
             return JsonConvert.SerializeObject(dictionaryVals);
         }
 
-        static void ConvertToDictionary(IConfiguration configuration, Dictionary<string, string> data = null, IConfigurationSection top = null)
+        static void ConvertToDictionary(IConfiguration configuration, Dictionary<string, string> data, IConfigurationSection top = null)
         {
-            if (data == null)
-            {
-                data = new Dictionary<string, string>();
-            }
-
             var children = configuration.GetChildren();
             foreach (var child in children)
             {

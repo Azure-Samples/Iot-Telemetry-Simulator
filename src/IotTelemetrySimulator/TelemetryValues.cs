@@ -110,25 +110,39 @@
                         next[seqVar.Name] = value;
                     }
 
-                    var referencedVariables = seqVar.GetReferenceVariableNames();
-                    foreach (var referenceVariable in referencedVariables)
-                    {
-                        if (referenceVariable != usedVariable)
-                        {
-                            if (previous != null && previous.TryGetValue(referenceVariable, out var previousValue))
-                            {
-                                next[referenceVariable] = previousValue;
-                            }
-                            else
-                            {
-                                next.Remove(referenceVariable);
-                            }
-                        }
-                    }
+                    ResetNonUsedReferencedVariables(previous, next, seqVar, usedVariable);
                 }
             }
 
             return next;
+        }
+
+        /// <summary>
+        /// Removes non-used variables in a sequence.
+        /// This way we can keep the a counter variable incrementally correctly if the sequence did not use it in current iteration.
+        /// </summary>
+        private static void ResetNonUsedReferencedVariables(
+            Dictionary<string, object> previous,
+            Dictionary<string, object> next,
+            TelemetryVariable sequenceVariable,
+            string usedVariable)
+        {
+            var referencedVariables = sequenceVariable.GetReferenceVariableNames();
+            foreach (var referencedVariable in referencedVariables)
+            {
+                if (referencedVariable != usedVariable)
+                {
+                    // Restore it from the previous value.
+                    if (previous != null && previous.TryGetValue(referencedVariable, out var previousValue))
+                    {
+                        next[referencedVariable] = previousValue;
+                    }
+                    else
+                    {
+                        next.Remove(referencedVariable);
+                    }
+                }
+            }
         }
 
         /// <summary>

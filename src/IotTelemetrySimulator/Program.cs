@@ -24,7 +24,7 @@
                     var fileConfig = tempConfig["File"];
                     if (!string.IsNullOrEmpty(fileConfig))
                     {
-                        builder.AddJsonFile(fileConfig, false, false);
+                        builder.AddJsonFile(fileConfig, optional: false, reloadOnChange: false);
                     }
 
                     if (tempConfig is IDisposable diposableConfig)

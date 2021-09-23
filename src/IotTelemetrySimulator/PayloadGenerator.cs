@@ -21,14 +21,9 @@
             }
 
             this.Payloads = payloads.OrderByDescending(x => x.Distribution).ToArray();
-            this.payloadsPerDevice = new Dictionary<string, PayloadBase>();
-            foreach (var payload in this.Payloads)
-            {
-                if (!string.IsNullOrEmpty(payload.DeviceId))
-                {
-                    this.payloadsPerDevice[payload.DeviceId] = payload;
-                }
-            }
+            this.payloadsPerDevice = this.Payloads
+                .Where(x => !string.IsNullOrEmpty(x.DeviceId))
+                .ToDictionary(x => x.DeviceId);
         }
 
         public (byte[], Dictionary<string, object>) Generate(string deviceId, Dictionary<string, object> variableValues)
@@ -36,7 +31,7 @@
             if (this.Payloads.Length == 1)
                 return this.Payloads[0].Generate(variableValues);
 
-            if (!string.IsNullOrEmpty(deviceId) && this.payloadsPerDevice.TryGetValue(deviceId, out var payloadForDevice))
+            if (deviceId != null && this.payloadsPerDevice.TryGetValue(deviceId, out var payloadForDevice))
                 return payloadForDevice.Generate(variableValues);
 
             var random = this.randomizer.Next(1, 101);
