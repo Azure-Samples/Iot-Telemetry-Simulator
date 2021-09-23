@@ -22,7 +22,7 @@
             var next = new Dictionary<string, object>();
             var now = DateTime.Now;
 
-            ulong iterationNumber = 0
+            ulong iterationNumber = 0;
             if (previous != null && previous.TryGetValue(Constants.IterationNumberValueName, out var previousIterationNumber))
             {
                 iterationNumber = (ulong)previousIterationNumber + 1;

@@ -131,10 +131,9 @@
 
             config.KafkaTopic = configuration.GetValue<string>(nameof(KafkaTopic));
 
-            // Variables can come in 2 forms: 
-            // - Configuration section, when reading configuration from a JSON file;
+            // Variables can come in 2 forms:
+            // - Configuration section, when reading configuration from a JSON file
             // - JSON string, when reading configuration from CLI parameters.
-
             var variablesSection = configuration.GetSection(nameof(Variables));
             if (variablesSection.Exists() && variablesSection.Value is not string)
             {
@@ -402,14 +401,14 @@
             return JsonConvert.SerializeObject(dictionaryVals);
         }
 
-        static void ConvertToDictionary(IConfiguration configuration, Dictionary<string, string> data, IConfigurationSection top = null)
+        static void ConvertToDictionary(IConfigurationSection configuration, Dictionary<string, string> data, IConfigurationSection top = null)
         {
             var children = configuration.GetChildren();
             foreach (var child in children)
             {
                 if (child.Value == null)
                 {
-                    ConvertToDictionary(configuration.GetSection(child.Key), data);
+                    ConvertToDictionary(configuration.GetSection(child.Key), data, configuration);
                     continue;
                 }
 
