@@ -97,7 +97,8 @@ Customizable variables can be created with the following properties:
 |name|Name of the property. Defines what will be replaced in the template telemetry $.Name|
 |random|Make the value random, limited by min and max|
 |step|If the value is not random, will be incremented each time by the value of step|
-|min|For random values defines it's minimum. Otherwise, will be the starting value|
+|randomDouble|Make the value random and double, limited by min and max|
+|min|For random (integer or double) values defines it's minimum. Otherwise, will be the starting value|
 |max|The maximum value generated|
 |values|Defines an array of possible values. Example ["on", "off"]|
 |customlengthstring|Creates a random string of n bytes. Provide n as parameter|
@@ -109,34 +110,34 @@ Customizable variables can be created with the following properties:
 Template:
 
 ```json
-{ "deviceId": "$.DeviceId", "temp": $.Temp, "Ticks": $.Ticks, "Counter": $.Counter, "time": "$.Time" }
+{ "deviceId": "$.DeviceId", "temp": $.Temp, "temp2": $.DoubleValue, "Ticks": $.Ticks, "Counter": $.Counter, "time": "$.Time" }
 ```
 
 Variables:
 
 ```json
-[{"name": "Temp", "random": true, "max": 25, "min": 23}, {"name":"Counter", "min":100, "max":102}]
+[{"name": "Temp", "random": true, "max": 25, "min": 23}, {"name":"Counter", "min":100, "max":102}, {"name": "DoubleValue", "randomDouble":true, "min":0.22, "max":1.25}]
 ```
 
 Output:
 
 ```json
-{ "deviceId": "sim000001", "temp": 23, "Ticks": 637097550115091350, "Counter": 100, "time": "2019-11-19T10:10:11.5091350Z" }
-{ "deviceId": "sim000001", "temp": 23, "Ticks": 637097550115952079, "Counter": 101, "time": "2019-11-19T10:10:11.5952079Z" }
-{ "deviceId": "sim000001", "temp": 24, "Ticks": 637097550116627320, "Counter": 102, "time": "2019-11-19T10:10:11.6627320Z" }
-{ "deviceId": "sim000001", "temp": 24, "Ticks": 637097550117027320, "Counter": 100, "time": "2019-11-19T10:10:11.7027320Z" }
+{ "deviceId": "sim000001", "temp": 23, "temp2": 0.207759137669466, "Ticks": 637097550115091350, "Counter": 100, "time": "2019-11-19T10:10:11.5091350Z" }
+{ "deviceId": "sim000001", "temp": 23, "temp2": 1.207232427664231, "Ticks": 637097550115952079, "Counter": 101, "time": "2019-11-19T10:10:11.5952079Z" }
+{ "deviceId": "sim000001", "temp": 24, "temp2": 0.992871827638167, "Ticks": 637097550116627320, "Counter": 102, "time": "2019-11-19T10:10:11.6627320Z" }
+{ "deviceId": "sim000001", "temp": 24, "temp2": 0.779288272162327, "Ticks": 637097550117027320, "Counter": 100, "time": "2019-11-19T10:10:11.7027320Z" }
 ```
 
 Running with Docker:
 
 ```powershell
-docker run -it -e "IotHubConnectionString=HostName=your-iothub-name.azure-devices.net;SharedAccessKeyName=device;SharedAccessKey=your-iothub-key" -e Template="{ \"deviceId\": \"$.DeviceId\", \"temp\": $.Temp, \"Ticks\": $.Ticks, \"Counter\": $.Counter, \"time\": \"$.Time\" }" -e Variables="[{name: \"Temp\", \"random\": true, \"max\": 25, \"min\": 23}, {\"name\":\"Counter\", \"min\":100, \"max\":102} ]" mcr.microsoft.com/oss/azure-samples/azureiot-telemetrysimulator
+docker run -it -e "IotHubConnectionString=HostName=your-iothub-name.azure-devices.net;SharedAccessKeyName=device;SharedAccessKey=your-iothub-key" -e Template="{ \"deviceId\": \"$.DeviceId\", \"temp\": $.Temp, \"temp2\": $.DoubleValue, \"Ticks\": $.Ticks, \"Counter\": $.Counter, \"time\": \"$.Time\" }" -e Variables="[{name: \"Temp\", \"random\": true, \"max\": 25, \"min\": 23}, {\"name\":\"Counter\", \"min\":100, \"max\":102} ]" mcr.microsoft.com/oss/azure-samples/azureiot-telemetrysimulator
 ```
 
 calling from PowerShell:
 
 ```powershell
-docker run -it -e "IotHubConnectionString=HostName=your-iothub-name.azure-devices.net;SharedAccessKeyName=iothubowner;SharedAccessKey=your-iothub-key" -e Template="{ \"""deviceId\""": \"""$.DeviceId\""", \"""temp\""": $.Temp, \"""Ticks\""": $.Ticks, \"""Counter\""": $.Counter, \"""time\""": \"""$.Time\""", \"""engine\""": \"""$.Engine\""" }" -e Variables="[{name: \"""Temp\""", \"""random\""": true, \"""max\""": 25, \"""min\""": 23}, {\"""name\""":\"""Counter\""", \"""min\""":100, \"""max\""":102}, {name:\"""Engine\""", values: [\"""on\""", \"""off\"""]}]" -e DeviceCount=1 -e MessageCount=3 mcr.microsoft.com/oss/azure-samples/azureiot-telemetrysimulator
+docker run -it -e "IotHubConnectionString=HostName=your-iothub-name.azure-devices.net;SharedAccessKeyName=iothubowner;SharedAccessKey=your-iothub-key" -e Template="{ \"""deviceId\""": \"""$.DeviceId\""", \"""temp\""": $.Temp, \"""temp2\""": $.RandomDouble , \"""Ticks\""": $.Ticks, \"""Counter\""": $.Counter, \"""time\""": \"""$.Time\""", \"""engine\""": \"""$.Engine\""" }" -e Variables="[{name: \"""Temp\""", \"""random\""": true, \"""max\""": 25, \"""min\""": 23}, {\"""name\""":\"""Counter\""", \"""min\""":100, \"""max\""":102}, {name:\"""Engine\""", values: [\"""on\""", \"""off\"""]}]" -e DeviceCount=1 -e MessageCount=3 mcr.microsoft.com/oss/azure-samples/azureiot-telemetrysimulator
 ```
 
 #### Example 2: Adding the engine status ("on" or "off") to the telemetry

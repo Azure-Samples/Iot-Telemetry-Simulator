@@ -90,6 +90,57 @@
             }
         }
 
+        [Theory]
+        [InlineData(null, null)]
+        [InlineData(null, 15.0)]
+        [InlineData(10.0, null)]
+        [InlineData(0.01, 0.02)]
+        [InlineData(-5, 5)]
+        public void RandomDouble_Generator(double? min, double? max)
+        {
+            var telemetryTemplate = new TelemetryTemplate("{\"val\":\"$.Value\"}", new[] { "Value" });
+            var telemetryVariables = new[]
+            {
+                new TelemetryVariable
+                {
+                    Name = "Value",
+                    RandomDouble = true,
+                    Min = min,
+                    Max = max
+                }
+            };
+            var telemetryValues = new TelemetryValues(telemetryVariables);
+
+            var payload = new TemplatedPayload(100, telemetryTemplate, telemetryValues);
+
+            var target = new PayloadGenerator(new[] { payload }, new DefaultRandomizer());
+
+            var variables = new Dictionary<string, object>
+            {
+                { Constants.DeviceIdValueName, "mydevice" },
+            };
+
+            if (max == null || min == null)
+            {
+                for (int i = 0; i < 10; i++)
+                {
+                    (_, variables) = target.Generate(null, variables);
+                    variables.TryGetValue("Value", out var o);
+                    Assert.IsType<double>(o);
+                }
+            }
+            else
+            {
+                for (int i = 0; i < 10; i++)
+                {
+                    (_, variables) = target.Generate(null, variables);
+                    variables.TryGetValue("Value", out var o);
+                    var result = Convert.ToDouble(o);
+                    Assert.True(result >= min && result <= max);
+                }
+            }
+        }
+
         [Fact]
         public void Sequence_Generator()
         {

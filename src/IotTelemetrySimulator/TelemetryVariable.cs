@@ -15,11 +15,14 @@
         [JsonProperty("sequence")]
         public bool Sequence { get; set; }
 
+        [JsonProperty("randomDouble")]
+        public bool RandomDouble { get; set; }
+
         [JsonProperty("max")]
-        public int? Max { get; set; }
+        public double? Max { get; set; }
 
         [JsonProperty("min")]
-        public int? Min { get; set; }
+        public double? Min { get; set; }
 
         [JsonProperty("step")]
         public int? Step { get; set; }

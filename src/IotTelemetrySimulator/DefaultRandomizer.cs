@@ -22,5 +22,18 @@
         {
             return this.generator.Value.Next(min, max);
         }
+
+        public double NextDouble()
+        {
+            var randomDouble = this.generator.Value.NextDouble();
+            var randomInt = this.generator.Value.Next();
+
+            return randomDouble * randomInt;
+        }
+
+        public double NextDouble(double min, double max)
+        {
+            return this.generator.Value.NextDouble() * (max - min) + min;
+        }
     }
 }

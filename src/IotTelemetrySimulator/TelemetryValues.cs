@@ -53,11 +53,22 @@
                 {
                     if (val.Min.HasValue && val.Max.HasValue && val.Max > val.Min)
                     {
-                        next[val.Name] = this.random.Next(val.Min.Value, val.Max.Value);
+                        next[val.Name] = this.random.Next((int)val.Min.Value, (int)val.Max.Value);
                     }
                     else
                     {
                         next[val.Name] = this.random.Next();
+                    }
+                }
+                else if (val.RandomDouble)
+                {
+                    if (val.Min.HasValue && val.Max.HasValue && val.Max > val.Min)
+                    {
+                        next[val.Name] = this.random.NextDouble(val.Min.Value, val.Max.Value);
+                    }
+                    else
+                    {
+                        next[val.Name] = this.random.NextDouble();
                     }
                 }
                 else if (val.CustomLengthString != null)
@@ -88,7 +99,7 @@
                     }
                     else
                     {
-                        next[val.Name] = val.Min ?? 1;
+                        next[val.Name] = val.Min == null ? 1 : (int)val.Min;
                     }
                 }
             }
