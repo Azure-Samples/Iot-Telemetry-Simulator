@@ -93,5 +93,136 @@
                 Assert.Equal(expectedValue, Encoding.UTF8.GetString(result));
             }
         }
+
+        [Fact]
+        public void Sequence_With_Exchanging_Counters_Generator()
+        {
+            var telemetryTemplate = new TelemetryTemplate("{\"val1\":\"$.Value1\",\"val2\":\"$.Value2\"}", new[] { "Value1", "Value2", "Counter1", "Counter2" });
+            var telemetryVariables = new[]
+            {
+                new TelemetryVariable
+                {
+                    Name = "Value1",
+                    Sequence = true,
+                    Values = new object[] { "$.Counter1", "$.Counter2" },
+                },
+
+                new TelemetryVariable
+                {
+                    Name = "Value2",
+                    Sequence = true,
+                    Values = new object[] { "$.Counter2", "$.Counter1" },
+                },
+
+                new TelemetryVariable
+                {
+                    Name = "Counter1",
+                    Step = 1,
+                    Min = 1
+                },
+
+                new TelemetryVariable
+                {
+                    Name = "Counter2",
+                    Step = 1,
+                    Min = 1_001
+                }
+            };
+            var telemetryValues = new TelemetryValues(telemetryVariables);
+
+            var payload = new TemplatedPayload(100, telemetryTemplate, telemetryValues);
+
+            var target = new PayloadGenerator(new[] { payload }, new DefaultRandomizer());
+
+            var expectedValues = new[]
+            {
+                "{\"val1\":\"1\",\"val2\":\"1001\"}",
+                "{\"val1\":\"1002\",\"val2\":\"2\"}",
+                "{\"val1\":\"3\",\"val2\":\"1003\"}",
+                "{\"val1\":\"1004\",\"val2\":\"4\"}",
+            };
+
+            var variables = new Dictionary<string, object>
+            {
+                { Constants.DeviceIdValueName, "mydevice" },
+            };
+
+            byte[] result;
+            foreach (var expectedValue in expectedValues)
+            {
+                (result, variables) = target.Generate(null, variables);
+                Assert.NotEmpty(variables);
+                Assert.Equal(expectedValue, Encoding.UTF8.GetString(result));
+            }
+        }
+
+        [Fact]
+        public void Sequence_With_Mixed_Counters_Generator()
+        {
+            var telemetryTemplate = new TelemetryTemplate("{\"val1\":\"$.Value1\",\"val2\":\"$.Value2\",\"counter_3\":\"$.Counter3\"}", new[] { "Value1", "Value2", "Counter1", "Counter2", "Counter3" });
+            var telemetryVariables = new[]
+            {
+                new TelemetryVariable
+                {
+                    Name = "Value1",
+                    Sequence = true,
+                    Values = new object[] { "$.Counter1", "$.Counter2" },
+                },
+
+                new TelemetryVariable
+                {
+                    Name = "Value2",
+                    Sequence = true,
+                    Values = new object[] { "$.Counter2", "$.Counter1" },
+                },
+
+                new TelemetryVariable
+                {
+                    Name = "Counter1",
+                    Step = 1,
+                    Min = 1
+                },
+
+                new TelemetryVariable
+                {
+                    Name = "Counter2",
+                    Step = 1,
+                    Min = 1_001
+                },
+
+                new TelemetryVariable
+                {
+                    Name = "Counter3",
+                    Step = 1,
+                    Min = 1_000_001
+                }
+            };
+            var telemetryValues = new TelemetryValues(telemetryVariables);
+
+            var payload = new TemplatedPayload(100, telemetryTemplate, telemetryValues);
+
+            var target = new PayloadGenerator(new[] { payload }, new DefaultRandomizer());
+
+            var expectedValues = new[]
+            {
+                "{\"val1\":\"1\",\"val2\":\"1001\",\"counter_3\":\"1000001\"}",
+                "{\"val1\":\"1002\",\"val2\":\"2\",\"counter_3\":\"1000002\"}",
+                "{\"val1\":\"3\",\"val2\":\"1003\",\"counter_3\":\"1000003\"}",
+                "{\"val1\":\"1004\",\"val2\":\"4\",\"counter_3\":\"1000004\"}",
+            };
+
+            var variables = new Dictionary<string, object>
+            {
+                { Constants.DeviceIdValueName, "mydevice" },
+            };
+
+            byte[] result;
+            foreach (var expectedValue in expectedValues)
+            {
+                (result, variables) = target.Generate(null, variables);
+                Assert.NotEmpty(variables);
+                Assert.Equal(expectedValue, Encoding.UTF8.GetString(result));
+            }
+        }
     }
 }
