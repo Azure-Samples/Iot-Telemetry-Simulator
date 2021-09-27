@@ -79,13 +79,12 @@
         {
             // Should convert variable values to string
             var customObj = new CustomClass("some_data");
-            var doubleValue = -0.5;
             yield return new object[]
             {
                 null,
-                new Dictionary<string, object> { { "name", "World" }, { "var1", customObj }, { "var2", doubleValue }, { "var3", string.Empty } },
+                new Dictionary<string, object> { { "name", "World" }, { "var1", customObj }, { "var2", -0.5 }, { "var3", string.Empty } },
                 "Hello, $.name! I like $.var1, $.var2 and $.var3, $.name.",
-                $"Hello, World! I like some_data, {doubleValue} and , World.",
+                $"Hello, World! I like some_data, -0.5 and , World.",
             };
 
             // Should ignore extra variables
