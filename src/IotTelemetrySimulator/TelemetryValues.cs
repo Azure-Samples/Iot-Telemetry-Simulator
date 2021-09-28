@@ -106,13 +106,12 @@
                         if (next.TryGetValue(usedVariable, out var valueFromVariable))
                         {
                             next[seqVar.Name] = valueFromVariable;
+                            notUsedSequenceVariables.Remove(usedVariable);
                         }
                         else
                         {
                             next[seqVar.Name] = value;
                         }
-
-                        notUsedSequenceVariables.Remove(usedVariable);
                     }
                     else
                     {
@@ -133,9 +132,9 @@
         private static void ResetNotUsedReferencedVariables(
             Dictionary<string, object> previous,
             Dictionary<string, object> next,
-            IEnumerable<string> notUserVariables)
+            IEnumerable<string> notUsedVariables)
         {
-            foreach (var notUsedVariable in notUserVariables)
+            foreach (var notUsedVariable in notUsedVariables)
             {
                 // Restore it from the previous value.
                 if (previous != null && previous.TryGetValue(notUsedVariable, out var previousValue))
