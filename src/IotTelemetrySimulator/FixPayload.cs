@@ -7,7 +7,12 @@
         public byte[] Payload { get; }
 
         public FixPayload(int distribution, byte[] payload)
-            : base(distribution)
+            : this(distribution, null, payload)
+        {
+        }
+
+        public FixPayload(int distribution, string deviceId, byte[] payload)
+            : base(distribution, deviceId)
         {
             this.Payload = payload;
         }

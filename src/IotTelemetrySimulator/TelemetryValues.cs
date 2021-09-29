@@ -6,8 +6,8 @@
 
     public class TelemetryValues
     {
-        private IRandomizer random = new DefaultRandomizer();
-        string machineName;
+        private readonly IRandomizer random = new DefaultRandomizer();
+        readonly string machineName;
 
         public IList<TelemetryVariable> Variables { get; }
 
@@ -22,21 +22,34 @@
             var next = new Dictionary<string, object>();
             var now = DateTime.Now;
 
+            ulong iterationNumber = 0;
+            if (previous != null && previous.TryGetValue(Constants.IterationNumberValueName, out var previousIterationNumber))
+            {
+                iterationNumber = (ulong)previousIterationNumber + 1;
+            }
+
             next[Constants.TimeValueName] = now.ToUniversalTime().ToString("o");
             next[Constants.LocalTimeValueName] = now.ToString("o");
             next[Constants.TicksValueName] = now.Ticks;
             next[Constants.EpochValueName] = new DateTimeOffset(now).ToUnixTimeSeconds();
             next[Constants.GuidValueName] = Guid.NewGuid().ToString();
             next[Constants.MachineNameValueName] = this.machineName;
+            next[Constants.IterationNumberValueName] = iterationNumber;
 
             if (previous != null)
             {
                 next[Constants.DeviceIdValueName] = previous[Constants.DeviceIdValueName];
             }
 
+            var hasSequenceVars = false;
+
             foreach (var val in this.Variables)
             {
-                if (val.Random)
+                if (val.Sequence)
+                {
+                    hasSequenceVars = true;
+                }
+                else if (val.Random)
                 {
                     if (val.Min.HasValue && val.Max.HasValue && val.Max > val.Min)
                     {
@@ -74,7 +87,65 @@
                 }
             }
 
+            // We generate values of sequence vars after the non-sequence vars, because
+            // sequence vars might reference non-sequence vars.
+            if (hasSequenceVars)
+            {
+                var notUsedSequenceVariables = this.Variables
+                                                .Where(x => x.Sequence)
+                                                .SelectMany(x => x.GetReferenceVariableNames())
+                                                .ToHashSet();
+
+                foreach (var seqVar in this.Variables.Where(x => x.Sequence))
+                {
+                    var value = seqVar.Values[iterationNumber % (ulong)seqVar.Values.Length];
+                    string usedVariable = null;
+                    if (value is string valueString && valueString.StartsWith("$."))
+                    {
+                        usedVariable = valueString[2..];
+                        if (next.TryGetValue(usedVariable, out var valueFromVariable))
+                        {
+                            next[seqVar.Name] = valueFromVariable;
+                            notUsedSequenceVariables.Remove(usedVariable);
+                        }
+                        else
+                        {
+                            next[seqVar.Name] = value;
+                        }
+                    }
+                    else
+                    {
+                        next[seqVar.Name] = value;
+                    }
+                }
+
+                ResetNotUsedReferencedVariables(previous, next, notUsedSequenceVariables);
+            }
+
             return next;
+        }
+
+        /// <summary>
+        /// Removes non-used variables in a sequence.
+        /// This way we can keep the a counter variable incrementally correctly if the sequence did not use it in current iteration.
+        /// </summary>
+        private static void ResetNotUsedReferencedVariables(
+            Dictionary<string, object> previous,
+            Dictionary<string, object> next,
+            IEnumerable<string> notUsedVariables)
+        {
+            foreach (var notUsedVariable in notUsedVariables)
+            {
+                // Restore it from the previous value.
+                if (previous != null && previous.TryGetValue(notUsedVariable, out var previousValue))
+                {
+                    next[notUsedVariable] = previousValue;
+                }
+                else
+                {
+                    next.Remove(notUsedVariable);
+                }
+            }
         }
 
         /// <summary>

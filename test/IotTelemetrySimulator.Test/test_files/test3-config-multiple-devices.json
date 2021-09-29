@@ -1,0 +1,29 @@
+﻿{
+  "Variables": [
+    {
+      "name": "Value",
+      "sequence": true,
+      "values": [ "$.Counter", "true" ]
+    },
+    {
+      "name": "Counter"
+    }
+  ],
+  "Payloads": [
+    {
+      "type": "template",
+      "deviceId": "device0001",
+      "template": "{\"value\":\"$.Value\"}"
+    },
+    {
+      "type": "fix",
+      "deviceId": "device0002",
+      "value": "{\"value\":\"myfixvalue\"}"
+    },
+    {
+      "type": "template",
+      "deviceId": "device0003",
+      "template": "{\"a\":\"b\",\"value\":\"$.Value\"}"
+    }
+  ]
+}

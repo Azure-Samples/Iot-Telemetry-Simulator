@@ -1,0 +1,13 @@
+﻿{
+  "Variables": [
+    {
+      "name": "Value",
+      "sequence": true,
+      "values": [ "$.Counter", "true" ]
+    },
+    {
+      "name": "Counter"
+    }
+  ],
+  "Template": "{\"value\": \"$.Value\" }"
+}

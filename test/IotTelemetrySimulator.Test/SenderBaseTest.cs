@@ -6,6 +6,7 @@
     using System.Diagnostics;
     using System.Linq;
     using System.Runtime.CompilerServices;
+    using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
     using Microsoft.Extensions.Configuration;
@@ -101,6 +102,52 @@
             Assert.Equal(1, stats.MessagesSent);
             Assert.Equal(0, stats.TotalSendTelemetryErrors);
             Assert.Single(sender.TestMessages);
+        }
+
+        [Fact]
+        public async Task When_SendingMessage_With_Different_Payload_Per_Device_Should_Work()
+        {
+            var configuration = new ConfigurationBuilder()
+                .AddJsonFile("./test_files/test3-config-multiple-devices.json")
+                .Build();
+
+            var stats = new RunnerStats();
+            var config = RunnerConfiguration.Load(configuration, NullLogger.Instance);
+            var senderDevice1 = new TestSender(false, false, "device0001", config);
+            var senderDevice2 = new TestSender(false, false, "device0002", config);
+            var senderDevice3 = new TestSender(false, false, "device0003", config);
+
+            const int messageCount = 3;
+            for (int i = 0; i < messageCount; i++)
+            {
+                await Task.WhenAll(
+                    senderDevice1.SendMessageAsync(stats, default),
+                    senderDevice2.SendMessageAsync(stats, default),
+                    senderDevice3.SendMessageAsync(stats, default));
+            }
+
+            foreach (var expectedMessageForDevice1 in new[]
+            {
+                "{\"value\":\"1\"}",
+                "{\"value\":\"true\"}",
+                "{\"value\":\"2\"}",
+            })
+            {
+                Assert.Equal(1, senderDevice1.TestMessages.Count(x => expectedMessageForDevice1 == Encoding.UTF8.GetString(x.MessageBytes)));
+            }
+
+            foreach (var expectedMessageForDevice3 in new[]
+            {
+                "{\"a\":\"b\",\"value\":\"1\"}",
+                "{\"a\":\"b\",\"value\":\"true\"}",
+                "{\"a\":\"b\",\"value\":\"2\"}",
+            })
+            {
+                Assert.Equal(1, senderDevice3.TestMessages.Count(x => expectedMessageForDevice3 == Encoding.UTF8.GetString(x.MessageBytes)));
+            }
+
+            const string expectedMessageForDevice2 = "{\"value\":\"myfixvalue\"}";
+            Assert.Equal(messageCount, senderDevice2.TestMessages.Count(x => Encoding.UTF8.GetString(x.MessageBytes) == expectedMessageForDevice2));
         }
 
         class TestMessage

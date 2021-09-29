@@ -15,8 +15,8 @@
     {
         private readonly IDeviceSimulatorFactory deviceSimulatorFactory;
         private readonly IHostApplicationLifetime applicationLifetime;
-        private CancellationTokenSource stopping;
-        private RunnerConfiguration config;
+        private readonly CancellationTokenSource stopping;
+        private readonly RunnerConfiguration config;
         private RunnerStats stats;
         private List<SimulatedDevice> devices;
         private Task runner;

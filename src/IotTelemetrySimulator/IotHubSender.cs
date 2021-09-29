@@ -11,7 +11,7 @@
         const string ApplicationJsonContentType = "application/json";
         const string Utf8Encoding = "utf-8";
 
-        private DeviceClient deviceClient;
+        private readonly DeviceClient deviceClient;
 
         public IotHubSender(DeviceClient deviceClient, string deviceId, RunnerConfiguration config)
             : base(deviceId, config)
