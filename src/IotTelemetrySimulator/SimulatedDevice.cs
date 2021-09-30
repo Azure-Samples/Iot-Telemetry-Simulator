@@ -1,6 +1,7 @@
 ﻿namespace IotTelemetrySimulator
 {
     using System;
+    using System.Collections.Generic;
     using System.Diagnostics;
     using System.Threading;
     using System.Threading.Tasks;
@@ -8,7 +9,7 @@
     public class SimulatedDevice
     {
         private readonly ISender sender;
-        private readonly int interval;
+        private readonly object interval;
         private readonly RunnerConfiguration config;
         private readonly IRandomizer random = new DefaultRandomizer();
 
@@ -29,21 +30,27 @@
 
         async Task RunnerAsync(RunnerStats stats, CancellationToken cancellationToken)
         {
+            int counter = 0;
+            int newcounter = 0;
+            int crtInterval = 0;
             try
             {
                 await this.sender.OpenAsync();
                 stats.IncrementDeviceConnected();
 
                 // Delay first event by a random amount to avoid bursts
-                await Task.Delay(this.random.Next(this.interval), cancellationToken);
+                crtInterval = GetCurrentInterval(this.interval, 0, counter, out newcounter);
+
+                await Task.Delay(this.random.Next(crtInterval), cancellationToken);
 
                 var stopwatch = new Stopwatch();
                 stopwatch.Start();
                 for (var i = 0L; !cancellationToken.IsCancellationRequested && (this.config.MessageCount <= 0 || i < this.config.MessageCount); i++)
                 {
                     await this.sender.SendMessageAsync(stats, cancellationToken);
-
-                    var millisecondsDelay = Math.Max(0, this.interval * i - stopwatch.ElapsedMilliseconds);
+                    crtInterval = GetCurrentInterval(this.interval, crtInterval, counter, out newcounter);
+                    counter = newcounter;
+                    var millisecondsDelay = Math.Max(0, crtInterval - stopwatch.ElapsedMilliseconds);
                     await Task.Delay((int)millisecondsDelay, cancellationToken);
                 }
 
@@ -55,6 +62,30 @@
             catch (Exception ex)
             {
                 Console.Error.WriteLine(ex);
+            }
+
+            // This has to return the new interval sum and the counter
+            int GetCurrentInterval(object interval, int previousInterval, int counter, out int newcounter)
+            {
+                newcounter = counter;
+                int crtInterval = 0;
+                if (this.interval is int)
+                {
+                    crtInterval = (int)this.interval;
+                }
+                else if (this.interval is List<int>)
+                {
+                    IList<int> collection = (List<int>)this.interval;
+                    newcounter++;
+                    if (counter >= collection.Count)
+                    {
+                        newcounter = 0;
+                    }
+
+                    crtInterval = (int)collection[newcounter];
+                }
+
+                return previousInterval + crtInterval;
             }
         }
     }

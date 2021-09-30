@@ -33,7 +33,7 @@
 
         public int MessageCount { get; set; } = 10;
 
-        public int Interval { get; set; } = 1_000;
+        public List<int> Interval { get; set; } = new List<int>() { 1000 };
 
         public int DuplicateEvery { get; private set; }
 
@@ -47,7 +47,7 @@
 
         public byte[] FixPayload { get; set; }
 
-        public Dictionary<string, int> Intervals { get; set; }
+        public Dictionary<string, object> Intervals { get; set; }
 
         public void EnsureIsValid()
         {
@@ -86,14 +86,14 @@
                     $"{nameof(this.KafkaConnectionProperties)} should contain at least a value for bootstrap.servers");
             }
 
-            if (this.Interval <= 0)
-                throw new Exception($"{nameof(this.Interval)} must be greater than zero");
+            if (this.Interval.Any(x => (x <= 0)))
+                throw new Exception($"Elements in {nameof(this.Interval)} must be greater than zero");
 
             if (this.DuplicateEvery < 0)
                 throw new Exception($"{nameof(this.DuplicateEvery)} must be greater than or equal to zero");
         }
 
-        public int GetMessageIntervalForDevice(string deviceId)
+        public object GetMessageIntervalForDevice(string deviceId)
         {
             if (this.Intervals != null && this.Intervals.TryGetValue(deviceId, out var customInterval))
             {
@@ -196,7 +196,7 @@
             return config;
         }
 
-        private static Dictionary<string, int> LoadIntervals(IConfiguration configuration)
+        private static Dictionary<string, object> LoadIntervals(IConfiguration configuration)
         {
             var section = configuration.GetSection(nameof(RunnerConfiguration.Intervals));
             if (!section.Exists())
@@ -204,7 +204,7 @@
                 return null;
             }
 
-            var result = new Dictionary<string, int>();
+            var result = new Dictionary<string, object>();
             section.Bind(result);
 
             return result;

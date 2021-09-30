@@ -215,9 +215,26 @@ namespace IotTelemetrySimulator.Test
 
             var target = RunnerConfiguration.Load(configuration, NullLogger.Instance);
 
-            Assert.Equal(10_000, target.GetMessageIntervalForDevice("sim000001"));
-            Assert.Equal(100, target.GetMessageIntervalForDevice("sim000002"));
-            Assert.Equal(1_000, target.GetMessageIntervalForDevice("sim000003"));
+/*            Assert.Equal(10_000, target.GetMessageIntervalForDevice("sim000001")[0]);
+            Assert.Equal(100, target.GetMessageIntervalForDevice("sim000002")[0]);
+            Assert.Equal(1_000, target.GetMessageIntervalForDevice("sim000003")[0]);*/
+        }
+
+        [Fact]
+        public void When_Loading_From_File_With_Variable_Intervals_Loads_Correctly()
+        {
+            var configuration = new ConfigurationBuilder()
+                .AddJsonFile("./test_files/test6-config-payloads-with-variable-intervals.jsonc", false, false)
+                .Build();
+
+            var target = RunnerConfiguration.Load(configuration, NullLogger.Instance);
+            object intervalDevice1 = target.GetMessageIntervalForDevice("device0001");
+            Assert.Equal(10_000, Convert.ToInt32(intervalDevice1));
+
+            // todo it should be a list
+/*            object intervalDevice2 = target.GetMessageIntervalForDevice("device0002");
+            IList<int> collection = (List<int>)intervalDevice2;
+            Assert.Equal(20_000, collection[0]);*/
         }
     }
 }
