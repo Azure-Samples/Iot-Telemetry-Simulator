@@ -47,7 +47,7 @@
         [InlineData(5, 9, null)]
         [InlineData(null, 2, null)]
         [InlineData(-3, 2, null)]
-        public void Counter_With_Threshold_Should_Reset_To_Min(int? min, int? max, int? step)
+        public void Counter_With_Threshold_Should_Reset_To_Min(double? min, double? max, int? step)
         {
             var telemetryTemplate = new TelemetryTemplate("{\"val\":\"$.Value\"}", new[] { "Counter" });
             var telemetryVariables = new[]

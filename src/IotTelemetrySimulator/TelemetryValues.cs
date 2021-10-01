@@ -84,12 +84,12 @@
                     if (previous != null && previous.TryGetValue(val.Name, out var prevValue))
                     {
                         var step = val.Step ?? 1;
-                        var maxThres = val.Max ?? int.MaxValue;
+                        var maxThres = val.Max ?? long.MaxValue;
 
                         switch (prevValue)
                         {
                             case int value when value + step > maxThres:
-                                next[val.Name] = val.Min ?? 1;
+                                next[val.Name] = val.Min == null ? 1 : (int)val.Min;
                                 break;
 
                             case int prevIntValue:
