@@ -47,7 +47,9 @@
 
         public byte[] FixPayload { get; set; }
 
-        public Dictionary<string, object> Intervals { get; set; }
+        public Dictionary<string, int> Intervals { get; set; }
+
+        public Dictionary<string, List<int>> VariableIntervals { get; set; }
 
         public void EnsureIsValid()
         {
@@ -93,11 +95,16 @@
                 throw new Exception($"{nameof(this.DuplicateEvery)} must be greater than or equal to zero");
         }
 
-        public object GetMessageIntervalForDevice(string deviceId)
+        public List<int> GetMessageIntervalForDevice(string deviceId)
         {
             if (this.Intervals != null && this.Intervals.TryGetValue(deviceId, out var customInterval))
             {
-                return customInterval;
+                return new List<int>() { customInterval };
+            }
+
+            if (this.VariableIntervals != null && this.VariableIntervals.TryGetValue(deviceId, out var customVariableInterval))
+            {
+                return customVariableInterval;
             }
 
             return this.Interval;
@@ -189,6 +196,7 @@
             }
 
             config.Intervals = LoadIntervals(configuration);
+            config.VariableIntervals = LoadVariableIntervals(configuration);
 
             config.Header = GetTelemetryTemplate(configuration, nameof(Header), futureVariableNames);
             config.PartitionKey = GetTelemetryTemplate(configuration, nameof(PartitionKey), futureVariableNames);
@@ -196,7 +204,7 @@
             return config;
         }
 
-        private static Dictionary<string, object> LoadIntervals(IConfiguration configuration)
+        private static Dictionary<string, int> LoadIntervals(IConfiguration configuration)
         {
             var section = configuration.GetSection(nameof(RunnerConfiguration.Intervals));
             if (!section.Exists())
@@ -204,7 +212,21 @@
                 return null;
             }
 
-            var result = new Dictionary<string, object>();
+            var result = new Dictionary<string, int>();
+            section.Bind(result);
+
+            return result;
+        }
+
+        private static Dictionary<string, List<int>> LoadVariableIntervals(IConfiguration configuration)
+        {
+            var section = configuration.GetSection(nameof(RunnerConfiguration.VariableIntervals));
+            if (!section.Exists())
+            {
+                return null;
+            }
+
+            var result = new Dictionary<string, List<int>>();
             section.Bind(result);
 
             return result;

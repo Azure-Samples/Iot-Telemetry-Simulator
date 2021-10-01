@@ -9,7 +9,7 @@
     public class SimulatedDevice
     {
         private readonly ISender sender;
-        private readonly object interval;
+        private readonly List<int> interval;
         private readonly RunnerConfiguration config;
         private readonly IRandomizer random = new DefaultRandomizer();
 
@@ -31,15 +31,13 @@
         async Task RunnerAsync(RunnerStats stats, CancellationToken cancellationToken)
         {
             int counter = 0;
-            int newcounter = 0;
-            int crtInterval = 0;
             try
             {
                 await this.sender.OpenAsync();
                 stats.IncrementDeviceConnected();
 
                 // Delay first event by a random amount to avoid bursts
-                crtInterval = GetCurrentInterval(this.interval, 0, counter, out newcounter);
+                int crtInterval = GetCurrentInterval(0, this.interval, counter);
 
                 await Task.Delay(this.random.Next(crtInterval), cancellationToken);
 
@@ -48,8 +46,14 @@
                 for (var i = 0L; !cancellationToken.IsCancellationRequested && (this.config.MessageCount <= 0 || i < this.config.MessageCount); i++)
                 {
                     await this.sender.SendMessageAsync(stats, cancellationToken);
-                    crtInterval = GetCurrentInterval(this.interval, crtInterval, counter, out newcounter);
-                    counter = newcounter;
+                    if (counter >= this.interval.Count)
+                    {
+                        counter = 0;
+                    }
+
+                    crtInterval = GetCurrentInterval(crtInterval, this.interval, counter);
+                    counter++;
+                    Console.WriteLine("Sending total" + crtInterval);
                     var millisecondsDelay = Math.Max(0, crtInterval - stopwatch.ElapsedMilliseconds);
                     await Task.Delay((int)millisecondsDelay, cancellationToken);
                 }
@@ -64,28 +68,10 @@
                 Console.Error.WriteLine(ex);
             }
 
-            // This has to return the new interval sum and the counter
-            int GetCurrentInterval(object interval, int previousInterval, int counter, out int newcounter)
+            // Returns the interval sum to the counter point
+            int GetCurrentInterval(int previousSum, List<int> intervals, int counter)
             {
-                newcounter = counter;
-                int crtInterval = 0;
-                if (this.interval is int)
-                {
-                    crtInterval = (int)this.interval;
-                }
-                else if (this.interval is List<int>)
-                {
-                    IList<int> collection = (List<int>)this.interval;
-                    newcounter++;
-                    if (counter >= collection.Count)
-                    {
-                        newcounter = 0;
-                    }
-
-                    crtInterval = (int)collection[newcounter];
-                }
-
-                return previousInterval + crtInterval;
+                return previousSum + intervals[counter];
             }
         }
     }

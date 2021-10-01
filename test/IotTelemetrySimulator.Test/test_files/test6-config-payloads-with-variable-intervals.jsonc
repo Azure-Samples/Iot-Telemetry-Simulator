@@ -10,22 +10,25 @@
     }
   ],
   "Intervals": {
-    "device0001": 10000 ,
-    "device0002": [ 20000 ]
+    "sim000001": 100000
+  },
+  "VariableIntervals": {
+    "sim000002": [ 2000, 3000 ]
   },
   "Payloads": [
     {
       "type": "template",
-      "deviceId": "device0001",
+      "deviceId": "sim000001",
       "template": {
         "value": "$.Value",
-        "a_second_value":  "20"
+        "a_second_value": "20"
       }
     },
     {
       "type": "fix",
-      "deviceId": "device0002",
+      "deviceId": "sim000002",
       "value": { "value": "myfixvalue" }
     }
-  ]
+  ],
+  "DeviceCount": 2
 }
