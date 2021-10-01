@@ -33,7 +33,7 @@
 
         public int MessageCount { get; set; } = 10;
 
-        public List<int> Interval { get; set; } = new List<int>() { 1000 };
+        public int[] Interval { get; set; } = new int[] { 1000 };
 
         public int DuplicateEvery { get; private set; }
 
@@ -47,9 +47,7 @@
 
         public byte[] FixPayload { get; set; }
 
-        public Dictionary<string, int> Intervals { get; set; }
-
-        public Dictionary<string, List<int>> VariableIntervals { get; set; }
+        public Dictionary<string, int[]> Intervals { get; set; }
 
         public void EnsureIsValid()
         {
@@ -95,7 +93,7 @@
                 throw new Exception($"{nameof(this.DuplicateEvery)} must be greater than or equal to zero");
         }
 
-        public List<int> GetMessageIntervalForDevice(string deviceId)
+        public int[] GetMessageIntervalForDevice(string deviceId)
         {
             if (this.Intervals != null && this.Intervals.TryGetValue(deviceId, out var customInterval))
             {
@@ -204,7 +202,7 @@
             return config;
         }
 
-        private static Dictionary<string, int> LoadIntervals(IConfiguration configuration)
+        private static Dictionary<string, int[]> LoadIntervals(IConfiguration configuration)
         {
             var section = configuration.GetSection(nameof(RunnerConfiguration.Intervals));
             if (!section.Exists())
@@ -212,22 +210,19 @@
                 return null;
             }
 
-            var result = new Dictionary<string, int>();
-            section.Bind(result);
+            var result = new Dictionary<string, int[]>();
 
-            return result;
-        }
-
-        private static Dictionary<string, List<int>> LoadVariableIntervals(IConfiguration configuration)
-        {
-            var section = configuration.GetSection(nameof(RunnerConfiguration.VariableIntervals));
-            if (!section.Exists())
+            foreach (var intervalSection in section.GetChildren())
             {
-                return null;
+                if (intervalSection.Value != null && int.TryParse(intervalSection.Value, out int interval))
+                {
+                    result[intervalSection.Key] = new[] { interval };
+                }
+                else
+                {
+                    result[intervalSection.Key] = intervalSection.Get<int[]>();
+                }
             }
-
-            var result = new Dictionary<string, List<int>>();
-            section.Bind(result);
 
             return result;
         }

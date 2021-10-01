@@ -228,14 +228,13 @@ namespace IotTelemetrySimulator.Test
                 .Build();
 
             var target = RunnerConfiguration.Load(configuration, NullLogger.Instance);
-            List<int> intervalDevice1 = target.GetMessageIntervalForDevice("sim000001");
-            Assert.Equal(10_000, intervalDevice1[0]);
+            int[] intervalsDevice1 = target.GetMessageIntervalForDevice("sim000001");
+            Assert.Equal(10_000, intervalsDevice1[0]);
 
-            // todo it should be a list
-            List<int> intervalDevice2 = target.GetMessageIntervalForDevice("sim000002");
-            Assert.Equal(2, intervalDevice2.Count);
-            Assert.Equal(20_000, intervalDevice2[0]);
-            Assert.Equal(30_000, intervalDevice2[1]);
+            int[] intervalsDevice2 = target.GetMessageIntervalForDevice("sim000002");
+            Assert.Equal(20_000, intervalsDevice2[0]);
+            Assert.Equal(30_000, intervalsDevice2[1]);
+            Assert.Equal(15_000, intervalsDevice2[2]);
         }
     }
 }
