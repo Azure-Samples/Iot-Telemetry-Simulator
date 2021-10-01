@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Globalization;
     using System.Linq;
 
     // A function that represents a part of the template.
@@ -92,7 +93,7 @@
                 string Substitute(Dictionary<string, object> variables)
                 {
                     variables.TryGetValue(varName, out var result);
-                    return result == null ? "$." + varName : result.ToString();
+                    return result == null ? "$." + varName : Convert.ToString(result, CultureInfo.InvariantCulture);
                 }
 
                 // In all template substrings, replace all occurrences of $.varName
