@@ -9,7 +9,7 @@
     public class SimulatedDevice
     {
         private readonly ISender sender;
-        private readonly List<int> interval;
+        private readonly int[] interval;
         private readonly RunnerConfiguration config;
         private readonly IRandomizer random = new DefaultRandomizer();
 
@@ -30,31 +30,27 @@
 
         async Task RunnerAsync(RunnerStats stats, CancellationToken cancellationToken)
         {
-            int counter = 0;
             try
             {
                 await this.sender.OpenAsync();
                 stats.IncrementDeviceConnected();
 
                 // Delay first event by a random amount to avoid bursts
-                int crtInterval = GetCurrentInterval(0, this.interval, counter);
+                int crtInterval = this.interval[0];
 
                 await Task.Delay(this.random.Next(crtInterval), cancellationToken);
 
                 var stopwatch = new Stopwatch();
                 stopwatch.Start();
+                ulong totalIntervalTime = 0;
                 for (var i = 0L; !cancellationToken.IsCancellationRequested && (this.config.MessageCount <= 0 || i < this.config.MessageCount); i++)
                 {
                     await this.sender.SendMessageAsync(stats, cancellationToken);
-                    if (counter >= this.interval.Count)
-                    {
-                        counter = 0;
-                    }
 
-                    crtInterval = GetCurrentInterval(crtInterval, this.interval, counter);
-                    counter++;
-                    Console.WriteLine("Sending total" + crtInterval);
-                    var millisecondsDelay = Math.Max(0, crtInterval - stopwatch.ElapsedMilliseconds);
+                    crtInterval = this.interval[i % this.interval.Length];
+                    totalIntervalTime = totalIntervalTime + (ulong)crtInterval;
+
+                    var millisecondsDelay = Math.Max(0, totalIntervalTime - (ulong)stopwatch.ElapsedMilliseconds);
                     await Task.Delay((int)millisecondsDelay, cancellationToken);
                 }
 
@@ -66,12 +62,6 @@
             catch (Exception ex)
             {
                 Console.Error.WriteLine(ex);
-            }
-
-            // Returns the interval sum to the counter point
-            int GetCurrentInterval(int previousSum, List<int> intervals, int counter)
-            {
-                return previousSum + intervals[counter];
             }
         }
     }

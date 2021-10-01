@@ -97,12 +97,7 @@
         {
             if (this.Intervals != null && this.Intervals.TryGetValue(deviceId, out var customInterval))
             {
-                return new List<int>() { customInterval };
-            }
-
-            if (this.VariableIntervals != null && this.VariableIntervals.TryGetValue(deviceId, out var customVariableInterval))
-            {
-                return customVariableInterval;
+                return customInterval;
             }
 
             return this.Interval;
@@ -194,8 +189,6 @@
             }
 
             config.Intervals = LoadIntervals(configuration);
-            config.VariableIntervals = LoadVariableIntervals(configuration);
-
             config.Header = GetTelemetryTemplate(configuration, nameof(Header), futureVariableNames);
             config.PartitionKey = GetTelemetryTemplate(configuration, nameof(PartitionKey), futureVariableNames);
 
