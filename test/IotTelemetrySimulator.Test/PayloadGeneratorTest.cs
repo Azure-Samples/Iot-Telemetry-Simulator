@@ -42,6 +42,54 @@
             }
         }
 
+        [Theory]
+        [InlineData(1, 5, 2)]
+        [InlineData(5, 9, null)]
+        [InlineData(null, 2, null)]
+        [InlineData(-3, 2, null)]
+        public void Counter_With_Threshold_Should_Reset_To_Min(int? min, int? max, int? step)
+        {
+            var telemetryTemplate = new TelemetryTemplate("{\"val\":\"$.Value\"}", new[] { "Counter" });
+            var telemetryVariables = new[]
+            {
+                new TelemetryVariable
+                {
+                    Name = "Counter",
+                    Step = step,
+                    Min = min,
+                    Max = max
+                }
+            };
+            var telemetryValues = new TelemetryValues(telemetryVariables);
+
+            var payload = new TemplatedPayload(100, telemetryTemplate, telemetryValues);
+
+            var target = new PayloadGenerator(new[] { payload }, new DefaultRandomizer());
+            var variables = new Dictionary<string, object>
+            {
+                { Constants.DeviceIdValueName, "mydevice" },
+            };
+
+            var minValue = min ?? 1;
+
+            for (int i = 0; i < 10; i += step ?? 1)
+            {
+                (_, variables) = target.Generate(null, variables);
+                variables.TryGetValue("Counter", out var o);
+                var result = Convert.ToInt32(o);
+
+                if (i + minValue > max)
+                {
+                    Assert.Equal(result, minValue);
+                    break;
+                }
+                else
+                {
+                    Assert.Equal(result, minValue + i);
+                }
+            }
+        }
+
         [Fact]
         public void Sequence_Generator()
         {
