@@ -33,7 +33,7 @@
 
         public int MessageCount { get; set; } = 10;
 
-        public int[] Interval { get; set; } = new int[] { 1000 };
+        public int[] Interval { get; set; } = new int[] { 1_000 };
 
         public int DuplicateEvery { get; private set; }
 
