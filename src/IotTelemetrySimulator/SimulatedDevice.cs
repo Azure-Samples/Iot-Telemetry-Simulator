@@ -42,19 +42,13 @@
 
                 var stopwatch = new Stopwatch();
                 stopwatch.Start();
-                long previousStamp = stopwatch.ElapsedMilliseconds;
-                long crtStamp = 0;
                 for (var i = 0L; !cancellationToken.IsCancellationRequested && (this.config.MessageCount <= 0 || i < this.config.MessageCount); i++)
                 {
                     await this.sender.SendMessageAsync(stats, cancellationToken);
                     crtInterval = this.intervals[i % this.intervals.Length];
-                    crtStamp = stopwatch.ElapsedMilliseconds;
-                    if (crtInterval > (int)(crtStamp - previousStamp))
-                    {
-                        await Task.Delay(crtInterval - (int)(crtStamp - previousStamp), cancellationToken);
-                    }
-
-                    previousStamp = crtStamp;
+                    var millisecondsDelay = Math.Max(0, crtInterval - stopwatch.ElapsedMilliseconds);
+                    await Task.Delay((int)millisecondsDelay, cancellationToken);
+                    stopwatch.Restart();
                 }
 
                 stats.IncrementCompletedDevice();
