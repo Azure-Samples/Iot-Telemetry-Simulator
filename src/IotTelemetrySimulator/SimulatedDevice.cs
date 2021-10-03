@@ -9,7 +9,7 @@
     public class SimulatedDevice
     {
         private readonly ISender sender;
-        private readonly int[] interval;
+        private readonly int[] intervals;
         private readonly RunnerConfiguration config;
         private readonly IRandomizer random = new DefaultRandomizer();
 
@@ -20,7 +20,7 @@
             this.DeviceID = deviceId;
             this.config = config;
             this.sender = sender;
-            this.interval = config.GetMessageIntervalForDevice(deviceId);
+            this.intervals = config.GetMessageIntervalForDevice(deviceId);
         }
 
         public Task Start(RunnerStats stats, CancellationToken cancellationToken)
@@ -36,25 +36,29 @@
                 stats.IncrementDeviceConnected();
 
                 // Delay first event by a random amount to avoid bursts
-                int crtInterval = this.interval[0];
+                int crtInterval = this.intervals[0];
 
                 await Task.Delay(this.random.Next(crtInterval), cancellationToken);
 
                 var stopwatch = new Stopwatch();
                 stopwatch.Start();
-                ulong totalIntervalTime = 0;
+                long previousStamp = stopwatch.ElapsedMilliseconds;
+                long crtStamp = 0;
                 for (var i = 0L; !cancellationToken.IsCancellationRequested && (this.config.MessageCount <= 0 || i < this.config.MessageCount); i++)
                 {
                     await this.sender.SendMessageAsync(stats, cancellationToken);
+                    crtInterval = this.intervals[i % this.intervals.Length];
+                    crtStamp = stopwatch.ElapsedMilliseconds;
+                    if (crtInterval > (int)(crtStamp - previousStamp))
+                    {
+                        await Task.Delay(crtInterval - (int)(crtStamp - previousStamp), cancellationToken);
+                    }
 
-                    crtInterval = this.interval[i % this.interval.Length];
-                    totalIntervalTime = totalIntervalTime + (ulong)crtInterval;
-
-                    var millisecondsDelay = Math.Max(0, totalIntervalTime - (ulong)stopwatch.ElapsedMilliseconds);
-                    await Task.Delay((int)millisecondsDelay, cancellationToken);
+                    previousStamp = crtStamp;
                 }
 
                 stats.IncrementCompletedDevice();
+                stopwatch.Stop();
             }
             catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
             {
