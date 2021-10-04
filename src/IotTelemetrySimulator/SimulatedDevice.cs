@@ -9,7 +9,7 @@
     public class SimulatedDevice
     {
         private readonly ISender sender;
-        private readonly int[] intervals;
+        private readonly int[] interval;
         private readonly RunnerConfiguration config;
         private readonly IRandomizer random = new DefaultRandomizer();
 
@@ -20,7 +20,7 @@
             this.DeviceID = deviceId;
             this.config = config;
             this.sender = sender;
-            this.intervals = config.GetMessageIntervalForDevice(deviceId);
+            this.interval = config.GetMessageIntervalForDevice(deviceId);
         }
 
         public Task Start(RunnerStats stats, CancellationToken cancellationToken)
@@ -36,19 +36,28 @@
                 stats.IncrementDeviceConnected();
 
                 // Delay first event by a random amount to avoid bursts
-                int crtInterval = this.intervals[0];
+                int crtInterval = this.interval[0];
 
                 await Task.Delay(this.random.Next(crtInterval), cancellationToken);
 
                 var stopwatch = new Stopwatch();
                 stopwatch.Start();
+                long totalIntervalTime = 0;
                 for (var i = 0L; !cancellationToken.IsCancellationRequested && (this.config.MessageCount <= 0 || i < this.config.MessageCount); i++)
                 {
+                    if (i % 1000 == 0)
+                    {
+                        totalIntervalTime = 0;
+                        stopwatch.Restart();
+                    }
+
                     await this.sender.SendMessageAsync(stats, cancellationToken);
-                    crtInterval = this.intervals[i % this.intervals.Length];
-                    var millisecondsDelay = Math.Max(0, crtInterval - stopwatch.ElapsedMilliseconds);
+
+                    crtInterval = this.interval[i % this.interval.Length];
+                    totalIntervalTime = totalIntervalTime + (long)crtInterval;
+
+                    var millisecondsDelay = Math.Max(0, totalIntervalTime - stopwatch.ElapsedMilliseconds);
                     await Task.Delay((int)millisecondsDelay, cancellationToken);
-                    stopwatch.Restart();
                 }
 
                 stats.IncrementCompletedDevice();
