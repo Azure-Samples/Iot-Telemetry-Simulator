@@ -25,10 +25,7 @@
 
         public double NextDouble()
         {
-            var randomDouble = this.generator.Value.NextDouble();
-            var randomInt = this.generator.Value.Next();
-
-            return randomDouble * randomInt;
+            return this.generator.Value.NextDouble();
         }
 
         public double NextDouble(double min, double max)
