@@ -93,6 +93,10 @@
                 string Substitute(Dictionary<string, object> variables)
                 {
                     variables.TryGetValue(varName, out var result);
+
+                    // If it is not able to get the value it returns $.{name of the variable}.
+                    // Otherwise it converts the result to string using InvariantCulture. InvariantCulture
+                    // is used because of value substitutions that depend on region/country. E.g "1,8" for "1.8".
                     return result == null ? "$." + varName : Convert.ToString(result, CultureInfo.InvariantCulture);
                 }
 
