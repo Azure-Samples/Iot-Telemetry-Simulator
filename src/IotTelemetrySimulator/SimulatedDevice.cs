@@ -36,9 +36,9 @@
                 stats.IncrementDeviceConnected();
 
                 // Delay first event by a random amount to avoid bursts
-                int crtInterval = this.interval[0];
+                int currentInterval = this.interval[0];
 
-                await Task.Delay(this.random.Next(crtInterval), cancellationToken);
+                await Task.Delay(this.random.Next(currentInterval), cancellationToken);
 
                 var stopwatch = new Stopwatch();
                 stopwatch.Start();
@@ -53,15 +53,14 @@
 
                     await this.sender.SendMessageAsync(stats, cancellationToken);
 
-                    crtInterval = this.interval[i % this.interval.Length];
-                    totalIntervalTime = totalIntervalTime + (long)crtInterval;
+                    currentInterval = this.interval[i % this.interval.Length];
+                    totalIntervalTime = totalIntervalTime + (long)currentInterval;
 
                     var millisecondsDelay = Math.Max(0, totalIntervalTime - stopwatch.ElapsedMilliseconds);
                     await Task.Delay((int)millisecondsDelay, cancellationToken);
                 }
 
                 stats.IncrementCompletedDevice();
-                stopwatch.Stop();
             }
             catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
             {

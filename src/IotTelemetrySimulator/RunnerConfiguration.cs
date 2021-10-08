@@ -33,7 +33,7 @@
 
         public int MessageCount { get; set; } = 10;
 
-        public int[] Interval { get; set; } = new int[] { 1_000 };
+        public int[] Intervals { get; set; } = new int[] { 1_000 };
 
         public int DuplicateEvery { get; private set; }
 
@@ -47,7 +47,7 @@
 
         public byte[] FixPayload { get; set; }
 
-        public Dictionary<string, int[]> Intervals { get; set; }
+        public Dictionary<string, int[]> DeviceIntervals { get; set; }
 
         public void EnsureIsValid()
         {
@@ -86,8 +86,8 @@
                     $"{nameof(this.KafkaConnectionProperties)} should contain at least a value for bootstrap.servers");
             }
 
-            if (this.Interval.Any(x => (x <= 0)))
-                throw new Exception($"Elements in {nameof(this.Interval)} must be greater than zero");
+            if (this.Intervals.Any(x => (x <= 0)))
+                throw new Exception($"Elements in {nameof(this.Intervals)} must be greater than zero");
 
             if (this.DuplicateEvery < 0)
                 throw new Exception($"{nameof(this.DuplicateEvery)} must be greater than or equal to zero");
@@ -95,12 +95,12 @@
 
         public int[] GetMessageIntervalForDevice(string deviceId)
         {
-            if (this.Intervals != null && this.Intervals.TryGetValue(deviceId, out var customInterval))
+            if (this.DeviceIntervals != null && this.DeviceIntervals.TryGetValue(deviceId, out var customInterval))
             {
                 return customInterval;
             }
 
-            return this.Interval;
+            return this.Intervals;
         }
 
         public static RunnerConfiguration Load(IConfiguration configuration, ILogger logger)
@@ -112,7 +112,7 @@
             config.DeviceIndex = configuration.GetValue(nameof(DeviceIndex), config.DeviceIndex);
             config.DeviceCount = configuration.GetValue(nameof(DeviceCount), config.DeviceCount);
             config.MessageCount = configuration.GetValue(nameof(MessageCount), config.MessageCount);
-            config.Interval = configuration.GetValue(nameof(Interval), config.Interval);
+            config.Intervals = configuration.GetValue(nameof(Intervals), config.Intervals);
             config.DuplicateEvery = configuration.GetValue(nameof(DuplicateEvery), config.DuplicateEvery);
 
             var kafkaProperties = configuration.GetValue<string>(nameof(KafkaConnectionProperties));
@@ -188,7 +188,7 @@
                 }
             }
 
-            config.Intervals = LoadIntervals(configuration);
+            config.DeviceIntervals = LoadIntervals(configuration);
             config.Header = GetTelemetryTemplate(configuration, nameof(Header), futureVariableNames);
             config.PartitionKey = GetTelemetryTemplate(configuration, nameof(PartitionKey), futureVariableNames);
 
@@ -197,7 +197,7 @@
 
         private static Dictionary<string, int[]> LoadIntervals(IConfiguration configuration)
         {
-            var section = configuration.GetSection(nameof(RunnerConfiguration.Intervals));
+            var section = configuration.GetSection(nameof(RunnerConfiguration.DeviceIntervals));
             if (!section.Exists())
             {
                 return null;
