@@ -54,7 +54,7 @@
                     await this.sender.SendMessageAsync(stats, cancellationToken);
 
                     currentInterval = this.interval[i % this.interval.Length];
-                    totalIntervalTime = totalIntervalTime + (long)currentInterval;
+                    totalIntervalTime += currentInterval;
 
                     var millisecondsDelay = Math.Max(0, totalIntervalTime - stopwatch.ElapsedMilliseconds);
                     await Task.Delay((int)millisecondsDelay, cancellationToken);
