@@ -61,7 +61,8 @@ The amount of devices, their names and telemetry generated can be customized usi
 |Variables|telemetry variables (see telemetry template)|
 |DuplicateEveryNEvents|if > 0, send duplicates of the given fraction of messages. See [Advanced options](#advanced-options) (default = 0)|
 |File|Defines a json file where templates, variables and device based intervals can be defined. File and environment variable configuration can be used in conjunction.|
-|Intervals|Allows customizing the message interval per device. If an array is given, then the elements of the array will be used for getting the next interval delay, so the interval can be variable for the same device. The array is cycled when the number of values to be sent is bigger than the number of elements in the interval.|
+|Intervals|Allows customizing the intervals between messages per device. If an array is given, its elements are iterated one after another, so the interval can vary for the same device. The array is cycled when there's more values to send than elements in it.|
+
 
 ## Telemetry template
 
