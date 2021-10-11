@@ -110,7 +110,7 @@ Customizable variables can be created with the following properties:
 Template:
 
 ```json
-{ "deviceId": "$.DeviceId", "temp": $.Temp, "temp2": $.DoubleValue, "Ticks": $.Ticks, "Counter": $.Counter, "time": "$.Time" }
+{ "deviceId": "$.DeviceId", "rand_int": $.Temp, "rand_double": $.DoubleValue, "Ticks": $.Ticks, "Counter": $.Counter, "time": "$.Time" }
 ```
 
 Variables:
@@ -122,22 +122,22 @@ Variables:
 Output:
 
 ```json
-{ "deviceId": "sim000001", "temp": 23, "temp2": 0.207759137669466, "Ticks": 637097550115091350, "Counter": 100, "time": "2019-11-19T10:10:11.5091350Z" }
-{ "deviceId": "sim000001", "temp": 23, "temp2": 1.207232427664231, "Ticks": 637097550115952079, "Counter": 101, "time": "2019-11-19T10:10:11.5952079Z" }
-{ "deviceId": "sim000001", "temp": 24, "temp2": 0.992871827638167, "Ticks": 637097550116627320, "Counter": 102, "time": "2019-11-19T10:10:11.6627320Z" }
-{ "deviceId": "sim000001", "temp": 24, "temp2": 0.779288272162327, "Ticks": 637097550117027320, "Counter": 100, "time": "2019-11-19T10:10:11.7027320Z" }
+{ "deviceId": "sim000001", "rand_int": 23, "rand_double": 0.207759137669466, "Ticks": 637097550115091350, "Counter": 100, "time": "2019-11-19T10:10:11.5091350Z" }
+{ "deviceId": "sim000001", "rand_int": 23, "rand_double": 1.207232427664231, "Ticks": 637097550115952079, "Counter": 101, "time": "2019-11-19T10:10:11.5952079Z" }
+{ "deviceId": "sim000001", "rand_int": 24, "rand_double": 0.992871827638167, "Ticks": 637097550116627320, "Counter": 102, "time": "2019-11-19T10:10:11.6627320Z" }
+{ "deviceId": "sim000001", "rand_int": 24, "rand_double": 0.779288272162327, "Ticks": 637097550117027320, "Counter": 100, "time": "2019-11-19T10:10:11.7027320Z" }
 ```
 
 Running with Docker:
 
 ```powershell
-docker run -it -e "IotHubConnectionString=HostName=your-iothub-name.azure-devices.net;SharedAccessKeyName=device;SharedAccessKey=your-iothub-key" -e Template="{ \"deviceId\": \"$.DeviceId\", \"temp\": $.Temp, \"temp2\": $.DoubleValue, \"Ticks\": $.Ticks, \"Counter\": $.Counter, \"time\": \"$.Time\" }" -e Variables="[{name: \"Temp\", \"random\": true, \"max\": 25, \"min\": 23}, {\"name\":\"Counter\", \"min\":100, \"max\":102} ]" mcr.microsoft.com/oss/azure-samples/azureiot-telemetrysimulator
+docker run -it -e "IotHubConnectionString=HostName=your-iothub-name.azure-devices.net;SharedAccessKeyName=device;SharedAccessKey=your-iothub-key" -e Template="{ \"deviceId\": \"$.DeviceId\", \"rand_int\": $.Temp, \"rand_double\": $.DoubleValue, \"Ticks\": $.Ticks, \"Counter\": $.Counter, \"time\": \"$.Time\" }" -e Variables="[{name: \"Temp\", \"random\": true, \"max\": 25, \"min\": 23}, {\"name\":\"Counter\", \"min\":100, \"max\":102} ]" mcr.microsoft.com/oss/azure-samples/azureiot-telemetrysimulator
 ```
 
 calling from PowerShell:
 
 ```powershell
-docker run -it -e "IotHubConnectionString=HostName=your-iothub-name.azure-devices.net;SharedAccessKeyName=iothubowner;SharedAccessKey=your-iothub-key" -e Template="{ \"""deviceId\""": \"""$.DeviceId\""", \"""temp\""": $.Temp, \"""temp2\""": $.RandomDouble , \"""Ticks\""": $.Ticks, \"""Counter\""": $.Counter, \"""time\""": \"""$.Time\""", \"""engine\""": \"""$.Engine\""" }" -e Variables="[{name: \"""Temp\""", \"""random\""": true, \"""max\""": 25, \"""min\""": 23}, {\"""name\""":\"""Counter\""", \"""min\""":100, \"""max\""":102}, {name:\"""Engine\""", values: [\"""on\""", \"""off\"""]}]" -e DeviceCount=1 -e MessageCount=3 mcr.microsoft.com/oss/azure-samples/azureiot-telemetrysimulator
+docker run -it -e "IotHubConnectionString=HostName=your-iothub-name.azure-devices.net;SharedAccessKeyName=iothubowner;SharedAccessKey=your-iothub-key" -e Template="{ \"""deviceId\""": \"""$.DeviceId\""", \"""rand_int\""": $.Temp, \"""rand_double\""": $.RandomDouble , \"""Ticks\""": $.Ticks, \"""Counter\""": $.Counter, \"""time\""": \"""$.Time\""", \"""engine\""": \"""$.Engine\""" }" -e Variables="[{name: \"""Temp\""", \"""random\""": true, \"""max\""": 25, \"""min\""": 23}, {\"""name\""":\"""Counter\""", \"""min\""":100, \"""max\""":102}, {name:\"""Engine\""", values: [\"""on\""", \"""off\"""]}]" -e DeviceCount=1 -e MessageCount=3 mcr.microsoft.com/oss/azure-samples/azureiot-telemetrysimulator
 ```
 
 #### Example 2: Adding the engine status ("on" or "off") to the telemetry
@@ -145,7 +145,7 @@ docker run -it -e "IotHubConnectionString=HostName=your-iothub-name.azure-device
 Template:
 
 ```json
-{ "deviceId": "$.DeviceId", "temp": $.Temp, "Ticks": $.Ticks, "Counter": $.Counter, "time": "$.Time", "engine": "$.Engine" }
+{ "deviceId": "$.DeviceId", "rand_int": $.Temp, "Ticks": $.Ticks, "Counter": $.Counter, "time": "$.Time", "engine": "$.Engine" }
 ```
 
 Variables:
@@ -157,14 +157,14 @@ Variables:
 Output:
 
 ```json
-{ "deviceId": "sim000001", "temp": 23, "Ticks": 637097644549666920, "Counter": 100, "time": "2019-11-19T12:47:34.9666920Z", "engine": "off" }
-{ "deviceId": "sim000001", "temp": 24, "Ticks": 637097644550326096, "Counter": 101, "time": "2019-11-19T12:47:35.0326096Z", "engine": "on" }
+{ "deviceId": "sim000001", "rand_int": 23, "Ticks": 637097644549666920, "Counter": 100, "time": "2019-11-19T12:47:34.9666920Z", "engine": "off" }
+{ "deviceId": "sim000001", "rand_int": 24, "Ticks": 637097644550326096, "Counter": 101, "time": "2019-11-19T12:47:35.0326096Z", "engine": "on" }
 ```
 
 Running with Docker:
 
 ```bash
-docker run -it -e "IotHubConnectionString=HostName=your-iothub-name.azure-devices.net;SharedAccessKeyName=device;SharedAccessKey=your-iothub-key" -e Template="{ \"deviceId\": \"$.DeviceId\", \"temp\": $.Temp, \"Ticks\": $.Ticks, \"Counter\": $.Counter, \"time\": \"$.Time\", \"engine\": \"$.Engine\" }" -e Variables="[{name: \"Temp\", \"random\": true, \"max\": 25, \"min\": 23}, {\"name\":\"Counter\", \"min\":100}, {name:\"Engine\", values: [\"on\", \"off\"]}]" mcr.microsoft.com/oss/azure-samples/azureiot-telemetrysimulator
+docker run -it -e "IotHubConnectionString=HostName=your-iothub-name.azure-devices.net;SharedAccessKeyName=device;SharedAccessKey=your-iothub-key" -e Template="{ \"deviceId\": \"$.DeviceId\", \"rand_int\": $.Temp, \"Ticks\": $.Ticks, \"Counter\": $.Counter, \"time\": \"$.Time\", \"engine\": \"$.Engine\" }" -e Variables="[{name: \"Temp\", \"random\": true, \"max\": 25, \"min\": 23}, {\"name\":\"Counter\", \"min\":100}, {name:\"Engine\", values: [\"on\", \"off\"]}]" mcr.microsoft.com/oss/azure-samples/azureiot-telemetrysimulator
 ```
 
 #### Example 3: Using a configuration file to customize simulation
