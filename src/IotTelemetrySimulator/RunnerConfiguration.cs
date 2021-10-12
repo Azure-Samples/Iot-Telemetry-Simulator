@@ -31,7 +31,7 @@
 
         public IReadOnlyList<string> DeviceList { get; set; }
 
-        public int MessageCount { get; set; } = 10;
+        public int MessageCount { get; set; } = 100;
 
         public int[] Intervals { get; set; } = new int[] { 1_000 };
 
