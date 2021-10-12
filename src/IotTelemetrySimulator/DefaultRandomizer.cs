@@ -22,5 +22,15 @@
         {
             return this.generator.Value.Next(min, max);
         }
+
+        public double NextDouble()
+        {
+            return this.generator.Value.NextDouble();
+        }
+
+        public double NextDouble(double min, double max)
+        {
+            return this.generator.Value.NextDouble() * (max - min) + min;
+        }
     }
 }
