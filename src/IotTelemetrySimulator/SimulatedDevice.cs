@@ -1,6 +1,7 @@
 ﻿namespace IotTelemetrySimulator
 {
     using System;
+    using System.Collections.Generic;
     using System.Diagnostics;
     using System.Threading;
     using System.Threading.Tasks;
@@ -8,7 +9,7 @@
     public class SimulatedDevice
     {
         private readonly ISender sender;
-        private readonly int interval;
+        private readonly int[] interval;
         private readonly RunnerConfiguration config;
         private readonly IRandomizer random = new DefaultRandomizer();
 
@@ -35,15 +36,28 @@
                 stats.IncrementDeviceConnected();
 
                 // Delay first event by a random amount to avoid bursts
-                await Task.Delay(this.random.Next(this.interval), cancellationToken);
+                int currentInterval = this.interval[0];
+
+                await Task.Delay(this.random.Next(currentInterval), cancellationToken);
 
                 var stopwatch = new Stopwatch();
                 stopwatch.Start();
-                for (var i = 0L; !cancellationToken.IsCancellationRequested && (this.config.MessageCount <= 0 || i < this.config.MessageCount); i++)
+                long totalIntervalTime = 0;
+                var messageCount = (ulong)this.config.MessageCount;
+                for (ulong i = 0; !cancellationToken.IsCancellationRequested && (messageCount == 0 || i < messageCount); i++)
                 {
+                    if (i % 1000 == 0)
+                    {
+                        totalIntervalTime = 0;
+                        stopwatch.Restart();
+                    }
+
                     await this.sender.SendMessageAsync(stats, cancellationToken);
 
-                    var millisecondsDelay = Math.Max(0, this.interval * i - stopwatch.ElapsedMilliseconds);
+                    currentInterval = this.interval[i % (ulong)this.interval.Length];
+                    totalIntervalTime += currentInterval;
+
+                    var millisecondsDelay = Math.Max(0, totalIntervalTime - stopwatch.ElapsedMilliseconds);
                     await Task.Delay((int)millisecondsDelay, cancellationToken);
                 }
 

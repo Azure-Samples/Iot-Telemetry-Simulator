@@ -75,7 +75,7 @@
                 Console.WriteLine($"Device 0-last = ({this.devices[0].DeviceID}-{this.devices.Last().DeviceID})");
                 Console.WriteLine("Device index = " + this.config.DeviceIndex);
                 Console.WriteLine("Message count = " + this.config.MessageCount);
-                Console.WriteLine("Interval = " + this.config.Interval + "ms");
+                Console.WriteLine("Interval = " + this.config.WaitIntervals + "ms");
                 Console.WriteLine("Template = " + this.config.PayloadGenerator.GetDescription());
                 Console.WriteLine("Header = " + this.config.Header?.GetTemplateDefinition());
                 Console.WriteLine("========================================================================================================================");

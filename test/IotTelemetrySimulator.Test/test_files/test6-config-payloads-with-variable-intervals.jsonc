@@ -1,0 +1,32 @@
+﻿{
+  "Variables": [
+    {
+      "name": "Value",
+      "sequence": true,
+      "values": [ "$.Counter", "true" ]
+    },
+    {
+      "name": "Counter"
+    }
+  ],
+  "Intervals": {
+    "sim000001": 10000,
+    "sim000002": [ 20000, 30000, 15000 ]
+  },
+  "Payloads": [
+    {
+      "type": "template",
+      "deviceId": "sim000001",
+      "template": {
+        "value": "$.Value",
+        "a_second_value": "20"
+      }
+    },
+    {
+      "type": "fix",
+      "deviceId": "sim000002",
+      "value": { "value": "myfixvalue" }
+    }
+  ],
+  "DeviceCount": 2
+}
