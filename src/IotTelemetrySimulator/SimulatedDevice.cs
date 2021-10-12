@@ -43,7 +43,8 @@
                 var stopwatch = new Stopwatch();
                 stopwatch.Start();
                 long totalIntervalTime = 0;
-                for (var i = 0L; !cancellationToken.IsCancellationRequested && (this.config.MessageCount <= 0 || i < this.config.MessageCount); i++)
+                var messageCount = (ulong)this.config.MessageCount;
+                for (ulong i = 0; !cancellationToken.IsCancellationRequested && (messageCount == 0 || i < messageCount); i++)
                 {
                     if (i % 1000 == 0)
                     {
