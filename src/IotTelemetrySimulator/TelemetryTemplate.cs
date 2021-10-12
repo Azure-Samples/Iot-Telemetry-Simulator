@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Globalization;
     using System.Linq;
 
     // A function that represents a part of the template.
@@ -92,7 +93,11 @@
                 string Substitute(Dictionary<string, object> variables)
                 {
                     variables.TryGetValue(varName, out var result);
-                    return result == null ? "$." + varName : result.ToString();
+
+                    // If it is not able to get the value it returns $.{name of the variable}.
+                    // Otherwise it converts the value to string using InvariantCulture.
+                    // InvariantCulture is used to always serialize JSON-compatibly, e.g "1.8", not "1,8".
+                    return result == null ? "$." + varName : Convert.ToString(result, CultureInfo.InvariantCulture);
                 }
 
                 // In all template substrings, replace all occurrences of $.varName
