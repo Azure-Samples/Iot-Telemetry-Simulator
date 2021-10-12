@@ -96,7 +96,7 @@
 
                     // If it is not able to get the value it returns $.{name of the variable}.
                     // Otherwise it converts the value to string using InvariantCulture.
-                    // is used because of value substitutions that depend on region/country. E.g "1,8" for "1.8".
+                    // InvariantCulture is used to always serialize JSON-compatibly, e.g "1.8", not "1,8".
                     return result == null ? "$." + varName : Convert.ToString(result, CultureInfo.InvariantCulture);
                 }
 
