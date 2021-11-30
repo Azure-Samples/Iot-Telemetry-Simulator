@@ -12,11 +12,11 @@ This way, automated load tests can be run as part of a CD/CI pipeline or any aut
 
 ## Project Structure
 
-[IotTelemetrySimulator.Atuomation](/src/IotTelemetrySimulator.Automation) : The .NET Standard 2.1 automation library.
+[IotTelemetrySimulator.Automation](/src/IotTelemetrySimulator.Automation) : The .NET Standard 2.1 automation library.
 
 * [appsettings.json](/src/IotTelemetrySimulator.Automation/appsettings.json) : Configuration file.
 
-[IotTelemetrySimulator.Atuomation.Console](/src/IotTelemetrySimulator.Automation.Console) : A .NET Core 3.1 console app that illustrates how to use the automation component.
+[IotTelemetrySimulator.Automation.Console](/src/IotTelemetrySimulator.Automation.Console) : A .NET Core 3.1 console app that illustrates how to use the automation component.
 
 ## Setup
 
