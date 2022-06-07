@@ -2,8 +2,11 @@
 {
     public static class Constants
     {
-        public const string AppVersion = "1.0";
+        public const string AppVersion = "1.1";
 
+        /// <summary>For backward compatibility.</summary>
+        public const string LegacyIntervalConfigName = "Interval";
+        public const string IntervalsConfigName = "Intervals";
         public const string TemplateConfigName = "Template";
         public const string PayloadDistributionConfigName = "PayloadDistribution";
 

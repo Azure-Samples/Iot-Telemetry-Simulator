@@ -11,6 +11,8 @@
 
     public class RunnerConfiguration
     {
+        private static int[] defaultInterval = new int[] { 1_000 };
+
         public const string DefaultTemplate = "{\"deviceId\": \"$.DeviceId\", \"time\": \"$.Time\", \"counter\": $.Counter}";
         private const string RegexExpression = "(?<type>fixsize|template|fix)(\\()(?<pv>[[0-9a-z,=,\\s]+)";
         static readonly Regex TemplateParser = new Regex(RegexExpression, RegexOptions.IgnoreCase | RegexOptions.Singleline);
@@ -33,8 +35,6 @@
 
         public int MessageCount { get; set; } = 100;
 
-        public int[] WaitIntervals { get; set; } = new int[] { 1_000 };
-
         public int DuplicateEvery { get; private set; }
 
         public PayloadGenerator PayloadGenerator { get; private set; }
@@ -47,7 +47,9 @@
 
         public byte[] FixPayload { get; set; }
 
-        public Dictionary<string, int[]> Intervals { get; set; }
+        public int[] Intervals { get; set; } = defaultInterval;
+
+        public Dictionary<string, int[]> DeviceSpecificIntervals { get; set; }
 
         public void EnsureIsValid()
         {
@@ -86,8 +88,8 @@
                     $"{nameof(this.KafkaConnectionProperties)} should contain at least a value for bootstrap.servers");
             }
 
-            if (this.WaitIntervals.Any(x => (x <= 0)))
-                throw new Exception($"Elements in {nameof(this.WaitIntervals)} must be greater than zero");
+            if (this.Intervals.Any(x => (x <= 0)))
+                throw new Exception($"Elements in {nameof(this.Intervals)} must be greater than zero");
 
             if (this.DuplicateEvery < 0)
                 throw new Exception($"{nameof(this.DuplicateEvery)} must be greater than or equal to zero");
@@ -95,12 +97,12 @@
 
         public int[] GetMessageIntervalForDevice(string deviceId)
         {
-            if (this.Intervals != null && this.Intervals.TryGetValue(deviceId, out var customInterval))
+            if (this.DeviceSpecificIntervals != null && this.DeviceSpecificIntervals.TryGetValue(deviceId, out var customInterval))
             {
                 return customInterval;
             }
 
-            return this.WaitIntervals;
+            return this.Intervals;
         }
 
         public static RunnerConfiguration Load(IConfiguration configuration, ILogger logger)
@@ -112,7 +114,6 @@
             config.DeviceIndex = configuration.GetValue(nameof(DeviceIndex), config.DeviceIndex);
             config.DeviceCount = configuration.GetValue(nameof(DeviceCount), config.DeviceCount);
             config.MessageCount = configuration.GetValue(nameof(MessageCount), config.MessageCount);
-            config.WaitIntervals = configuration.GetValue(nameof(WaitIntervals), config.WaitIntervals);
             config.DuplicateEvery = configuration.GetValue(nameof(DuplicateEvery), config.DuplicateEvery);
 
             var kafkaProperties = configuration.GetValue<string>(nameof(KafkaConnectionProperties));
@@ -188,36 +189,70 @@
                 }
             }
 
-            config.Intervals = LoadIntervals(configuration);
+            (config.Intervals, config.DeviceSpecificIntervals) = LoadIntervals(configuration);
             config.Header = GetTelemetryTemplate(configuration, nameof(Header), futureVariableNames);
             config.PartitionKey = GetTelemetryTemplate(configuration, nameof(PartitionKey), futureVariableNames);
 
             return config;
         }
 
-        private static Dictionary<string, int[]> LoadIntervals(IConfiguration configuration)
+        private static (int[], Dictionary<string, int[]>) LoadIntervals(IConfiguration configuration)
         {
-            var section = configuration.GetSection(nameof(RunnerConfiguration.Intervals));
+            var intervalForAllDevices = defaultInterval;
+            var section = configuration.GetSection(Constants.IntervalsConfigName);
             if (!section.Exists())
             {
-                return null;
+                section = configuration.GetSection(Constants.LegacyIntervalConfigName);
+                if (!section.Exists())
+                {
+                    return (intervalForAllDevices, null);
+                }
             }
 
             var result = new Dictionary<string, int[]>();
-
-            foreach (var intervalSection in section.GetChildren())
+            var sectionChildren = section.GetChildren();
+            if (sectionChildren.Any())
             {
-                if (intervalSection.Value != null && int.TryParse(intervalSection.Value, out int interval))
+                foreach (var intervalSection in sectionChildren)
                 {
-                    result[intervalSection.Key] = new[] { interval };
+                    int[] interval = null;
+                    if (intervalSection.Value != null && int.TryParse(intervalSection.Value, out int singleInterval))
+                    {
+                        interval = new[] { singleInterval };
+                    }
+                    else
+                    {
+                        interval = intervalSection.Get<int[]>();
+                    }
+
+                    if (string.IsNullOrEmpty(intervalSection.Key))
+                    {
+                        intervalForAllDevices = interval;
+                    }
+                    else
+                    {
+                        result[intervalSection.Key] = interval;
+                    }
                 }
-                else
+            }
+            else if (!string.IsNullOrEmpty(section.Value))
+            {
+                var settingsInterval = section.Value.Split(new[] { ",", ";" }, StringSplitOptions.RemoveEmptyEntries)
+                    .Select(x =>
+                    {
+                        int.TryParse(x, out var intX);
+                        return intX;
+                    })
+                    .Where(x => x > 0)
+                    .ToArray();
+
+                if (settingsInterval.Length > 0)
                 {
-                    result[intervalSection.Key] = intervalSection.Get<int[]>();
+                    intervalForAllDevices = settingsInterval;
                 }
             }
 
-            return result;
+            return (intervalForAllDevices, result);
         }
 
         private static TelemetryTemplate GetTelemetryTemplate(IConfiguration configuration, string headerName, IEnumerable<string> futureVariableNames)

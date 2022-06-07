@@ -224,7 +224,7 @@ namespace IotTelemetrySimulator.Test
         public void When_Loading_From_File_With_Variable_Intervals_Loads_Correctly()
         {
             var configuration = new ConfigurationBuilder()
-                .AddJsonFile("./test_files/test6-config-payloads-with-variable-intervals.jsonc", false, false)
+                .AddJsonFile("./test_files/test6-config-payloads-with-variable-intervals.json", false, false)
                 .Build();
 
             var target = RunnerConfiguration.Load(configuration, NullLogger.Instance);
@@ -235,6 +235,34 @@ namespace IotTelemetrySimulator.Test
             Assert.Equal(20_000, intervalsDevice2[0]);
             Assert.Equal(30_000, intervalsDevice2[1]);
             Assert.Equal(15_000, intervalsDevice2[2]);
+        }
+
+        [Theory]
+        [InlineData("5000", new[] { 5_000 })]
+        [InlineData("5000,", new[] { 5_000 })]
+        [InlineData("5000;", new[] { 5_000 })]
+        [InlineData("1000,5000", new[] { 1_000, 5_000 })]
+        [InlineData("1000, 5000", new[] { 1_000, 5_000 })]
+        [InlineData("1000;5000", new[] { 1_000, 5_000 })]
+        [InlineData("1000; 5000", new[] { 1_000, 5_000 })]
+        public void When_Intervals_Is_Set_Should_Load(string rawValue, int[] expectedInterval)
+        {
+            var configurationNames = new[] { Constants.IntervalsConfigName, Constants.LegacyIntervalConfigName };
+
+            foreach (var configurationName in configurationNames)
+            {
+                var configuration = new ConfigurationBuilder()
+                    .AddInMemoryCollection(new Dictionary<string, string>
+                    {
+                        { configurationName, rawValue }
+                    })
+                    .Build();
+
+                var target = RunnerConfiguration.Load(configuration, NullLogger.Instance);
+                var intervals = target.GetMessageIntervalForDevice("sim000001");
+
+                Assert.Equal(intervals, expectedInterval);
+            }
         }
     }
 }
