@@ -239,6 +239,7 @@ namespace IotTelemetrySimulator.Test
         }
 
         [Theory]
+        [InlineData("1", new[] { 1 })]
         [InlineData("5000", new[] { 5_000 })]
         [InlineData("5000,", new[] { 5_000 })]
         [InlineData("5000;", new[] { 5_000 })]
@@ -269,6 +270,7 @@ namespace IotTelemetrySimulator.Test
         [Theory]
         [InlineData("aaaa")]
         [InlineData("1,aaaa")]
+        [InlineData("0")]
         [InlineData("-1")]
         [InlineData("1,-1")]
         public void When_Interval_Is_Not_Positive_Number_Should_Throw(string intervalValue)
@@ -279,6 +281,18 @@ namespace IotTelemetrySimulator.Test
                         { Constants.IntervalsConfigName, intervalValue }
                     })
                     .Build();
+
+            Assert.Throws<ConfigurationErrorsException>(() => RunnerConfiguration.Load(configuration, NullLogger.Instance));
+        }
+
+        [Theory]
+        [InlineData("./test_files/test7-config-payloads-with-invalid-variable-intervals.json")]
+        [InlineData("./test_files/test8-config-payloads-with-invalid-variable-intervals.json")]
+        public void When_DeviceSpecific_Interval_Is_Not_Positive_Number_Should_Throw(string srcConfigFile)
+        {
+            var configuration = new ConfigurationBuilder()
+                .AddJsonFile(srcConfigFile, false, false)
+                .Build();
 
             Assert.Throws<ConfigurationErrorsException>(() => RunnerConfiguration.Load(configuration, NullLogger.Instance));
         }

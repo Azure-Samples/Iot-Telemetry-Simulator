@@ -35,6 +35,12 @@
     <None Update="test_files\test5-config-payloads-as-json.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="test_files\test8-config-payloads-with-invalid-variable-intervals.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="test_files\test7-config-payloads-with-invalid-variable-intervals.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="test_files\test7-config-payloads-with-variable-intervals-and-tags.jsonc">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
