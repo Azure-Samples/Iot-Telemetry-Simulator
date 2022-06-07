@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Configuration;
     using System.Linq;
     using System.Text;
     using System.Text.RegularExpressions;
@@ -238,12 +239,16 @@
             else if (!string.IsNullOrEmpty(section.Value))
             {
                 var settingsInterval = section.Value.Split(new[] { ",", ";" }, StringSplitOptions.RemoveEmptyEntries)
-                    .Select(x =>
+                    .Select(intervalText =>
                     {
-                        int.TryParse(x, out var intX);
-                        return intX;
+                        int.TryParse(intervalText, out var interval);
+                        if (interval < 1)
+                        {
+                            throw new ConfigurationErrorsException($"Interval value must be a positive number. Actual: {intervalText}");
+                        }
+
+                        return interval;
                     })
-                    .Where(x => x > 0)
                     .ToArray();
 
                 if (settingsInterval.Length > 0)

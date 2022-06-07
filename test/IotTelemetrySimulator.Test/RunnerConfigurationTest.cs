@@ -2,6 +2,7 @@ namespace IotTelemetrySimulator.Test
 {
     using System;
     using System.Collections.Generic;
+    using System.Configuration;
     using System.Text;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.Logging.Abstractions;
@@ -263,6 +264,23 @@ namespace IotTelemetrySimulator.Test
 
                 Assert.Equal(intervals, expectedInterval);
             }
+        }
+
+        [Theory]
+        [InlineData("aaaa")]
+        [InlineData("1,aaaa")]
+        [InlineData("-1")]
+        [InlineData("1,-1")]
+        public void When_Interval_Is_Not_Positive_Number_Should_Throw(string intervalValue)
+        {
+            var configuration = new ConfigurationBuilder()
+                    .AddInMemoryCollection(new Dictionary<string, string>
+                    {
+                        { Constants.IntervalsConfigName, intervalValue }
+                    })
+                    .Build();
+
+            Assert.Throws<ConfigurationErrorsException>(() => RunnerConfiguration.Load(configuration, NullLogger.Instance));
         }
     }
 }
