@@ -228,7 +228,7 @@
 
                     if (interval.Any(x => x < 1))
                     {
-                        throw new ConfigurationErrorsException($"Interval values must be a positive number.");
+                        throw new ConfigurationErrorsException($"Interval value must be a positive number.");
                     }
 
                     if (string.IsNullOrEmpty(intervalSection.Key))
