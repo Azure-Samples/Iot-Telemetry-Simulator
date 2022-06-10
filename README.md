@@ -246,7 +246,7 @@ The cloud runner can be customized with the following parameters (as `-Parameter
 |DeviceCount|Total amout of devices (Default = 100)|
 |ContainerCount|Total amount of container instances to create. The total DeviceCount will be divided among all instances (Default = 1)|
 |MessageCount|Total amount of messages to send per device. 0 means no limit, **causing the container to never end. It is your job to stop and delete it!** (Default = 100)|
-|Interval|Interval in which each device will send messages in milliseconds (Default = 1000)|
+|Intervals|Interval in which each device will send messages in milliseconds (Default = 1000). Provide a comma separated list in case intervals change after each message.|
 |Template|Telemetry payload template to be used<br />(Default = '{ \"deviceId\": \"$.DeviceId\", \"temp\": $.Temp, \"Ticks\": $.Ticks, \"Counter\": $.Counter, \"time\": \"$.Time\", \"engine\": \"$.Engine\", \"source\": \"$.MachineName\" }')|
 |PayloadDistribution|Allows the generation of payloads based on a distribution<br />Example: "fixSize(10, 12) template(25, default) fix(65, aaaaBBBBBCCC)" generates 10% a fix payload of 10 bytes, 25% a template generated payload and 65% of the time a fix payload from values aaaaBBBBBCCC|
 |Header|Header properties template to be used<br />(Default = '')|
