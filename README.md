@@ -68,7 +68,7 @@ The amount of devices, their names and telemetry generated can be customized usi
 
 The simulator is able to create user customizable telemetry with dynamic variables (random, counter, time, unique identifier, value range).
 
-To generate a custom telemetry it is required to set the template and, optionally, variables.
+To generate a custom piece of telemetry it is required to set the template and, optionally, variables.
 
 The **template** defines how the telemetry looks like, having placeholders for variables.
 Variables are declared in the telemetry as `$.VariableName`. The optional **header** defines properties that will be transmitted as message properties.
