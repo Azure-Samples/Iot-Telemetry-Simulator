@@ -44,7 +44,7 @@ The amount of devices, their names and telemetry generated can be customized usi
 |-|-|
 |IotHubConnectionString|Iot Hub connection string. "Device" our "Iot Hub owner" scopes are good. Example: HostName=your-iothub-name.azure-devices.net;SharedAccessKeyName=device;SharedAccessKey=your-iothub-key|
 |EventHubConnectionString|Event Hub connection string. SAS Policy "Send" is required. For EventHub no device registration is required. Example: Endpoint=sb://your-eventhub-namespace.servicebus.windows.net/;SharedAccessKeyName=send;SharedAccessKey=your-send-sas-primary-key;EntityPath=your-eventhub-name.|
-|KafkaConnectionProperties|Kafka connection properties as a JSON string. Example: `{"bootstrap.servers=kafka"}`.|
+|KafkaConnectionProperties|Kafka connection properties as a JSON string. Example: `{"bootstrap.servers": "kafka"}`.|
 |KafkaTopic|Kafka topic name.|
 |DeviceList|comma separated list of device identifiers (default = ""). Use it to generate telemetry for specific devices instead of numeric generated identifiers. If the parameter has a value the following parameters are ignored: DevicePrefix, DeviceIndex and DeviceCount are ignored|
 |DevicePrefix|device identifier prefix (default = "sim")|
