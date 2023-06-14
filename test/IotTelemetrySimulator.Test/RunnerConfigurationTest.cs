@@ -296,5 +296,21 @@ namespace IotTelemetrySimulator.Test
 
             Assert.Throws<ConfigurationErrorsException>(() => RunnerConfiguration.Load(configuration, NullLogger.Instance));
         }
+
+        [Fact]
+        public void When_Payload_Array_Template_Loads_Correctly()
+        {
+            var configuration = new ConfigurationBuilder()
+                .AddJsonFile("./test_files/test9-config-array-template.json", false, false)
+                .Build();
+
+            var target = RunnerConfiguration.Load(configuration, NullLogger.Instance);
+            var templatedPayload = Assert.IsType<TemplatedPayload>(target.PayloadGenerator.Payloads[0]);
+            Assert.Equal(1, templatedPayload.Variables.Variables.Count);
+            Assert.True(templatedPayload.Variables.Variables[0].Sequence);
+            Assert.Equal("device0001", templatedPayload.DeviceId);
+            Assert.Equal(new[] { "Counter" }, templatedPayload.Variables.Variables[0].GetReferenceVariableNames());
+            Assert.Equal("[{\"value1\":{\"value2\":\"$.Value\"}}]", templatedPayload.Template.ToString());
+        }
     }
 }
