@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
@@ -32,6 +32,9 @@
     <AdditionalFiles Include="../../stylecop.json" Link="stylecop.json" />
   </ItemGroup>
   <ItemGroup>
+    <None Update="test_files\test9-config-array-template.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="test_files\test5-config-payloads-as-json.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
