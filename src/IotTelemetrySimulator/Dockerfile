@@ -1,7 +1,7 @@
-FROM mcr.microsoft.com/dotnet/runtime:5.0-buster-slim AS base
+FROM mcr.microsoft.com/dotnet/runtime:8.0 AS base
 WORKDIR /app
 
-FROM mcr.microsoft.com/dotnet/sdk:5.0-buster-slim AS build
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 COPY ["src/IotTelemetrySimulator/IotTelemetrySimulator.csproj", "src/IotTelemetrySimulator/"]
 RUN dotnet restore "src/IotTelemetrySimulator/IotTelemetrySimulator.csproj"

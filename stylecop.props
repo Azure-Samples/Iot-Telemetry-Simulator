@@ -4,8 +4,4 @@
     <WarningsNotAsErrors>612,618,619,168</WarningsNotAsErrors>
     <CodeAnalysisRuleSet>$(MSBuildThisFileDirectory)\stylecop.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
-
-  <ItemGroup>
-    <PackageReference Include="StyleCop.Analyzers" Version="1.1.118" />
-  </ItemGroup>
 </Project>
