@@ -10,10 +10,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@0717577d45739eb3c851188b29f50ed6c0b2194e # v2.8.0
     
     - name: Setup .NET
-      uses: actions/setup-dotnet@v1
+      uses: actions/setup-dotnet@871f041373faaad213a635d9afb62905ec029bbb # v1.10.1
     
     - name: Build
       run: dotnet build --configuration Release
@@ -30,7 +30,7 @@ jobs:
         WITH_V: false
     
     - name: DockerHub Build and push Simulator Docker Image
-      uses: docker/build-push-action@v1.0.0
+      uses: docker/build-push-action@a226a125496f62f63b8900ba21147241e75e1ce9 # v1.0.0
       with:
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
@@ -40,7 +40,7 @@ jobs:
         push: true
         
     - name: DockerHub Build and push Provisioning Docker Image
-      uses: docker/build-push-action@v1.0.0
+      uses: docker/build-push-action@a226a125496f62f63b8900ba21147241e75e1ce9 # v1.0.0
       with:
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
@@ -50,7 +50,7 @@ jobs:
         push: true
 
     - name: Azure Coontainer Registry Build and push Docker Images
-      uses: azure/docker-login@v1
+      uses: azure/docker-login@83efeb77770c98b620c73055fbb59b2847e17dc0 # v1.0.1
       with:
         login-server: ${{ secrets.ACR_URL }}
         username: ${{ secrets.ACR_USERNAME }}
