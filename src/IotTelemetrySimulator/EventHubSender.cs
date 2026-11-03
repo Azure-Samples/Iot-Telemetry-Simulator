@@ -1,4 +1,4 @@
-﻿namespace IotTelemetrySimulator
+namespace IotTelemetrySimulator
 {
     using System;
     using System.Threading;
@@ -22,11 +22,11 @@
 
             if (string.IsNullOrWhiteSpace(partitionKey))
             {
-                await this.eventHubProducer.SendAsync(new EventData[] { msg });
+                await this.eventHubProducer.SendAsync(new EventData[] { msg }, cancellationToken);
             }
             else
             {
-                await this.eventHubProducer.SendAsync(new EventData[] { msg }, new SendEventOptions { PartitionKey = partitionKey });
+                await this.eventHubProducer.SendAsync(new EventData[] { msg }, new SendEventOptions { PartitionKey = partitionKey }, cancellationToken);
             }
         }
 
