@@ -1,4 +1,4 @@
-﻿namespace IotTelemetrySimulator
+namespace IotTelemetrySimulator
 {
     using System;
     using System.Collections.Generic;
@@ -31,6 +31,8 @@
 
             for (var attempt = 1; attempt <= MaxSendAttempts; ++attempt)
             {
+                cancellationToken.ThrowIfCancellationRequested();
+
                 try
                 {
                     await this.SendAsync(msg, cancellationToken);
@@ -40,6 +42,10 @@
                         break;
                     attempt = 1;
                 }
+                catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+                {
+                    throw;
+                }
                 catch (Exception ex) when (this.IsTransientException(ex))
                 {
                     stats.IncrementSendTelemetryErrors();
@@ -48,7 +54,7 @@
                 catch (Exception)
                 {
                     stats.IncrementSendTelemetryErrors();
-                    await Task.Delay(WaitTimeOnTransientError);
+                    await Task.Delay(WaitTimeOnTransientError, cancellationToken);
                 }
             }
         }

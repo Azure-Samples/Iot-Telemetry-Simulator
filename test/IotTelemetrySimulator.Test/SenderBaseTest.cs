@@ -79,6 +79,81 @@
         }
 
         [Fact]
+        public async Task When_SendMessageAsync_Cancelled_Before_Send_Throws_OperationCanceledException_And_No_Error_Incremented()
+        {
+            const string deviceId = "device1";
+            var configuration = new ConfigurationBuilder()
+                .AddInMemoryCollection(new Dictionary<string, string>())
+                .Build();
+
+            var stats = new RunnerStats();
+            var config = RunnerConfiguration.Load(configuration, NullLogger.Instance);
+            var sender = new TestSender(false, false, deviceId, config);
+
+            using var cts = new CancellationTokenSource();
+            cts.Cancel();
+
+            await Assert.ThrowsAnyAsync<OperationCanceledException>(() => sender.SendMessageAsync(stats, cts.Token));
+
+            Assert.Equal(0, stats.MessagesSent);
+            Assert.Equal(0, stats.TotalSendTelemetryErrors);
+            Assert.Empty(sender.TestMessages);
+        }
+
+        [Fact]
+        public async Task When_SendMessageAsync_Cancelled_During_SendAsync_Throws_OperationCanceledException_And_No_Error_Incremented()
+        {
+            const string deviceId = "device1";
+            var configuration = new ConfigurationBuilder()
+                .AddInMemoryCollection(new Dictionary<string, string>())
+                .Build();
+
+            var stats = new RunnerStats();
+            var config = RunnerConfiguration.Load(configuration, NullLogger.Instance);
+            using var cts = new CancellationTokenSource();
+            var sender = new TestSender(
+                false,
+                false,
+                deviceId,
+                config,
+                onSend: _ =>
+                {
+                    cts.Cancel();
+                    cts.Token.ThrowIfCancellationRequested();
+                });
+
+            await Assert.ThrowsAnyAsync<OperationCanceledException>(() => sender.SendMessageAsync(stats, cts.Token));
+
+            Assert.Equal(0, stats.MessagesSent);
+            Assert.Equal(0, stats.TotalSendTelemetryErrors);
+            Assert.Empty(sender.TestMessages);
+        }
+
+        [Fact]
+        public async Task When_SendMessageAsync_Cancelled_During_Retry_Wait_Aborts_Promptly_And_Throws_OperationCanceledException()
+        {
+            const string deviceId = "device1";
+            var configuration = new ConfigurationBuilder()
+                .AddInMemoryCollection(new Dictionary<string, string>())
+                .Build();
+
+            var stats = new RunnerStats();
+            var config = RunnerConfiguration.Load(configuration, NullLogger.Instance);
+            var sender = new TestSender(false, true, deviceId, config);
+
+            using var cts = new CancellationTokenSource(100);
+
+            var stopwatch = Stopwatch.StartNew();
+            await Assert.ThrowsAnyAsync<OperationCanceledException>(() => sender.SendMessageAsync(stats, cts.Token));
+            stopwatch.Stop();
+
+            Assert.InRange(stopwatch.ElapsedMilliseconds, 0, sender.TransientErrorWaitTime - 1000);
+            Assert.Equal(0, stats.MessagesSent);
+            Assert.Equal(1, stats.TotalSendTelemetryErrors);
+            Assert.Empty(sender.TestMessages);
+        }
+
+        [Fact]
         public async Task When_SendMessageAsync_With_Header_Property_Is_Added()
         {
             const string deviceId = "device1";
@@ -170,6 +245,7 @@
         {
             private readonly bool throwTransientException;
             private readonly bool throwNonTransientException;
+            private readonly Action<CancellationToken> onSend;
 
             public int TransientErrorWaitTime => WaitTimeOnTransientError;
 
@@ -177,11 +253,17 @@
 
             public ConcurrentBag<TestMessage> TestMessages { get; private set; } = new ConcurrentBag<TestMessage>();
 
-            public TestSender(bool throwTransientException, bool throwNonTransientException, string deviceId, RunnerConfiguration config)
+            public TestSender(
+                bool throwTransientException,
+                bool throwNonTransientException,
+                string deviceId,
+                RunnerConfiguration config,
+                Action<CancellationToken> onSend = null)
                 : base(deviceId, config)
             {
                 this.throwTransientException = throwTransientException;
                 this.throwNonTransientException = throwNonTransientException;
+                this.onSend = onSend;
             }
 
             public override Task OpenAsync()
@@ -201,6 +283,10 @@
 
             protected override Task SendAsync(TestMessage msg, CancellationToken cancellationToken)
             {
+                cancellationToken.ThrowIfCancellationRequested();
+
+                this.onSend?.Invoke(cancellationToken);
+
                 if (this.throwTransientException)
                 {
                     throw new TestException();
