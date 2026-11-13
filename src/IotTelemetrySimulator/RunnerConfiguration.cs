@@ -9,6 +9,7 @@
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.Logging;
     using Newtonsoft.Json;
+    using Newtonsoft.Json.Linq;
 
     public class RunnerConfiguration
     {
@@ -450,26 +451,37 @@
                 return valueString;
             }
 
-            var dictionaryVals = new Dictionary<string, string>();
-            ConvertToDictionary(templateConfigSection, dictionaryVals, templateConfigSection);
-
-            return JsonConvert.SerializeObject(dictionaryVals);
+            return JsonConvert.SerializeObject(ConvertToJToken(templateConfigSection));
         }
 
-        static void ConvertToDictionary(IConfigurationSection configuration, Dictionary<string, string> data, IConfigurationSection top = null)
+        // Implemention from https://stackoverflow.com/a/62533775
+        private static JToken ConvertToJToken(IConfiguration config)
         {
-            var children = configuration.GetChildren();
-            foreach (var child in children)
+            JObject obj = new JObject();
+
+            foreach (var child in config.GetChildren())
             {
-                if (child.Value == null)
+                if (child.Path.EndsWith(":0"))
                 {
-                    ConvertToDictionary(configuration.GetSection(child.Key), data, configuration);
-                    continue;
+                    var arr = new JArray();
+
+                    foreach (var arrayChild in config.GetChildren())
+                    {
+                        arr.Add(ConvertToJToken(arrayChild));
+                    }
+
+                    return arr;
                 }
 
-                var key = top != null ? child.Path.Substring(top.Path.Length + 1) : child.Path;
-                data[key] = child.Value;
+                obj.Add(child.Key, ConvertToJToken(child));
             }
+
+            if (!obj.HasValues && config is IConfigurationSection section)
+            {
+                return new JValue(section.Value);
+            }
+
+            return obj;
         }
     }
 }

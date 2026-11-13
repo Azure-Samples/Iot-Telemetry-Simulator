@@ -1,0 +1,16 @@
+{
+  "Variables": [
+    {
+      "name": "Value",
+      "sequence": true,
+      "values": [ "$.Counter", "true" ]
+    }
+  ],
+  "Payloads": [
+    {
+      "type": "template",
+      "deviceId": "device0001",
+      "template": [{"value1": {"value2": "$.Value" } }]
+    }
+  ]
+}
